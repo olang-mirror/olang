@@ -1,0 +1,14 @@
+image: archlinux
+packages:
+  - gcc
+  - make
+  - clang
+sources:
+  - https://git.sr.ht/~johnnyrichard/olang
+tasks:
+  - lint: |
+      cd olang
+      make linter
+  - build: |
+      cd olang
+      make

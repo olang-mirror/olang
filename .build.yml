@@ -1,10 +1,15 @@
 image: archlinux
+oauth: pages.sr.ht/PAGES:RW
 packages:
   - gcc
   - make
+  - hut
   - clang
+  - python-sphinx
 sources:
   - https://git.sr.ht/~johnnyrichard/olang
+environment:
+  site: johnnyrichard.srht.site
 tasks:
   - lint: |
       cd olang
@@ -15,4 +20,10 @@ tasks:
   - check: |
       cd olang
       make check
+  - docs: |
+      cd olang/docs
+      make html
+      cd _build/html
+      tar -czvf ../docs.tar.gz .
+      hut pages publish -d $site ../docs.tar.gz
 

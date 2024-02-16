@@ -19,10 +19,22 @@ $(BUILD_DIR):
 .PHONY: linter
 linter: $(SRCS) $(HEADERS)
 	clang-format --dry-run --Werror $?
+	$(MAKE) -C tests/integration/ linter
+
 
 .PHONY: linter-fix
 linter-fix: $(SRCS) $(HEADERS)
 	clang-format -i $?
+	$(MAKE) -C tests/integration/ linter-fix
+
+.PHONY: integration-test
+integration-test:
+	$(MAKE)
+	$(MAKE) -C tests/integration/
+
+.PHONY: check
+check:
+	$(MAKE) integration-test
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@

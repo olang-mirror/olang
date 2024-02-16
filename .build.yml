@@ -12,3 +12,7 @@ tasks:
   - build: |
       cd olang
       make
+  - check: |
+      cd olang
+      make check
+

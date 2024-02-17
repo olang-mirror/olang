@@ -29,4 +29,4 @@ $(BUILD_DIR):
 	@mkdir -p $@/$(PAGES_DIR)
 
 $(BUILD_DIR)/$(PAGES_DIR)/%.html: $(PAGES_DIR)/%.md
-	$(PANDOC) -s --template template.html -f markdown -t html $< > $@
+	$(PANDOC) -s --template template.html -f markdown -t html --toc $< > $@

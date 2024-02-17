@@ -36,5 +36,13 @@ integration-test:
 check:
 	$(MAKE) integration-test
 
+.PHONY: docs
+docs:
+	$(MAKE) -C docs
+
+.PHONY: docs-dist
+docs-dist:
+	$(MAKE) -C docs dist
+
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@

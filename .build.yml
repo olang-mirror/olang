@@ -1,8 +1,13 @@
 image: archlinux
+oauth: pages.sr.ht/PAGES:RW
 packages:
   - gcc
   - make
+  - hut
   - clang
+  - pandoc-cli
+environment:
+  site: johnnyrichard.srht.site
 sources:
   - https://git.sr.ht/~johnnyrichard/olang
 tasks:
@@ -12,7 +17,11 @@ tasks:
   - build: |
       cd olang
       make
+      make docs-dist
   - check: |
       cd olang
       make check
+  - docs-publish: |
+      cd olang
+      [ -z "$BUILD_REASON" ] && hut pages publish -d $site docs/site.tar.gz
 

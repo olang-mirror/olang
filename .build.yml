@@ -23,5 +23,8 @@ tasks:
       make check
   - docs-publish: |
       cd olang
-      [ -z "$BUILD_REASON" ] && hut pages publish -d $site docs/site.tar.gz
+      if [ "$BUILD_REASON" = "" ]
+      then
+        hut pages publish -d $site docs/site.tar.gz
+      fi
 

@@ -7,7 +7,7 @@ packages:
   - clang
   - pandoc-cli
 environment:
-  site: johnnyrichard.srht.site
+  site: olang.johnnyrichard.com
 sources:
   - https://git.sr.ht/~johnnyrichard/olang
 tasks:

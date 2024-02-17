@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="date" content='$date-meta$'>
   <title>$title$ | olang</title>
   <style>
@@ -23,7 +24,7 @@
       font-family: monospace;
       font-size: 1.1rem;
       margin: 0;
-      padding: 0;
+      padding: 0 40px;
     }
     a {
       color: var(--link-color);
@@ -37,11 +38,15 @@
     }
     article {
       line-height: 1.75rem;
+      overflow: hidden;
     }
+
     pre {
       background: rgba(0,0,0, 0.75);
       color: white;
       padding: 10px;
+      max-width: 100%;
+      overflow: auto;
     }
   </style>
 </head>
@@ -51,14 +56,13 @@
     <nav>
       <a href="/">Index</a> |
       <a href="/pages/getting-started.html">Getting started (WIP)</a> |
-      <a href="/pages/hacking.html">Hacking (WIP)</a> |
+      <a href="/pages/hacking.html">Hacking</a> |
       <a href="https://sr.ht/~johnnyrichard/olang/sources" target="_blank">Sources ↗</a> |
       <a href="https://sr.ht/~johnnyrichard/olang/lists" target="_blank">Mailing list ↗</a>
     </nav>
   </header>
   <article>
     <h1>$title$</h1>
-
     $toc$
 
     $body$

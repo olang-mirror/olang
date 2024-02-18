@@ -1,12 +1,13 @@
 SRCS        := $(wildcard *_test.c)
-TO_LINT     := $(filter-out munit.c munit.h,$(wildcard *.c *.h))
 OBJS        := $(patsubst %_test.c, %_test.o, $(SRCS))
-CFLAGS      := -I../../src
+CFLAGS      := -I../../src -I../shared
 TESTS       := $(patsubst %_test.c, %_test, $(SRCS))
 EXEC_TESTS  := $(patsubst %_test, ./%_test, $(TESTS))
+MUNIT_SRC   := ../shared/munit.c
+MUNIT       := ./munit.o
 
 .PHONY: all
-all: munit.o cli_runner.o $(TESTS)
+all: $(MUNIT) cli_runner.o $(TESTS)
 	@for file in $(EXEC_TESTS); do \
                 ./"$$file"; \
         done
@@ -16,12 +17,15 @@ clean:
 	$(RM) *.o *_test
 
 .PHONY: linter
-linter: $(TO_LINT)
+linter: $(SRCS)
 	clang-format --dry-run --Werror $?
 
 .PHONY: linter-fix
-linter-fix: $(TO_LINT)
+linter-fix: $(SRCS)
 	clang-format -i $?
 
-cli_test: munit.o cli_runner.o cli_test.o
+cli_test: $(MUNIT) cli_runner.o cli_test.o
 	$(CC) $? $(CFLAGS) -o $@
+
+$(MUNIT):
+	$(CC) -c $(MUNIT_SRC) $(CFLAGS) -o $(MUNIT)

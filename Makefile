@@ -21,7 +21,6 @@ linter: $(SRCS) $(HEADERS)
 	clang-format --dry-run --Werror $?
 	$(MAKE) -C tests/integration/ linter
 
-
 .PHONY: linter-fix
 linter-fix: $(SRCS) $(HEADERS)
 	clang-format -i $?
@@ -32,9 +31,14 @@ integration-test:
 	$(MAKE)
 	$(MAKE) -C tests/integration/
 
+.PHONY: unit-test
+unit-test:
+	$(MAKE) -C tests/unit/
+
 .PHONY: check
 check:
 	$(MAKE) integration-test
+	$(MAKE) unit-test
 
 .PHONY: docs
 docs:

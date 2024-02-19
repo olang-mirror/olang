@@ -34,7 +34,6 @@ cli_args_shift(cli_args_t *args);
 
 typedef struct cli_opts
 {
-    // TODO: create man page instruction for --dump-tokens option
     bool dump_tokens;
     char *file_path;
 } cli_opts_t;

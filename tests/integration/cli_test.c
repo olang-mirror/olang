@@ -21,7 +21,7 @@
 static MunitResult
 test_cli_hello_file(const MunitParameter params[], void *user_data_or_fixture)
 {
-    cli_result_t compilation_result = cli_runner_compile_file("../../examples/hello.olang");
+    cli_result_t compilation_result = cli_runner_compiler_dump_tokens("../../examples/main_exit.0");
     munit_assert_int(compilation_result.exit_code, ==, 0);
     return MUNIT_OK;
 }

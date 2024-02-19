@@ -23,5 +23,5 @@ typedef struct cli_result_t
 } cli_result_t;
 
 cli_result_t
-cli_runner_compile_file(char *src);
+cli_runner_compiler_dump_tokens(char *src);
 #endif

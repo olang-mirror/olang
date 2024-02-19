@@ -62,7 +62,7 @@ create_tmp_file_name(char *file_name)
 }
 
 cli_result_t
-cli_runner_compile_file(char *src)
+cli_runner_compiler_dump_tokens(char *src)
 {
     assert_compiler_exists();
 
@@ -70,7 +70,7 @@ cli_runner_compile_file(char *src)
     create_tmp_file_name(result.program_path);
 
     char command[1024];
-    sprintf(command, "%s -o %s %s", OLANG_COMPILER_PATH, result.program_path, src);
+    sprintf(command, "%s %s --dump-tokens", OLANG_COMPILER_PATH, src);
 
     result.exit_code = system(command);
     return result;

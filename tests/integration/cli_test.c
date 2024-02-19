@@ -23,6 +23,21 @@ test_cli_hello_file(const MunitParameter params[], void *user_data_or_fixture)
 {
     cli_result_t compilation_result = cli_runner_compiler_dump_tokens("../../examples/main_exit.0");
     munit_assert_int(compilation_result.exit_code, ==, 0);
+    munit_assert_string_equal(compilation_result.compiler_output,
+                              "../../examples/main_exit.0:1:1: <fn>\n"
+                              "../../examples/main_exit.0:1:4: <identifier>\n"
+                              "../../examples/main_exit.0:1:8: <(>\n"
+                              "../../examples/main_exit.0:1:9: <)>\n"
+                              "../../examples/main_exit.0:1:10: <:>\n"
+                              "../../examples/main_exit.0:1:12: <identifier>\n"
+                              "../../examples/main_exit.0:1:16: <{>\n"
+                              "../../examples/main_exit.0:1:17: <line_feed>\n"
+                              "../../examples/main_exit.0:2:3: <return>\n"
+                              "../../examples/main_exit.0:2:10: <number>\n"
+                              "../../examples/main_exit.0:2:11: <line_feed>\n"
+                              "../../examples/main_exit.0:3:1: <}>\n"
+                              "../../examples/main_exit.0:3:2: <line_feed>\n"
+                              "../../examples/main_exit.0:4:1: <EOF>\n");
     return MUNIT_OK;
 }
 

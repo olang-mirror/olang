@@ -75,7 +75,6 @@ main(int argc, char **argv)
 
     string_view_t file_content = read_entire_file(opts.file_path);
 
-    // TODO: missing integration test for lexer tokenizing
     lexer_t lexer = { 0 };
     lexer_init(&lexer, file_content);
 

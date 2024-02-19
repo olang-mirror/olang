@@ -20,6 +20,7 @@ typedef struct cli_result_t
 {
     int exit_code;
     char program_path[255];
+    char compiler_output[1024];
 } cli_result_t;
 
 cli_result_t

@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #define OLANG_COMPILER_PATH "../../0c"
@@ -62,16 +63,52 @@ create_tmp_file_name(char *file_name)
 }
 
 cli_result_t
-cli_runner_compiler_dump_tokens(char *src)
+cli_runner_compiler(char *src, char *args[])
 {
     assert_compiler_exists();
 
-    cli_result_t result;
+    cli_result_t result = { 0 };
     create_tmp_file_name(result.program_path);
 
-    char command[1024];
-    sprintf(command, "%s %s --dump-tokens", OLANG_COMPILER_PATH, src);
+    int fd_link[2];
 
-    result.exit_code = system(command);
+    if (pipe(fd_link) == -1) {
+        perror("pipe error.");
+        exit(1);
+    }
+
+    pid_t pid = fork();
+
+    if (pid == -1) {
+        perror("fork error.");
+        exit(1);
+    }
+
+    if (pid == 0) {
+        dup2(fd_link[1], STDOUT_FILENO);
+        close(fd_link[0]);
+        close(fd_link[1]);
+
+        execv(OLANG_COMPILER_PATH, args);
+        perror("execl error.");
+        exit(127);
+    } else {
+        close(fd_link[1]);
+        if (read(fd_link[0], result.compiler_output, sizeof(result.compiler_output)) == -1) {
+            perror("read error.");
+            exit(1);
+        }
+        int status;
+        waitpid(pid, &status, 0);
+        result.exit_code = WEXITSTATUS(status);
+    }
+
     return result;
+}
+
+cli_result_t
+cli_runner_compiler_dump_tokens(char *src)
+{
+    char *program_args[] = { "0c", "--dump-tokens", src, NULL };
+    return cli_runner_compiler(src, program_args);
 }

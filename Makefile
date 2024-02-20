@@ -20,11 +20,13 @@ $(BUILD_DIR):
 linter: $(SRCS) $(HEADERS)
 	clang-format --dry-run --Werror $?
 	$(MAKE) -C tests/integration/ linter
+	$(MAKE) -C tests/unit/ linter
 
 .PHONY: linter-fix
 linter-fix: $(SRCS) $(HEADERS)
 	clang-format -i $?
 	$(MAKE) -C tests/integration/ linter-fix
+	$(MAKE) -C tests/unit/ linter-fix
 
 .PHONY: integration-test
 integration-test:
@@ -33,12 +35,14 @@ integration-test:
 
 .PHONY: unit-test
 unit-test:
+	$(MAKE)
 	$(MAKE) -C tests/unit/
 
 .PHONY: check
 check:
-	$(MAKE) integration-test
-	$(MAKE) unit-test
+	$(MAKE)
+	$(MAKE) -C tests/integration/
+	$(MAKE) -C tests/unit/
 
 .PHONY: docs
 docs:

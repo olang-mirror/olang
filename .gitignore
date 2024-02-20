@@ -2,4 +2,4 @@
 build
 *.o
 docs/site.tar.gz
-tests/integration/*_test
+tests/*/*_test

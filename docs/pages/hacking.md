@@ -68,7 +68,11 @@ make check
 Submitting a patch
 ------------------
 
-Before submit a patch, ensure your code follows our coding style and is
+All contributors are required to "sign-off" their commits (using git commit -s)
+to indicate that they have agreed to the [Developer Certificate of
+Origin](https://developercertificate.org/).
+
+Before submit the patch, ensure the code follows our coding style and is
 well-tested. After that, you\'re good to follow the steps bellow.
 
 ### Step 1: Commit your changes

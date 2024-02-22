@@ -1,6 +1,6 @@
 SRCS         := $(wildcard *_test.c)
 OBJS         := $(patsubst %_test.c, %_test.o, $(SRCS))
-SUBJECT_OBJS := $(filter-out ../../build/0c.o, $(wildcard ../../build/*.o))
+SUBJECT_OBJS := $(filter-out ../../build/main.o, $(wildcard ../../build/*.o))
 CFLAGS       := -I../../src -I../shared
 TESTS        := $(patsubst %_test.c, %_test, $(SRCS))
 EXEC_TESTS   := $(patsubst %_test, ./%_test, $(TESTS))

@@ -52,7 +52,7 @@ arena_test(const MunitParameter params[], void *user_data_or_fixture)
 static MunitTest tests[] = { { "/arena_test", arena_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
                              { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL } };
 
-static const MunitSuite suite = { "/cli_test", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE };
+static const MunitSuite suite = { "/arena", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE };
 
 int
 main(int argc, char *argv[])

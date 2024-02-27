@@ -38,6 +38,12 @@ unit-test:
 	$(MAKE)
 	$(MAKE) -C tests/unit/
 
+.PHONY: clean
+clean:
+	$(MAKE) -C tests/integration/ clean
+	$(MAKE) -C tests/unit/ clean
+	@rm -rf build/ 0c
+
 .PHONY: check
 check:
 	$(MAKE)

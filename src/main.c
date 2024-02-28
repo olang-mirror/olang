@@ -14,14 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "arena.h"
 #include "lexer.h"
 #include "string_view.h"
+
+// TODO: find a better solution to define the arena capacity
+#define ARENA_CAPACITY (1024 * 1024)
 
 typedef struct cli_args
 {
@@ -45,7 +50,7 @@ static void
 print_token(char *file_path, token_t *token);
 
 string_view_t
-read_entire_file(char *file_path);
+read_entire_file(char *file_path, arena_t *arena);
 
 int
 main(int argc, char **argv)
@@ -73,7 +78,8 @@ main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    string_view_t file_content = read_entire_file(opts.file_path);
+    arena_t arena = arena_new(ARENA_CAPACITY);
+    string_view_t file_content = read_entire_file(opts.file_path, &arena);
 
     lexer_t lexer = { 0 };
     lexer_init(&lexer, file_content);
@@ -107,7 +113,7 @@ print_usage(FILE *stream, char *prog)
 }
 
 string_view_t
-read_entire_file(char *file_path)
+read_entire_file(char *file_path, arena_t *arena)
 {
     FILE *stream = fopen(file_path, "rb");
 
@@ -122,7 +128,9 @@ read_entire_file(char *file_path)
     file_content.size = ftell(stream);
     fseek(stream, 0, SEEK_SET);
 
-    file_content.chars = (char *)malloc(file_content.size);
+    assert(file_content.size * 2 < ARENA_CAPACITY);
+
+    file_content.chars = (char *)arena_alloc(arena, (size_t)file_content.size);
 
     if (file_content.chars == NULL) {
         fprintf(stderr, "Could not read file %s: %s\n", file_path, strerror(errno));

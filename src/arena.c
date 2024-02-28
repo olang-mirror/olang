@@ -28,14 +28,18 @@ arena_new(size_t size)
     return arena;
 }
 
+static uint8_t
+arena_padding(size_t bytes);
+
 void *
-arena_alloc(arena_t *arena, size_t size)
+arena_alloc(arena_t *arena, size_t bytes)
 {
-    if ((arena->offset + size) > arena->size) {
+    if ((arena->offset + bytes) > arena->size) {
         return NULL;
     }
     void *pointer = arena->region + arena->offset;
-    arena->offset += size;
+    arena->offset += bytes + arena_padding(bytes);
+
     return pointer;
 }
 
@@ -50,4 +54,10 @@ arena_free(arena_t *arena)
 {
     arena->size = 0;
     free(arena->region);
+}
+
+static uint8_t
+arena_padding(size_t bytes)
+{
+    return (ARENA_ALIGNMENT_BYTES - bytes) & ARENA_ALIGNMENT_BYTES_MASK;
 }

@@ -19,6 +19,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define ARENA_ALIGNMENT_BYTES 16
+#define ARENA_ALIGNMENT_BYTES_MASK (ARENA_ALIGNMENT_BYTES - 1)
+
 typedef struct arena
 {
     size_t offset;

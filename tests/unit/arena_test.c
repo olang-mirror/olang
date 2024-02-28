@@ -19,14 +19,14 @@
 #include "munit.h"
 
 static MunitResult
-arena_test(const MunitParameter params[], void *user_data_or_fixture)
+arena_alloc_test(const MunitParameter params[], void *user_data_or_fixture)
 {
-    arena_t arena = arena_new(sizeof(int) * 2);
+    arena_t arena = arena_new(ARENA_ALIGNMENT_BYTES * 2);
 
-    int *a = arena_alloc(&arena, sizeof(int));
+    uint8_t *a = arena_alloc(&arena, sizeof(uint8_t));
     *a = 1;
 
-    int *b = arena_alloc(&arena, sizeof(int));
+    uint8_t *b = arena_alloc(&arena, sizeof(uint8_t));
     *b = 2;
 
     munit_assert_int(*a, ==, 1);
@@ -34,7 +34,7 @@ arena_test(const MunitParameter params[], void *user_data_or_fixture)
 
     arena_release(&arena);
 
-    int *c = arena_alloc(&arena, sizeof(int));
+    uint8_t *c = arena_alloc(&arena, sizeof(uint8_t));
     *c = 3;
 
     munit_assert_int(*c, ==, 3);
@@ -49,7 +49,43 @@ arena_test(const MunitParameter params[], void *user_data_or_fixture)
     return MUNIT_OK;
 }
 
-static MunitTest tests[] = { { "/arena_test", arena_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+static MunitResult
+arena_padding_test(const MunitParameter params[], void *user_data_or_fixture)
+{
+    arena_t arena = arena_new(512);
+
+    // Allocated bytes is < ARENA_ALIGNMENT_BYTES
+    uint8_t *a = arena_alloc(&arena, sizeof(uint8_t));
+    uint8_t *b = arena_alloc(&arena, sizeof(uint8_t));
+
+    munit_assert_int((b - a) % ARENA_ALIGNMENT_BYTES, ==, 0);
+    munit_assert_int(b - a, ==, ARENA_ALIGNMENT_BYTES);
+
+    arena_release(&arena);
+
+    // Allocated bytes is == ARENA_ALIGNMENT_BYTES
+    a = arena_alloc(&arena, ARENA_ALIGNMENT_BYTES);
+    b = arena_alloc(&arena, sizeof(uint8_t));
+
+    munit_assert_int((b - a) % ARENA_ALIGNMENT_BYTES, ==, 0);
+    munit_assert_int(b - a, ==, ARENA_ALIGNMENT_BYTES);
+
+    arena_release(&arena);
+
+    // Allocated bytes is > ARENA_ALIGNMENT_BYTES
+    a = arena_alloc(&arena, ARENA_ALIGNMENT_BYTES + 1);
+    b = arena_alloc(&arena, sizeof(uint8_t));
+
+    munit_assert_int((b - a) % ARENA_ALIGNMENT_BYTES, ==, 0);
+    munit_assert_int(b - a, ==, ARENA_ALIGNMENT_BYTES * 2);
+
+    arena_free(&arena);
+
+    return MUNIT_OK;
+}
+
+static MunitTest tests[] = { { "/arena_alloc_test", arena_alloc_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+                             { "/arena_padding_test", arena_padding_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
                              { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL } };
 
 static const MunitSuite suite = { "/arena", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE };

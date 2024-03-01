@@ -19,6 +19,7 @@
 
 #include "string_view.h"
 #include <stdint.h>
+#include <stdio.h>
 
 typedef struct lexer
 {
@@ -76,5 +77,8 @@ lexer_lookahead(lexer_t *lexer, token_t *token, size_t n);
 
 char *
 token_kind_to_cstr(token_kind_t kind);
+
+string_view_t
+lexer_get_token_line(lexer_t *lexer, token_t *token);
 
 #endif /* LEXER_H */

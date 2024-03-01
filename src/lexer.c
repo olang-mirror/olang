@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 void
 lexer_init(lexer_t *lexer, string_view_t source)
@@ -254,4 +255,17 @@ lexer_lookahead(lexer_t *lexer, token_t *token, size_t n)
     lexer->offset = previous_offset;
     lexer->row = previous_row;
     lexer->bol = previous_bol;
+}
+
+string_view_t
+lexer_get_token_line(lexer_t *lexer, token_t *token)
+{
+    size_t offset = token->location.bol;
+    string_view_t line = { .chars = lexer->source.chars + offset, .size = 0 };
+
+    while ((line.size + offset) < lexer->source.size && line.chars[line.size] != '\n' && line.chars[line.size] != 0) {
+        ++line.size;
+    }
+
+    return line;
 }

@@ -17,6 +17,8 @@
 #include "string_view.h"
 
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 bool
@@ -32,4 +34,13 @@ string_view_eq_to_cstr(string_view_t str, char *cstr)
         i++;
     }
     return i == cstr_len;
+}
+
+uint32_t
+string_view_to_u32(string_view_t str)
+{
+    char ret[str.size + 1];
+    ret[str.size + 1] = 0;
+    memcpy(ret, str.chars, str.size);
+    return atoi(ret);
 }

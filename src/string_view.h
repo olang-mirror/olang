@@ -19,6 +19,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define SV_FMT "%.*s"
 #define SV_ARG(sv) (int)(sv).size, (sv).chars
@@ -30,8 +31,10 @@ typedef struct string_view
 
 } string_view_t;
 
-// TODO: missing unit test
 bool
 string_view_eq_to_cstr(string_view_t str, char *cstr);
+
+uint32_t
+string_view_to_u32(string_view_t str);
 
 #endif /* STRING_VIEW_T */

@@ -233,3 +233,25 @@ lexer_str_to_token_kind(string_view_t text)
 
     return TOKEN_IDENTIFIER;
 }
+
+void
+lexer_peek_next(lexer_t *lexer, token_t *token)
+{
+    lexer_lookahead(lexer, token, 1);
+}
+
+void
+lexer_lookahead(lexer_t *lexer, token_t *token, size_t n)
+{
+    size_t previous_offset = lexer->offset;
+    size_t previous_row = lexer->row;
+    size_t previous_bol = lexer->bol;
+
+    for (size_t i = 0; i < n; ++i) {
+        lexer_next_token(lexer, token);
+    }
+
+    lexer->offset = previous_offset;
+    lexer->row = previous_row;
+    lexer->bol = previous_bol;
+}

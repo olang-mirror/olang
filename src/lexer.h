@@ -68,6 +68,12 @@ lexer_init(lexer_t *lexer, string_view_t source);
 void
 lexer_next_token(lexer_t *lexer, token_t *token);
 
+void
+lexer_peek_next(lexer_t *lexer, token_t *token);
+
+void
+lexer_lookahead(lexer_t *lexer, token_t *token, size_t n);
+
 char *
 token_kind_to_cstr(token_kind_t kind);
 

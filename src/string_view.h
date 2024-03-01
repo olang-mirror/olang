@@ -20,6 +20,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#define SV_FMT "%.*s"
+#define SV_ARG(sv) (int)(sv).size, (sv).chars
+
 typedef struct string_view
 {
     char *chars;

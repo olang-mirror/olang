@@ -48,6 +48,10 @@ string_view_to_u32_test(const MunitParameter params[], void *user_data_or_fixtur
 
     assert_uint32(string_view_to_u32(str), ==, 69);
 
+    str = (string_view_t){ .chars = "39;", .size = 2 };
+
+    assert_uint32(string_view_to_u32(str), ==, 39);
+
     return MUNIT_OK;
 }
 

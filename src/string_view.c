@@ -40,7 +40,7 @@ uint32_t
 string_view_to_u32(string_view_t str)
 {
     char ret[str.size + 1];
-    ret[str.size + 1] = 0;
+    ret[str.size] = 0;
     memcpy(ret, str.chars, str.size);
     return atoi(ret);
 }

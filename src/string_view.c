@@ -21,6 +21,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+string_view_t
+string_view_from_cstr(char *cstr)
+{
+    return (string_view_t){ .chars = cstr, .size = strlen(cstr) };
+}
+
 bool
 string_view_eq_to_cstr(string_view_t str, char *cstr)
 {

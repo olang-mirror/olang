@@ -31,6 +31,9 @@ typedef struct string_view
 
 } string_view_t;
 
+string_view_t
+string_view_from_cstr(char *cstr);
+
 bool
 string_view_eq_to_cstr(string_view_t str, char *cstr);
 

@@ -7,7 +7,7 @@ MUNIT_SRC   := ../shared/munit.c
 MUNIT       := ./munit.o
 
 .PHONY: all
-all: $(MUNIT) cli_runner.o $(TESTS)
+all: $(MUNIT) proc_exec.o cli_runner.o $(TESTS)
 	@for file in $(EXEC_TESTS); do \
                 ./"$$file"; \
         done
@@ -24,7 +24,7 @@ linter: $(SRCS)
 linter-fix: $(SRCS)
 	clang-format -i $?
 
-cli_test: $(MUNIT) cli_runner.o cli_test.o
+cli_test: $(MUNIT) proc_exec.o cli_runner.o cli_test.o
 	$(CC) $? $(CFLAGS) -o $@
 
 $(MUNIT):

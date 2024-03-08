@@ -14,19 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef CLI_RUNNER_H
-#define CLI_RUNNER_H
-#include "proc_exec.h"
+#ifndef PROC_EXEC_H
+#define PROC_EXEC_H
+#include <stdlib.h>
 
-typedef struct cli_result_t
+typedef struct proc_exec_result
 {
-    char binary_path[255];
-    proc_exec_result_t exec;
-} cli_result_t;
+    int exit_code;
+    char stdout_buf[1024];
+} proc_exec_result_t;
 
-cli_result_t
-cli_runner_compiler_dump_tokens(char *src);
+typedef struct proc_exec_command
+{
+    char* path;
+    char** args;
+    proc_exec_result_t result;
+} proc_exec_command_t;
 
-cli_result_t
-cli_runner_compiler_compile(char *src);
+void
+proc_exec(proc_exec_command_t* command);
 #endif

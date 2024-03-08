@@ -22,8 +22,8 @@ static MunitResult
 test_cli_dump_tokens(const MunitParameter params[], void *user_data_or_fixture)
 {
     cli_result_t compilation_result = cli_runner_compiler_dump_tokens("../../examples/main_exit.0");
-    munit_assert_int(compilation_result.exit_code, ==, 0);
-    munit_assert_string_equal(compilation_result.compiler_output,
+    munit_assert_int(compilation_result.exec.exit_code, ==, 0);
+    munit_assert_string_equal(compilation_result.exec.stdout_buf,
                               "../../examples/main_exit.0:1:1: <fn>\n"
                               "../../examples/main_exit.0:1:4: <identifier>\n"
                               "../../examples/main_exit.0:1:8: <(>\n"

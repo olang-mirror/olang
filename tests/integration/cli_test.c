@@ -19,7 +19,7 @@
 #include "munit.h"
 
 static MunitResult
-test_cli_hello_file(const MunitParameter params[], void *user_data_or_fixture)
+test_cli_dump_tokens(const MunitParameter params[], void *user_data_or_fixture)
 {
     cli_result_t compilation_result = cli_runner_compiler_dump_tokens("../../examples/main_exit.0");
     munit_assert_int(compilation_result.exit_code, ==, 0);
@@ -41,8 +41,10 @@ test_cli_hello_file(const MunitParameter params[], void *user_data_or_fixture)
     return MUNIT_OK;
 }
 
-static MunitTest tests[] = { { "/test_cli_hello_file", test_cli_hello_file, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-                             { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL } };
+static MunitTest tests[] = {
+    { "/test_cli_dump_tokens", test_cli_dump_tokens, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+};
 
 static const MunitSuite suite = { "/cli_test", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE };
 

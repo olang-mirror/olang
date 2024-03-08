@@ -173,18 +173,18 @@ expected_token(parser_t *parser, token_t *token, token_kind_t expected_kind)
 
     if (token->kind != expected_kind) {
         fprintf(stderr,
-                "%s:%lu:%lu: error: got <%s> token but expect <%s>\n",
+                "%s:%lu:%lu: error: got '" SV_FMT "' token but expect <%s>\n",
                 parser->file_path,
                 token->location.row + 1,
                 (token->location.offset - token->location.bol) + 1,
-                token_kind_to_cstr(token->kind),
+                SV_ARG(token->value),
                 token_kind_to_cstr(expected_kind));
 
         string_view_t line = lexer_get_token_line(parser->lexer, token);
         fprintf(stderr, "" SV_FMT "\n", SV_ARG(line));
         fprintf(stderr, "%*s\n", (int)(token->location.offset - token->location.bol + 1), "^");
 
-        return false;
+        exit(EXIT_FAILURE);
     }
     return true;
 }

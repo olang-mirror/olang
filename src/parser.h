@@ -33,6 +33,6 @@ void
 parser_init(parser_t *parser, lexer_t *lexer, arena_t *arena, char *file_path);
 
 ast_node_t *
-parser_parse_fn_definition(parser_t *parser);
+parser_parse_program(parser_t *parser);
 
 #endif /* PARSER_H */

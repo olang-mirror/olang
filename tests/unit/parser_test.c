@@ -27,7 +27,7 @@
 #define ARENA_CAPACITY (1024 * 1024)
 
 static MunitResult
-parse_fn_definition_test(const MunitParameter params[], void *user_data_or_fixture)
+parse_program_test(const MunitParameter params[], void *user_data_or_fixture)
 {
     arena_t arena = arena_new(ARENA_CAPACITY);
 
@@ -41,15 +41,19 @@ parse_fn_definition_test(const MunitParameter params[], void *user_data_or_fixtu
     parser_t parser;
     parser_init(&parser, &lexer, &arena, file_path);
 
-    ast_node_t *node_fn_def = parser_parse_fn_definition(&parser);
-    assert_not_null(node_fn_def);
-    assert_uint(node_fn_def->kind, ==, AST_NODE_FN_DEF);
+    ast_node_t *program_node = parser_parse_program(&parser);
+    assert_not_null(program_node);
+    assert_uint(program_node->kind, ==, AST_NODE_PROGRAM);
 
-    ast_fn_definition_t *fn = &node_fn_def->data.as_fn_def;
-    assert_memory_equal(fn->identifier.size, fn->identifier.chars, "main");
-    assert_uint(fn->return_type, ==, TYPE_U32);
+    ast_program_t program = program_node->data.as_program;
+    assert_not_null(program.fn);
+    assert_uint(program.fn->kind, ==, AST_NODE_FN_DEF);
 
-    ast_node_t *block = fn->block;
+    ast_fn_definition_t fn = program.fn->data.as_fn_def;
+    assert_memory_equal(fn.identifier.size, fn.identifier.chars, "main");
+    assert_uint(fn.return_type, ==, TYPE_U32);
+
+    ast_node_t *block = fn.block;
     assert_not_null(block);
 
     assert_uint(block->kind, ==, AST_NODE_BLOCK);
@@ -73,10 +77,8 @@ parse_fn_definition_test(const MunitParameter params[], void *user_data_or_fixtu
     return MUNIT_OK;
 }
 
-static MunitTest tests[] = {
-    { "/parse_fn_definition", parse_fn_definition_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
-};
+static MunitTest tests[] = { { "/parse_program", parse_program_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+                             { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL } };
 
 static const MunitSuite suite = { "/parser", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE };
 

@@ -158,7 +158,7 @@ handle_codegen_linux_x86_64(cli_opts_t *opts)
     lexer_init(&lexer, file_content);
     parser_init(&parser, &lexer, &arena, opts->file_path);
 
-    ast_node_t *ast = parser_parse_fn_definition(&parser);
+    ast_node_t *ast = parser_parse_program(&parser);
 
     char asm_file[opts->output_bin.size + 3];
     sprintf(asm_file, "" SV_FMT ".s", SV_ARG(opts->output_bin));

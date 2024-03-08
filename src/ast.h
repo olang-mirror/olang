@@ -27,6 +27,7 @@ typedef struct ast_node ast_node_t;
 
 typedef enum
 {
+    AST_NODE_PROGRAM,
     AST_NODE_BLOCK,
     AST_NODE_FN_DEF,
     AST_NODE_RETURN_STMT,
@@ -43,6 +44,11 @@ typedef struct ast_block
 {
     list_t *nodes;
 } ast_block_t;
+
+typedef struct ast_program
+{
+    ast_node_t *fn;
+} ast_program_t;
 
 typedef struct ast_fn_definition
 {
@@ -74,6 +80,7 @@ typedef struct ast_return_stmt
 
 typedef union
 {
+    ast_program_t as_program;
     ast_fn_definition_t as_fn_def;
     ast_literal_t as_literal;
     ast_block_t as_block;
@@ -85,6 +92,9 @@ typedef struct ast_node
     ast_node_kind_t kind;
     ast_node_data_t data;
 } ast_node_t;
+
+ast_node_t *
+ast_new_program(arena_t *arena, ast_node_t *fn_def);
 
 ast_node_t *
 ast_new_node_fn_def(arena_t *arena, string_view_t identifier, type_t return_type, ast_node_t *block);

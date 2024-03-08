@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "ast.h"
 #include "lexer.h"
 #include "parser.h"
 
@@ -35,6 +36,9 @@ parser_parse_type(parser_t *parser, type_t *type);
 static ast_node_t *
 parser_parse_block(parser_t *parser);
 
+ast_node_t *
+parser_parse_fn_definition(parser_t *parser);
+
 static void
 skip_line_feeds(lexer_t *lexer);
 
@@ -47,6 +51,14 @@ parser_init(parser_t *parser, lexer_t *lexer, arena_t *arena, char *file_path)
     parser->lexer = lexer;
     parser->arena = arena;
     parser->file_path = file_path;
+}
+
+ast_node_t *
+parser_parse_program(parser_t *parser)
+{
+    ast_node_t *fn = parser_parse_fn_definition(parser);
+
+    return ast_new_program(parser->arena, fn);
 }
 
 ast_node_t *

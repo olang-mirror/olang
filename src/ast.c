@@ -23,6 +23,20 @@
 #include "string_view.h"
 
 ast_node_t *
+ast_new_program(arena_t *arena, ast_node_t *fn_def)
+{
+    ast_node_t *node = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
+    assert(node);
+
+    node->kind = AST_NODE_PROGRAM;
+    ast_program_t *program = &node->data.as_program;
+
+    program->fn = fn_def;
+
+    return node;
+}
+
+ast_node_t *
 ast_new_node_fn_def(arena_t *arena, string_view_t identifier, type_t return_type, ast_node_t *block)
 {
     ast_node_t *node_fn_def = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));

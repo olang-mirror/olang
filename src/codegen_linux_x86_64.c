@@ -30,12 +30,14 @@ static void
 codegen_linux_x86_64_emit_function(FILE *out, ast_fn_definition_t *fn);
 
 void
-codegen_linux_x86_64_emit_program(FILE *out, ast_node_t *prog)
+codegen_linux_x86_64_emit_program(FILE *out, ast_node_t *node)
 {
     codegen_linux_x86_64_emit_start_entrypoint(out);
 
-    assert(prog->kind == AST_NODE_FN_DEF);
-    ast_fn_definition_t fn = prog->data.as_fn_def;
+    assert(node->kind == AST_NODE_PROGRAM);
+    ast_program_t program = node->data.as_program;
+
+    ast_fn_definition_t fn = program.fn->data.as_fn_def;
 
     assert(string_view_eq_to_cstr(fn.identifier, "main"));
     codegen_linux_x86_64_emit_function(out, &fn);

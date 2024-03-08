@@ -17,6 +17,7 @@
 #define MUNIT_ENABLE_ASSERT_ALIASES
 #include "cli_runner.h"
 #include "munit.h"
+#include <stdio.h>
 
 static MunitResult
 test_cli_dump_tokens(const MunitParameter params[], void *user_data_or_fixture)
@@ -41,8 +42,28 @@ test_cli_dump_tokens(const MunitParameter params[], void *user_data_or_fixture)
     return MUNIT_OK;
 }
 
+static MunitResult
+test_cli_compile_minimal_program(const MunitParameter params[], void *user_data_or_fixture)
+{
+    cli_result_t compilation_result = cli_runner_compiler_compile("../../examples/main_exit.0");
+    munit_assert_int(compilation_result.exec.exit_code, ==, 0);
+
+    char *command_args[] = { compilation_result.binary_path, NULL };
+
+    proc_exec_command_t command = { .path = command_args[0], .args = command_args };
+
+    proc_exec(&command);
+
+    remove(command_args[0]);
+
+    munit_assert_int(command.result.exit_code, ==, 0);
+
+    return MUNIT_OK;
+}
+
 static MunitTest tests[] = {
     { "/test_cli_dump_tokens", test_cli_dump_tokens, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { "/test_cli_compile_minimal_program", test_cli_compile_minimal_program, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
 

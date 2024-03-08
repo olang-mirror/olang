@@ -87,3 +87,14 @@ cli_runner_compiler_dump_tokens(char *src)
     cli_runner_compiler(&result, program_args);
     return result;
 }
+
+cli_result_t
+cli_runner_compiler_compile(char *src)
+{
+    cli_result_t result = { 0 };
+    create_tmp_file_name(result.binary_path);
+
+    char *program_args[] = { "0c", src, "-o", result.binary_path, NULL };
+    cli_runner_compiler(&result, program_args);
+    return result;
+}

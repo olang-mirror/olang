@@ -22,30 +22,30 @@
 static MunitResult
 test_cli_dump_tokens(const MunitParameter params[], void *user_data_or_fixture)
 {
-    cli_result_t compilation_result = cli_runner_compiler_dump_tokens("../../examples/main_exit.0");
+    cli_result_t compilation_result = cli_runner_compiler_dump_tokens("../../examples/main_exit.ol");
     munit_assert_int(compilation_result.exec.exit_code, ==, 0);
     munit_assert_string_equal(compilation_result.exec.stdout_buf,
-                              "../../examples/main_exit.0:1:1: <fn>\n"
-                              "../../examples/main_exit.0:1:4: <identifier>\n"
-                              "../../examples/main_exit.0:1:8: <(>\n"
-                              "../../examples/main_exit.0:1:9: <)>\n"
-                              "../../examples/main_exit.0:1:10: <:>\n"
-                              "../../examples/main_exit.0:1:12: <identifier>\n"
-                              "../../examples/main_exit.0:1:16: <{>\n"
-                              "../../examples/main_exit.0:1:17: <line_feed>\n"
-                              "../../examples/main_exit.0:2:3: <return>\n"
-                              "../../examples/main_exit.0:2:10: <number>\n"
-                              "../../examples/main_exit.0:2:11: <line_feed>\n"
-                              "../../examples/main_exit.0:3:1: <}>\n"
-                              "../../examples/main_exit.0:3:2: <line_feed>\n"
-                              "../../examples/main_exit.0:4:1: <EOF>\n");
+                              "../../examples/main_exit.ol:1:1: <fn>\n"
+                              "../../examples/main_exit.ol:1:4: <identifier>\n"
+                              "../../examples/main_exit.ol:1:8: <(>\n"
+                              "../../examples/main_exit.ol:1:9: <)>\n"
+                              "../../examples/main_exit.ol:1:10: <:>\n"
+                              "../../examples/main_exit.ol:1:12: <identifier>\n"
+                              "../../examples/main_exit.ol:1:16: <{>\n"
+                              "../../examples/main_exit.ol:1:17: <line_feed>\n"
+                              "../../examples/main_exit.ol:2:3: <return>\n"
+                              "../../examples/main_exit.ol:2:10: <number>\n"
+                              "../../examples/main_exit.ol:2:11: <line_feed>\n"
+                              "../../examples/main_exit.ol:3:1: <}>\n"
+                              "../../examples/main_exit.ol:3:2: <line_feed>\n"
+                              "../../examples/main_exit.ol:4:1: <EOF>\n");
     return MUNIT_OK;
 }
 
 static MunitResult
 test_cli_compile_minimal_program(const MunitParameter params[], void *user_data_or_fixture)
 {
-    cli_result_t compilation_result = cli_runner_compiler_compile("../../examples/main_exit.0");
+    cli_result_t compilation_result = cli_runner_compiler_compile("../../examples/main_exit.ol");
     munit_assert_int(compilation_result.exec.exit_code, ==, 0);
 
     char *command_args[] = { compilation_result.binary_path, NULL };

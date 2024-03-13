@@ -1,4 +1,4 @@
-TARGET    := 0c
+TARGET    := olang
 SRC_DIR   := src
 BUILD_DIR := build
 CFLAGS    := -Werror -Wall -Wextra -Wmissing-declarations -pedantic -std=c11 -ggdb
@@ -42,7 +42,7 @@ unit-test:
 clean:
 	$(MAKE) -C tests/integration/ clean
 	$(MAKE) -C tests/unit/ clean
-	@rm -rf build/ 0c
+	@rm -rf build/ $(TARGET)
 
 .PHONY: check
 check:

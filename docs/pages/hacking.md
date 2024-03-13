@@ -53,7 +53,7 @@ Testing
 -------
 
 There are two layers of tests **integration** and **unit**. The
-integration test is going to execute the **0c** compiler and check if
+integration test is going to execute the **olang** compiler and check if
 the generated binary acts as expected. Unit tests will test C functions.
 
 For both unit and integration we use **munit** framework:

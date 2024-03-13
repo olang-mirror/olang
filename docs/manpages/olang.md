@@ -1,21 +1,21 @@
-% 0C(1)
+% OLANG(1)
 % olang mantainers
 % Feb 2024
 
 # NAME
 
-0c - zero language compiler
+olang - O Programming Language compiler
 
 # SYNOPSIS
 
-**0c**
+**olang**
     source_file
     [**----dump-tokens**]
     [**--o** output_file [**----save-temps**]] 
 
 # DESCRIPTION
 
-**0c** is the offical compiler for zero language, it is also a tool that
+**olang** is the offical O programming language compiler, it is also a tool that
 contains utilities to help the language development.
 
 # GENERAL OPTIONS

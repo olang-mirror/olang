@@ -24,7 +24,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#define OLANG_COMPILER_PATH "../../0c"
+#define OLANG_COMPILER_PATH "../../olang"
 
 static int compiler_exists_already_checked = 0;
 
@@ -83,7 +83,7 @@ cli_runner_compiler_dump_tokens(char *src)
 {
     cli_result_t result = { 0 };
 
-    char *program_args[] = { "0c", "--dump-tokens", src, NULL };
+    char *program_args[] = { "olang", "--dump-tokens", src, NULL };
     cli_runner_compiler(&result, program_args);
     return result;
 }
@@ -94,7 +94,7 @@ cli_runner_compiler_compile(char *src)
     cli_result_t result = { 0 };
     create_tmp_file_name(result.binary_path);
 
-    char *program_args[] = { "0c", src, "-o", result.binary_path, NULL };
+    char *program_args[] = { "olang", src, "-o", result.binary_path, NULL };
     cli_runner_compiler(&result, program_args);
     return result;
 }

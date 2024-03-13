@@ -21,7 +21,7 @@ clean:
 dist: $(DIST_FILE)
 
 .PHONY: manpages
-manpages: $(BUILD_DIR) $(MANPAGES)/0c.1
+manpages: $(BUILD_DIR) $(MANPAGES)/olang.1
 
 $(MANPAGES)/%.1: manpages/%.md
 	$(PANDOC) -s -t man $< > $@

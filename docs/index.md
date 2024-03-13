@@ -1,6 +1,6 @@
 % Welcome to olang documentation
 
-The zero programming language.
+The O Programming Language.
 
 ## olang manifest
 

@@ -39,7 +39,33 @@ typedef enum token_kind
     TOKEN_FN,
     TOKEN_RETURN,
 
+    // Equality operators
+    TOKEN_CMP_EQ,
+    TOKEN_CMP_NEQ,
+    TOKEN_CMP_LEQ,
+    TOKEN_CMP_GEQ,
+
+    // Logical Operators
+    TOKEN_LOGICAL_OR,
+    TOKEN_LOGICAL_AND,
+
+    // Bitwise Operators
+    TOKEN_BITWISE_LSHIFT,
+    TOKEN_BITWISE_RSHIFT,
+
     // Single char
+    TOKEN_BANG,
+    TOKEN_GT,
+    TOKEN_LT,
+    TOKEN_PERCENT,
+    TOKEN_AND,
+    TOKEN_PIPE,
+    TOKEN_CIRCUMFLEX,
+    TOKEN_EQ,
+    TOKEN_PLUS,
+    TOKEN_DASH,
+    TOKEN_SLASH,
+    TOKEN_STAR,
     TOKEN_LF,
     TOKEN_OPAREN,
     TOKEN_CPAREN,

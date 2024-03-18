@@ -101,6 +101,110 @@ lexer_next_token(lexer_t *lexer, token_t *token)
         }
 
         switch (current_char) {
+            case '=': {
+                size_t start_offset = lexer->offset;
+                lexer_skip_char(lexer);
+
+                if (lexer_current_char(lexer) == '=') {
+                    lexer_skip_char(lexer);
+                    lexer_init_str_value_token(lexer, token, TOKEN_CMP_EQ, start_offset);
+                    return;
+                }
+
+                lexer_init_str_value_token(lexer, token, TOKEN_EQ, start_offset);
+                return;
+            }
+            case '!': {
+                size_t start_offset = lexer->offset;
+                lexer_skip_char(lexer);
+
+                if (lexer_current_char(lexer) == '=') {
+                    lexer_skip_char(lexer);
+                    lexer_init_str_value_token(lexer, token, TOKEN_CMP_NEQ, start_offset);
+                    return;
+                }
+
+                lexer_init_str_value_token(lexer, token, TOKEN_BANG, start_offset);
+                return;
+            }
+            case '&': {
+                size_t start_offset = lexer->offset;
+                lexer_skip_char(lexer);
+
+                if (lexer_current_char(lexer) == '&') {
+                    lexer_skip_char(lexer);
+                    lexer_init_str_value_token(lexer, token, TOKEN_LOGICAL_AND, start_offset);
+                    return;
+                }
+
+                lexer_init_str_value_token(lexer, token, TOKEN_AND, start_offset);
+                return;
+            }
+            case '|': {
+                size_t start_offset = lexer->offset;
+                lexer_skip_char(lexer);
+
+                if (lexer_current_char(lexer) == '|') {
+                    lexer_skip_char(lexer);
+                    lexer_init_str_value_token(lexer, token, TOKEN_LOGICAL_OR, start_offset);
+                    return;
+                }
+
+                lexer_init_str_value_token(lexer, token, TOKEN_PIPE, start_offset);
+                return;
+            }
+            case '<': {
+                size_t start_offset = lexer->offset;
+                lexer_skip_char(lexer);
+
+                switch (lexer_current_char(lexer)) {
+                    case '<': {
+                        lexer_skip_char(lexer);
+                        lexer_init_str_value_token(lexer, token, TOKEN_BITWISE_LSHIFT, start_offset);
+                        return;
+                    }
+                    case '=': {
+                        lexer_skip_char(lexer);
+                        lexer_init_str_value_token(lexer, token, TOKEN_CMP_LEQ, start_offset);
+                        return;
+                    }
+                    default: {
+                        lexer_init_str_value_token(lexer, token, TOKEN_LT, start_offset);
+                        return;
+                    }
+                }
+            }
+            case '>': {
+                size_t start_offset = lexer->offset;
+                lexer_skip_char(lexer);
+
+                switch (lexer_current_char(lexer)) {
+                    case '>': {
+                        lexer_skip_char(lexer);
+                        lexer_init_str_value_token(lexer, token, TOKEN_BITWISE_RSHIFT, start_offset);
+                        return;
+                    }
+                    case '=': {
+                        lexer_skip_char(lexer);
+                        lexer_init_str_value_token(lexer, token, TOKEN_CMP_GEQ, start_offset);
+                        return;
+                    }
+                    default: {
+                        lexer_init_str_value_token(lexer, token, TOKEN_GT, start_offset);
+                        return;
+                    }
+                }
+            }
+            case '^': {
+                lexer_init_char_value_token(lexer, token, TOKEN_CIRCUMFLEX);
+                lexer_skip_char(lexer);
+                return;
+            }
+            case '%': {
+                lexer_init_char_value_token(lexer, token, TOKEN_PERCENT);
+                lexer_skip_char(lexer);
+                return;
+            }
             case '(': {
                 lexer_init_char_value_token(lexer, token, TOKEN_OPAREN);
                 lexer_skip_char(lexer);
@@ -126,6 +230,26 @@ lexer_next_token(lexer_t *lexer, token_t *token)
                 lexer_skip_char(lexer);
                 return;
             }
+            case '+': {
+                lexer_init_char_value_token(lexer, token, TOKEN_PLUS);
+                lexer_skip_char(lexer);
+                return;
+            }
+            case '-': {
+                lexer_init_char_value_token(lexer, token, TOKEN_DASH);
+                lexer_skip_char(lexer);
+                return;
+            }
+            case '*': {
+                lexer_init_char_value_token(lexer, token, TOKEN_STAR);
+                lexer_skip_char(lexer);
+                return;
+            }
+            case '/': {
+                lexer_init_char_value_token(lexer, token, TOKEN_SLASH);
+                lexer_skip_char(lexer);
+                return;
+            }
             case '\n': {
                 lexer_init_char_value_token(lexer, token, TOKEN_LF);
                 lexer_skip_char(lexer);
@@ -146,12 +270,38 @@ lexer_next_token(lexer_t *lexer, token_t *token)
 }
 
 static char *token_kind_str_table[] = {
-    [TOKEN_UNKNOWN] = "unknown", [TOKEN_IDENTIFIER] = "identifier",
-    [TOKEN_NUMBER] = "number",   [TOKEN_FN] = "fn",
-    [TOKEN_RETURN] = "return",   [TOKEN_LF] = "line_feed",
-    [TOKEN_OPAREN] = "(",        [TOKEN_CPAREN] = ")",
-    [TOKEN_COLON] = ":",         [TOKEN_OCURLY] = "{",
-    [TOKEN_CCURLY] = "}",        [TOKEN_EOF] = "EOF",
+    [TOKEN_UNKNOWN] = "unknown",
+    [TOKEN_IDENTIFIER] = "identifier",
+    [TOKEN_NUMBER] = "number",
+    [TOKEN_FN] = "fn",
+    [TOKEN_RETURN] = "return",
+    [TOKEN_LF] = "line_feed",
+    [TOKEN_OPAREN] = "(",
+    [TOKEN_CPAREN] = ")",
+    [TOKEN_COLON] = ":",
+    [TOKEN_OCURLY] = "{",
+    [TOKEN_CCURLY] = "}",
+    [TOKEN_PLUS] = "+",
+    [TOKEN_DASH] = "-",
+    [TOKEN_STAR] = "*",
+    [TOKEN_SLASH] = "/",
+    [TOKEN_EQ] = "=",
+    [TOKEN_CMP_EQ] = "==",
+    [TOKEN_BANG] = "!",
+    [TOKEN_CMP_NEQ] = "!=",
+    [TOKEN_LT] = "<",
+    [TOKEN_GT] = ">",
+    [TOKEN_CMP_LEQ] = "<=",
+    [TOKEN_CMP_GEQ] = ">=",
+    [TOKEN_PERCENT] = "%",
+    [TOKEN_BITWISE_LSHIFT] = "<<",
+    [TOKEN_BITWISE_RSHIFT] = ">>",
+    [TOKEN_CIRCUMFLEX] = "^",
+    [TOKEN_PIPE] = "|",
+    [TOKEN_LOGICAL_OR] = "||",
+    [TOKEN_AND] = "&",
+    [TOKEN_LOGICAL_AND] = "&&",
+    [TOKEN_EOF] = "EOF",
 };
 
 char *

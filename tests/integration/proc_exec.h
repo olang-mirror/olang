@@ -21,7 +21,8 @@
 typedef struct proc_exec_result
 {
     int exit_code;
-    char stdout_buf[1024];
+    // FIXME: output buffer shouldn't be fixed size
+    char stdout_buf[2048];
 } proc_exec_result_t;
 
 typedef struct proc_exec_command

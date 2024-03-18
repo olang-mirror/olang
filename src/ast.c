@@ -53,6 +53,20 @@ ast_new_node_fn_def(arena_t *arena, string_view_t identifier, type_t return_type
 }
 
 ast_node_t *
+ast_new_node_bin_op(arena_t *arena, ast_binary_op_kind_t kind, ast_node_t *lhs, ast_node_t *rhs)
+{
+    ast_node_t *node_bin_op = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
+    assert(node_bin_op);
+
+    node_bin_op->kind = AST_NODE_BINARY_OP;
+    node_bin_op->data.as_bin_op.kind = kind;
+    node_bin_op->data.as_bin_op.lhs = lhs;
+    node_bin_op->data.as_bin_op.rhs = rhs;
+
+    return node_bin_op;
+}
+
+ast_node_t *
 ast_new_node_literal_u32(arena_t *arena, uint32_t value)
 {
     ast_node_t *node_literal = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));

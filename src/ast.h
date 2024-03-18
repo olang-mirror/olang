@@ -30,6 +30,7 @@ typedef enum
     AST_NODE_PROGRAM,
     AST_NODE_BLOCK,
     AST_NODE_FN_DEF,
+    AST_NODE_BINARY_OP,
     AST_NODE_RETURN_STMT,
     AST_NODE_LITERAL,
     AST_NODE_UNKNOWN
@@ -73,6 +74,35 @@ typedef struct ast_literal
     ast_literal_value_t value;
 } ast_literal_t;
 
+typedef enum ast_binary_op_kind
+{
+    AST_BINOP_ADDITION,
+    AST_BINOP_SUBTRACTION,
+    AST_BINOP_MULTIPLICATION,
+    AST_BINOP_DIVISION,
+    AST_BINOP_REMINDER,
+    AST_BINOP_BITWISE_LSHIFT,
+    AST_BINOP_BITWISE_RSHIFT,
+    AST_BINOP_BITWISE_XOR,
+    AST_BINOP_BITWISE_AND,
+    AST_BINOP_BITWISE_OR,
+    AST_BINOP_CMP_LT,
+    AST_BINOP_CMP_GT,
+    AST_BINOP_CMP_LEQ,
+    AST_BINOP_CMP_GEQ,
+    AST_BINOP_CMP_EQ,
+    AST_BINOP_CMP_NEQ,
+    AST_BINOP_LOGICAL_AND,
+    AST_BINOP_LOGICAL_OR,
+} ast_binary_op_kind_t;
+
+typedef struct ast_binary_op
+{
+    ast_binary_op_kind_t kind;
+    ast_node_t *lhs;
+    ast_node_t *rhs;
+} ast_binary_op_t;
+
 typedef struct ast_return_stmt
 {
     ast_node_t *data;
@@ -82,6 +112,7 @@ typedef union
 {
     ast_program_t as_program;
     ast_fn_definition_t as_fn_def;
+    ast_binary_op_t as_bin_op;
     ast_literal_t as_literal;
     ast_block_t as_block;
     ast_return_stmt_t as_return_stmt;
@@ -98,6 +129,9 @@ ast_new_program(arena_t *arena, ast_node_t *fn_def);
 
 ast_node_t *
 ast_new_node_fn_def(arena_t *arena, string_view_t identifier, type_t return_type, ast_node_t *block);
+
+ast_node_t *
+ast_new_node_bin_op(arena_t *arena, ast_binary_op_kind_t kind, ast_node_t *lhs, ast_node_t *rhs);
 
 ast_node_t *
 ast_new_node_literal_u32(arena_t *arena, uint32_t value);

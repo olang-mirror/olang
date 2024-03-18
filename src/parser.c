@@ -39,6 +39,12 @@ parser_parse_block(parser_t *parser);
 ast_node_t *
 parser_parse_fn_definition(parser_t *parser);
 
+static ast_node_t *
+parser_parse_expr(parser_t *parser);
+
+static ast_node_t *
+parser_parse_factor(parser_t *parser);
+
 static void
 skip_line_feeds(lexer_t *lexer);
 
@@ -57,8 +63,187 @@ ast_node_t *
 parser_parse_program(parser_t *parser)
 {
     ast_node_t *fn = parser_parse_fn_definition(parser);
+    if (fn == NULL) {
+        return NULL;
+    }
 
     return ast_new_program(parser->arena, fn);
+}
+
+static ast_binary_op_kind_t
+token_kind_to_binary_op_kind(token_kind_t kind)
+{
+    switch (kind) {
+        case TOKEN_PLUS:
+            return AST_BINOP_ADDITION;
+        case TOKEN_DASH:
+            return AST_BINOP_SUBTRACTION;
+        case TOKEN_SLASH:
+            return AST_BINOP_DIVISION;
+        case TOKEN_STAR:
+            return AST_BINOP_MULTIPLICATION;
+        case TOKEN_PERCENT:
+            return AST_BINOP_REMINDER;
+        case TOKEN_BITWISE_LSHIFT:
+            return AST_BINOP_BITWISE_LSHIFT;
+        case TOKEN_BITWISE_RSHIFT:
+            return AST_BINOP_BITWISE_RSHIFT;
+        case TOKEN_CIRCUMFLEX:
+            return AST_BINOP_BITWISE_XOR;
+        case TOKEN_AND:
+            return AST_BINOP_BITWISE_AND;
+        case TOKEN_PIPE:
+            return AST_BINOP_BITWISE_OR;
+        case TOKEN_LT:
+            return AST_BINOP_CMP_LT;
+        case TOKEN_GT:
+            return AST_BINOP_CMP_GT;
+        case TOKEN_CMP_LEQ:
+            return AST_BINOP_CMP_LEQ;
+        case TOKEN_CMP_GEQ:
+            return AST_BINOP_CMP_GEQ;
+        case TOKEN_CMP_EQ:
+            return AST_BINOP_CMP_EQ;
+        case TOKEN_CMP_NEQ:
+            return AST_BINOP_CMP_NEQ;
+        case TOKEN_LOGICAL_AND:
+            return AST_BINOP_LOGICAL_AND;
+        case TOKEN_LOGICAL_OR:
+            return AST_BINOP_LOGICAL_OR;
+        default: {
+            fprintf(stderr, "error: token kind (%s) not compatible with binary op kind\n", token_kind_to_cstr(kind));
+            assert(false);
+        }
+    }
+}
+
+typedef enum
+{
+    BINOP_MIN_PREC,
+    BINOP_LOGICAL_OR_PREC,
+    BINOP_LOGICAL_AND_PREC,
+    BINOP_BITWISE_OR_PREC,
+    BINOP_BITWISE_XOR_PREC,
+    BINOP_BITWISE_AND_PREC,
+    BINOP_CMP_EQ_AND_NEQ_PREC,
+    BINOP_CMP_LT_AND_GT_PREC,
+    BINOP_BITWISE_SHIFT_PREC,
+    BINOP_ADDITIVE_PREC,
+    BINOP_MULTIPLICATIVE_PREC,
+} binary_op_precedence_t;
+
+static binary_op_precedence_t
+get_binary_op_precedence(token_kind_t kind)
+{
+    switch (kind) {
+        case TOKEN_PLUS:
+        case TOKEN_DASH:
+            return BINOP_ADDITIVE_PREC;
+        case TOKEN_SLASH:
+        case TOKEN_STAR:
+        case TOKEN_PERCENT:
+            return BINOP_MULTIPLICATIVE_PREC;
+        case TOKEN_BITWISE_LSHIFT:
+        case TOKEN_BITWISE_RSHIFT:
+            return BINOP_BITWISE_SHIFT_PREC;
+        case TOKEN_LT:
+        case TOKEN_GT:
+            return BINOP_CMP_LT_AND_GT_PREC;
+        case TOKEN_EQ:
+        case TOKEN_CMP_NEQ:
+            return BINOP_CMP_EQ_AND_NEQ_PREC;
+        case TOKEN_AND:
+            return BINOP_BITWISE_AND_PREC;
+        case TOKEN_CIRCUMFLEX:
+            return BINOP_BITWISE_XOR_PREC;
+        case TOKEN_PIPE:
+            return BINOP_BITWISE_OR_PREC;
+        case TOKEN_LOGICAL_AND:
+            return BINOP_LOGICAL_AND_PREC;
+        case TOKEN_LOGICAL_OR:
+            return BINOP_LOGICAL_OR_PREC;
+        default:
+            assert(false);
+    }
+}
+
+static ast_node_t *
+parser_parse_expr_1(parser_t *parser, ast_node_t *lhs, size_t prev_precedence)
+{
+    ast_node_t *expr = NULL;
+
+    token_t lookahead_token;
+    lexer_peek_next(parser->lexer, &lookahead_token);
+
+    while (token_kind_is_binary_op(lookahead_token.kind) &&
+           get_binary_op_precedence(lookahead_token.kind) >= prev_precedence) {
+        token_t token_op;
+        lexer_next_token(parser->lexer, &token_op);
+
+        ast_node_t *rhs = parser_parse_factor(parser);
+        if (rhs == NULL) {
+            return NULL;
+        }
+
+        lexer_peek_next(parser->lexer, &lookahead_token);
+
+        while (token_kind_is_binary_op(lookahead_token.kind) &&
+               get_binary_op_precedence(lookahead_token.kind) > get_binary_op_precedence(token_op.kind)) {
+            rhs = parser_parse_expr_1(parser, rhs, get_binary_op_precedence(token_op.kind));
+            lexer_peek_next(parser->lexer, &lookahead_token);
+        }
+
+        expr = ast_new_node_bin_op(parser->arena, token_kind_to_binary_op_kind(token_op.kind), lhs, rhs);
+        if (expr == NULL) {
+            return NULL;
+        }
+    }
+
+    if (expr == NULL) {
+        return lhs;
+    }
+
+    return expr;
+}
+
+static ast_node_t *
+parser_parse_expr(parser_t *parser)
+{
+    ast_node_t *lhs = parser_parse_factor(parser);
+    if (lhs == NULL) {
+        return NULL;
+    }
+
+    return parser_parse_expr_1(parser, lhs, BINOP_MIN_PREC);
+}
+
+static ast_node_t *
+parser_parse_factor(parser_t *parser)
+{
+    token_t token;
+    lexer_next_token(parser->lexer, &token);
+
+    switch (token.kind) {
+        case TOKEN_NUMBER:
+            return ast_new_node_literal_u32(parser->arena, string_view_to_u32(token.value));
+
+        case TOKEN_OPAREN: {
+            ast_node_t *expr = parser_parse_expr(parser);
+            if (expr == NULL) {
+                return NULL;
+            }
+
+            if (!skip_expected_token(parser, TOKEN_CPAREN)) {
+                return NULL;
+            }
+
+            return expr;
+        }
+        default: {
+            fprintf(stderr, "error: parse_factor: unsupported or invalid token (%s)\n", token_kind_to_cstr(token.kind));
+            assert(false);
+        }
+    }
 }
 
 ast_node_t *
@@ -131,41 +316,39 @@ parser_parse_type(parser_t *parser, type_t *type)
 static ast_node_t *
 parser_parse_block(parser_t *parser)
 {
-    token_t number_token;
     if (!skip_expected_token(parser, TOKEN_OCURLY)) {
-        return false;
+        return NULL;
     }
 
     skip_line_feeds(parser->lexer);
 
     ast_node_t *node_block = ast_new_node_block(parser->arena);
+    if (node_block == NULL) {
+        return NULL;
+    }
 
     if (!skip_expected_token(parser, TOKEN_RETURN)) {
-        return false;
+        return NULL;
     }
 
     ast_node_t *node_return_stmt = ast_new_node_return_stmt(parser->arena);
     assert(node_return_stmt);
 
-    if (!expected_token(parser, &number_token, TOKEN_NUMBER)) {
-        return false;
+    ast_node_t *expr = parser_parse_expr(parser);
+    if (expr == NULL) {
+        return NULL;
     }
 
-    ast_node_t *literal_node = ast_new_node_literal_u32(parser->arena, string_view_to_u32(number_token.value));
-    assert(literal_node);
-
-    node_return_stmt->data.as_return_stmt.data = literal_node;
+    node_return_stmt->data.as_return_stmt.data = expr;
 
     list_append(node_block->data.as_block.nodes, node_return_stmt);
-
     if (!skip_expected_token(parser, TOKEN_LF)) {
-        return false;
+        return NULL;
     }
 
     skip_line_feeds(parser->lexer);
-
     if (!skip_expected_token(parser, TOKEN_CCURLY)) {
-        return false;
+        return NULL;
     }
 
     return node_block;

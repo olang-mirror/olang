@@ -104,6 +104,9 @@ lexer_lookahead(lexer_t *lexer, token_t *token, size_t n);
 char *
 token_kind_to_cstr(token_kind_t kind);
 
+bool
+token_kind_is_binary_op(token_kind_t kind);
+
 string_view_t
 lexer_get_token_line(lexer_t *lexer, token_t *token);
 

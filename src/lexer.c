@@ -311,6 +311,34 @@ token_kind_to_cstr(token_kind_t kind)
     return token_kind_str_table[kind];
 }
 
+bool
+token_kind_is_binary_op(token_kind_t kind)
+{
+    switch (kind) {
+        case TOKEN_PLUS:
+        case TOKEN_DASH:
+        case TOKEN_SLASH:
+        case TOKEN_STAR:
+        case TOKEN_PERCENT:
+        case TOKEN_BITWISE_LSHIFT:
+        case TOKEN_BITWISE_RSHIFT:
+        case TOKEN_LT:
+        case TOKEN_CMP_LEQ:
+        case TOKEN_GT:
+        case TOKEN_CMP_GEQ:
+        case TOKEN_CMP_EQ:
+        case TOKEN_CMP_NEQ:
+        case TOKEN_AND:
+        case TOKEN_CIRCUMFLEX:
+        case TOKEN_PIPE:
+        case TOKEN_LOGICAL_AND:
+        case TOKEN_LOGICAL_OR:
+            return true;
+        default:
+            return false;
+    }
+}
+
 static char
 lexer_current_char(lexer_t *lexer)
 {

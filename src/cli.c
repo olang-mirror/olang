@@ -26,6 +26,12 @@ cli_args_shift(cli_args_t *args);
 static void
 cli_opts_parse_output(cli_opts_t *opts, cli_args_t *args);
 
+static void
+cli_opts_parse_arch(cli_opts_t *opts, cli_args_t *args);
+
+static void
+cli_opts_parse_sysroot(cli_opts_t *opts, cli_args_t *args);
+
 cli_opts_t
 cli_parse_args(int argc, char **argv)
 {
@@ -42,6 +48,12 @@ cli_parse_args(int argc, char **argv)
             opts.options |= CLI_OPT_SAVE_TEMPS;
         } else if (strcmp(arg, "-o") == 0) {
             cli_opts_parse_output(&opts, &args);
+        } else if (strcmp(arg, "--arch") == 0) {
+            opts.options |= CLI_OPT_ARCH;
+            cli_opts_parse_arch(&opts, &args);
+        } else if (strcmp(arg, "--sysroot") == 0) {
+            opts.options |= CLI_OPT_SYSROOT;
+            cli_opts_parse_sysroot(&opts, &args);
         } else {
             opts.file_path = arg;
         }
@@ -84,14 +96,52 @@ cli_opts_parse_output(cli_opts_t *opts, cli_args_t *args)
     opts->output_bin = string_view_from_cstr(output_bin);
 }
 
+static void
+cli_opts_parse_arch(cli_opts_t *opts, cli_args_t *args)
+{
+    assert(opts && "opts is required");
+    assert(args && "args is required");
+
+    char *arch = cli_args_shift(args);
+
+    if (arch == NULL) {
+        fprintf(stderr, "error: missing architecture for arg '--arch': available options (x86_64 | aarch64)\n");
+        cli_print_usage(stderr, opts->compiler_path);
+        exit(EXIT_FAILURE);
+    }
+
+    opts->options |= CLI_OPT_ARCH;
+    opts->arch = arch;
+}
+
+static void
+cli_opts_parse_sysroot(cli_opts_t *opts, cli_args_t *args)
+{
+    assert(opts && "opts is required");
+    assert(args && "args is required");
+
+    char *sysroot = cli_args_shift(args);
+
+    if (sysroot == NULL) {
+        fprintf(stderr, "error: missing sysroot arg '--sysroot'\n");
+        cli_print_usage(stderr, opts->compiler_path);
+        exit(EXIT_FAILURE);
+    }
+
+    opts->options |= CLI_OPT_SYSROOT;
+    opts->sysroot = sysroot;
+}
+
 void
 cli_print_usage(FILE *stream, char *compiler_path)
 {
     fprintf(stream,
             "Usage: %s [options] file...\n"
             "Options:\n"
-            "  --dump-tokens\t\tDisplay lexer token stream\n"
-            "  -o <file>\t\tCompile program into a binary file\n"
-            "  --save-temps\t\tKeep temp files used to compile program\n",
+            "  --dump-tokens    Display lexer token stream\n"
+            "  --arch <arch>    Binary arch: default to x86_64 (x86_64 | aarch64)\n"
+            "  --sysroot <dir>  System root dir where the GNU Assembler and GNU Linker are located: default to '/'\n"
+            "  -o <file>        Compile program into a binary file\n"
+            "  --save-temps     Keep temp files used to compile program\n",
             compiler_path);
 }

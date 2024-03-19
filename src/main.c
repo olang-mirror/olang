@@ -35,7 +35,7 @@ void
 handle_dump_tokens(cli_opts_t *opts);
 
 void
-handle_codegen_linux_x86_64(cli_opts_t *opts);
+handle_codegen_linux(cli_opts_t *opts);
 
 static void
 print_token(char *file_path, token_t *token);
@@ -54,7 +54,7 @@ main(int argc, char **argv)
     }
 
     if (opts.options & CLI_OPT_OUTPUT) {
-        handle_codegen_linux_x86_64(&opts);
+        handle_codegen_linux(&opts);
         return EXIT_SUCCESS;
     }
 
@@ -92,7 +92,7 @@ handle_dump_tokens(cli_opts_t *opts)
 }
 
 void
-handle_codegen_linux_x86_64(cli_opts_t *opts)
+handle_codegen_linux(cli_opts_t *opts)
 {
     if (opts->file_path == NULL) {
         cli_print_usage(stderr, opts->compiler_path);
@@ -114,14 +114,36 @@ handle_codegen_linux_x86_64(cli_opts_t *opts)
 
     FILE *out = fopen(asm_file, "w");
     assert(out);
-    codegen_linux_x86_64_emit_program(out, ast);
+
+    if (!(opts->options & CLI_OPT_ARCH)) {
+        codegen_linux_x86_64_emit_program(out, ast);
+    } else {
+        if (strcmp(opts->arch, "x86_64") == 0) {
+            codegen_linux_x86_64_emit_program(out, ast);
+        } else if (strcmp(opts->arch, "aarch64") == 0) {
+            assert(false && "Not implemented yet.");
+        } else {
+            fprintf(stderr, "error: architecture '%s' not supported\n", opts->arch);
+            cli_print_usage(stderr, opts->compiler_path);
+            exit(EXIT_FAILURE);
+        }
+    }
+
     fclose(out);
 
+    if (!(opts->options & CLI_OPT_SYSROOT)) {
+        opts->sysroot = "";
+    }
+
     char command[512];
-    sprintf(command, "as %s -o " SV_FMT ".o", asm_file, SV_ARG(opts->output_bin));
+    sprintf(command, "%s/bin/as %s -o " SV_FMT ".o", opts->sysroot, asm_file, SV_ARG(opts->output_bin));
     system(command);
 
-    sprintf(command, "ld " SV_FMT ".o -o " SV_FMT "", SV_ARG(opts->output_bin), SV_ARG(opts->output_bin));
+    sprintf(command,
+            "%s/bin/ld " SV_FMT ".o -o " SV_FMT "",
+            opts->sysroot,
+            SV_ARG(opts->output_bin),
+            SV_ARG(opts->output_bin));
     system(command);
 
     if (!(opts->options & CLI_OPT_SAVE_TEMPS)) {

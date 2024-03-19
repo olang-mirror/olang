@@ -11,7 +11,7 @@ olang - O Programming Language compiler
 **olang**
     source_file
     [**----dump-tokens**]
-    [**--o** output_file [**----save-temps**]] 
+    [**--o** ___output_file___ [**----save-temps**] [**----arch** ___arch___] [**----sysroot** ___dir___]]
 
 # DESCRIPTION
 
@@ -23,8 +23,14 @@ contains utilities to help the language development.
 **----dump-tokens**
 :   Display lexical tokens given a soruce.0 code.
 
-**--o <file>**
-:  Compile program into a binary file
+**--o** ___file___
+:   Compile program into a binary file
 
 **----save-temps**
 :   Keep temp files used to compile program
+
+**----arch** ___architecture___
+:   Binary arch: default to "x86_64", avaliable options ("x86_64" | "aarch64")
+
+**----sysroot**  ___dir___
+:   System root dir where the GNU Assembler and GNU Linker are located: default to '/'

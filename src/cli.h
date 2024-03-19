@@ -29,6 +29,8 @@ typedef struct cli_args
 typedef struct cli_opts
 {
     uint32_t options;
+    char *arch;
+    char *sysroot;
     char *compiler_path;
     char *file_path;
     string_view_t output_bin;
@@ -38,7 +40,9 @@ typedef enum
 {
     CLI_OPT_DUMP_TOKENS = 1 << 0,
     CLI_OPT_OUTPUT = 1 << 1,
-    CLI_OPT_SAVE_TEMPS = 1 << 2
+    CLI_OPT_SAVE_TEMPS = 1 << 2,
+    CLI_OPT_ARCH = 1 << 3,
+    CLI_OPT_SYSROOT = 1 << 4
 } cli_opt_t;
 
 cli_opts_t

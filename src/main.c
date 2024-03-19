@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "arena.h"
+#include "cli.h"
 #include "codegen_linux_x86_64.h"
 #include "lexer.h"
 #include "parser.h"
@@ -29,33 +30,6 @@
 
 // TODO: find a better solution to define the arena capacity
 #define ARENA_CAPACITY (1024 * 1024)
-
-typedef struct cli_args
-{
-    int argc;
-    char **argv;
-} cli_args_t;
-
-char *
-cli_args_shift(cli_args_t *args);
-
-typedef enum
-{
-    CLI_OPT_DUMP_TOKENS = 1 << 0,
-    CLI_OPT_OUTPUT = 1 << 1,
-    CLI_OPT_SAVE_TEMPS = 1 << 2
-} cli_opt_t;
-
-typedef struct cli_opts
-{
-    uint32_t options;
-    char *compiler_path;
-    char *file_path;
-    string_view_t output_bin;
-} cli_opts_t;
-
-void
-print_usage(FILE *stream, char *compiler_path);
 
 void
 handle_dump_tokens(cli_opts_t *opts);
@@ -69,29 +43,14 @@ print_token(char *file_path, token_t *token);
 string_view_t
 read_entire_file(char *file_path, arena_t *arena);
 
-void
-cli_opts_parse_output(cli_opts_t *opts, cli_args_t *args);
-
 int
 main(int argc, char **argv)
 {
-    cli_args_t args = { .argc = argc, .argv = argv };
-    cli_opts_t opts = { 0 };
+    cli_opts_t opts = cli_parse_args(argc, argv);
 
-    opts.compiler_path = cli_args_shift(&args);
-
-    char *arg = cli_args_shift(&args);
-    while (arg != NULL) {
-        if (strcmp(arg, "--dump-tokens") == 0) {
-            opts.options |= CLI_OPT_DUMP_TOKENS;
-        } else if (strcmp(arg, "--save-temps") == 0) {
-            opts.options |= CLI_OPT_SAVE_TEMPS;
-        } else if (strcmp(arg, "-o") == 0) {
-            cli_opts_parse_output(&opts, &args);
-        } else {
-            opts.file_path = arg;
-        }
-        arg = cli_args_shift(&args);
+    if (opts.options & CLI_OPT_DUMP_TOKENS) {
+        handle_dump_tokens(&opts);
+        return EXIT_SUCCESS;
     }
 
     if (opts.options & CLI_OPT_OUTPUT) {
@@ -104,24 +63,14 @@ main(int argc, char **argv)
         return EXIT_SUCCESS;
     }
 
-    print_usage(stderr, opts.compiler_path);
     return EXIT_FAILURE;
-}
-
-char *
-cli_args_shift(cli_args_t *args)
-{
-    if (args->argc == 0)
-        return NULL;
-    --(args->argc);
-    return *(args->argv)++;
 }
 
 void
 handle_dump_tokens(cli_opts_t *opts)
 {
     if (opts->file_path == NULL) {
-        print_usage(stderr, opts->compiler_path);
+        cli_print_usage(stderr, opts->compiler_path);
         exit(EXIT_FAILURE);
     }
 
@@ -146,7 +95,7 @@ void
 handle_codegen_linux_x86_64(cli_opts_t *opts)
 {
     if (opts->file_path == NULL) {
-        print_usage(stderr, opts->compiler_path);
+        cli_print_usage(stderr, opts->compiler_path);
         exit(EXIT_FAILURE);
     }
 
@@ -188,18 +137,6 @@ handle_codegen_linux_x86_64(cli_opts_t *opts)
     arena_free(&arena);
 }
 
-void
-print_usage(FILE *stream, char *compiler_path)
-{
-    fprintf(stream,
-            "Usage: %s [options] file...\n"
-            "Options:\n"
-            "  --dump-tokens\t\tDisplay lexer token stream\n"
-            "  -o <file>\t\tCompile program into a binary file\n"
-            "  --save-temps\t\tKeep temp files used to compile program\n",
-            compiler_path);
-}
-
 string_view_t
 read_entire_file(char *file_path, arena_t *arena)
 {
@@ -229,24 +166,6 @@ read_entire_file(char *file_path, arena_t *arena)
     fclose(stream);
 
     return file_content;
-}
-
-void
-cli_opts_parse_output(cli_opts_t *opts, cli_args_t *args)
-{
-    assert(opts && "opts is required");
-    assert(args && "args is required");
-
-    char *output_bin = cli_args_shift(args);
-
-    if (output_bin == NULL) {
-        fprintf(stderr, "error: missing filename after '-o'\n");
-        print_usage(stderr, opts->compiler_path);
-        exit(EXIT_FAILURE);
-    }
-
-    opts->options |= CLI_OPT_OUTPUT;
-    opts->output_bin = string_view_from_cstr(output_bin);
 }
 
 static void

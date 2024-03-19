@@ -23,6 +23,7 @@
 
 #include "arena.h"
 #include "cli.h"
+#include "codegen_linux_aarch64.h"
 #include "codegen_linux_x86_64.h"
 #include "lexer.h"
 #include "parser.h"
@@ -121,7 +122,7 @@ handle_codegen_linux(cli_opts_t *opts)
         if (strcmp(opts->arch, "x86_64") == 0) {
             codegen_linux_x86_64_emit_program(out, ast);
         } else if (strcmp(opts->arch, "aarch64") == 0) {
-            assert(false && "Not implemented yet.");
+            codegen_linux_aarch64_emit_program(out, ast);
         } else {
             fprintf(stderr, "error: architecture '%s' not supported\n", opts->arch);
             cli_print_usage(stderr, opts->compiler_path);

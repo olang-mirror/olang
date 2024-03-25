@@ -11,6 +11,7 @@ olang - O Programming Language compiler
 **olang**
     source_file
     [**----dump-tokens**]
+    [**----dump-ast**]
     [**--o** ___output_file___ [**----save-temps**] [**----arch** ___arch___] [**----sysroot** ___dir___]]
 
 # DESCRIPTION
@@ -22,6 +23,9 @@ contains utilities to help the language development.
 
 **----dump-tokens**
 :   Display lexical tokens given a soruce.0 code.
+
+**----dump-ast**
+:   Display AST tree to stdout right after syntax analyzes
 
 **--o** ___file___
 :   Compile program into a binary file

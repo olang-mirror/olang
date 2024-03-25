@@ -27,6 +27,7 @@
 #include "codegen_linux_x86_64.h"
 #include "lexer.h"
 #include "parser.h"
+#include "pretty_print_ast.h"
 #include "string_view.h"
 
 // TODO: find a better solution to define the arena capacity
@@ -34,6 +35,9 @@
 
 void
 handle_dump_tokens(cli_opts_t *opts);
+
+void
+handle_dump_ast(cli_opts_t *opts);
 
 void
 handle_codegen_linux(cli_opts_t *opts);
@@ -51,6 +55,11 @@ main(int argc, char **argv)
 
     if (opts.options & CLI_OPT_DUMP_TOKENS) {
         handle_dump_tokens(&opts);
+        return EXIT_SUCCESS;
+    }
+
+    if (opts.options & CLI_OPT_DUMP_AST) {
+        handle_dump_ast(&opts);
         return EXIT_SUCCESS;
     }
 
@@ -90,6 +99,28 @@ handle_dump_tokens(cli_opts_t *opts)
     print_token(opts->file_path, &token);
 
     arena_free(&arena);
+}
+
+void
+handle_dump_ast(cli_opts_t *opts)
+{
+    if (opts->file_path == NULL) {
+        cli_print_usage(stderr, opts->compiler_path);
+        exit(EXIT_FAILURE);
+    }
+
+    arena_t arena = arena_new(ARENA_CAPACITY);
+    lexer_t lexer = { 0 };
+    parser_t parser = { 0 };
+
+    string_view_t file_content = read_entire_file(opts->file_path, &arena);
+
+    lexer_init(&lexer, file_content);
+    parser_init(&parser, &lexer, &arena, opts->file_path);
+
+    ast_node_t *ast = parser_parse_program(&parser);
+
+    pretty_print_ast(ast);
 }
 
 void

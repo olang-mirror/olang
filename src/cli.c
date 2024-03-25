@@ -44,6 +44,8 @@ cli_parse_args(int argc, char **argv)
     while (arg != NULL) {
         if (strcmp(arg, "--dump-tokens") == 0) {
             opts.options |= CLI_OPT_DUMP_TOKENS;
+        } else if (strcmp(arg, "--dump-ast") == 0) {
+            opts.options |= CLI_OPT_DUMP_AST;
         } else if (strcmp(arg, "--save-temps") == 0) {
             opts.options |= CLI_OPT_SAVE_TEMPS;
         } else if (strcmp(arg, "-o") == 0) {
@@ -60,7 +62,7 @@ cli_parse_args(int argc, char **argv)
         arg = cli_args_shift(&args);
     }
 
-    if (opts.options & CLI_OPT_OUTPUT || opts.options & CLI_OPT_DUMP_TOKENS) {
+    if (opts.options & CLI_OPT_OUTPUT || opts.options & CLI_OPT_DUMP_TOKENS || opts.options & CLI_OPT_DUMP_AST) {
         return opts;
     }
 
@@ -139,6 +141,7 @@ cli_print_usage(FILE *stream, char *compiler_path)
             "Usage: %s [options] file...\n"
             "Options:\n"
             "  --dump-tokens    Display lexer token stream\n"
+            "  --dump-ast       Display ast tree to stdout\n"
             "  --arch <arch>    Binary arch: default to x86_64 (x86_64 | aarch64)\n"
             "  --sysroot <dir>  System root dir where the GNU Assembler and GNU Linker are located: default to '/'\n"
             "  -o <file>        Compile program into a binary file\n"

@@ -68,11 +68,6 @@ main(int argc, char **argv)
         return EXIT_SUCCESS;
     }
 
-    if (opts.options & CLI_OPT_DUMP_TOKENS) {
-        handle_dump_tokens(&opts);
-        return EXIT_SUCCESS;
-    }
-
     return EXIT_FAILURE;
 }
 

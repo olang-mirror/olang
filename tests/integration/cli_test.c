@@ -25,20 +25,23 @@ test_cli_dump_tokens_example_main_exit(const MunitParameter params[], void *user
     cli_result_t compilation_result = cli_runner_compiler_dump_tokens("../../examples/main_exit.ol");
     munit_assert_int(compilation_result.exec.exit_code, ==, 0);
     munit_assert_string_equal(compilation_result.exec.stdout_buf,
-                              "../../examples/main_exit.ol:1:1: <fn>\n"
-                              "../../examples/main_exit.ol:1:4: <identifier>\n"
-                              "../../examples/main_exit.ol:1:8: <(>\n"
-                              "../../examples/main_exit.ol:1:9: <)>\n"
-                              "../../examples/main_exit.ol:1:10: <:>\n"
-                              "../../examples/main_exit.ol:1:12: <identifier>\n"
-                              "../../examples/main_exit.ol:1:16: <{>\n"
-                              "../../examples/main_exit.ol:1:17: <line_feed>\n"
-                              "../../examples/main_exit.ol:2:3: <return>\n"
-                              "../../examples/main_exit.ol:2:10: <number>\n"
-                              "../../examples/main_exit.ol:2:11: <line_feed>\n"
-                              "../../examples/main_exit.ol:3:1: <}>\n"
-                              "../../examples/main_exit.ol:3:2: <line_feed>\n"
-                              "../../examples/main_exit.ol:4:1: <EOF>\n");
+                              "../../examples/main_exit.ol:1:12: <line_feed>\n"
+                              "../../examples/main_exit.ol:2:16: <line_feed>\n"
+                              "../../examples/main_exit.ol:3:1: <line_feed>\n"
+                              "../../examples/main_exit.ol:4:1: <fn>\n"
+                              "../../examples/main_exit.ol:4:4: <identifier>\n"
+                              "../../examples/main_exit.ol:4:8: <(>\n"
+                              "../../examples/main_exit.ol:4:9: <)>\n"
+                              "../../examples/main_exit.ol:4:10: <:>\n"
+                              "../../examples/main_exit.ol:4:12: <identifier>\n"
+                              "../../examples/main_exit.ol:4:16: <{>\n"
+                              "../../examples/main_exit.ol:4:17: <line_feed>\n"
+                              "../../examples/main_exit.ol:5:3: <return>\n"
+                              "../../examples/main_exit.ol:5:10: <number>\n"
+                              "../../examples/main_exit.ol:5:11: <line_feed>\n"
+                              "../../examples/main_exit.ol:6:1: <}>\n"
+                              "../../examples/main_exit.ol:6:2: <line_feed>\n"
+                              "../../examples/main_exit.ol:7:1: <EOF>\n");
     return MUNIT_OK;
 }
 

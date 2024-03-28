@@ -76,6 +76,13 @@ lexer_next_token(lexer_t *lexer, token_t *token)
     }
 
     while (lexer_is_not_eof(lexer)) {
+        if (current_char == '#') {
+            while (current_char != '\n' && lexer_is_not_eof(lexer)) {
+                lexer_skip_char(lexer);
+                current_char = lexer_current_char(lexer);
+            }
+        }
+
         if (isalpha(current_char)) {
             size_t start_offset = lexer->offset;
             while (isalnum(current_char) && lexer_is_not_eof(lexer)) {

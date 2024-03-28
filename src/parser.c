@@ -62,6 +62,7 @@ parser_init(parser_t *parser, lexer_t *lexer, arena_t *arena, char *file_path)
 ast_node_t *
 parser_parse_program(parser_t *parser)
 {
+    skip_line_feeds(parser->lexer);
     ast_node_t *fn = parser_parse_fn_definition(parser);
     if (fn == NULL) {
         return NULL;

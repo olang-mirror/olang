@@ -1,11 +1,10 @@
-% Hacking
+% Contribute
 
 We're thrilled to have you here! Your interest in making olang the most
 exceptional and straightforward language ever is greatly appreciated.
 
-In this document, we'll outline how you can begin contributing to olang.
-
-First and foremost, clone the project if you haven't done so already.
+In this document, we'll outline how you can begin contributing to olang.  First
+and foremost, clone the project if you haven't done so already.
 
 ``` {.sh}
 git clone https://git.sr.ht/~johnnyrichard/olang

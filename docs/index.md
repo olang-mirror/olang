@@ -1,27 +1,15 @@
-% Welcome to olang documentation
+% Introduction
 
-The O Programming Language.
+**[WARNING] THIS SOFTWARE IS UNFINISHED AND NOT PRODUCTION READY**
 
-## olang manifest
+The O language is a system programming language crafted to be remarkably simple
+and flexible. It stands not as a replacement for C, but rather as a
+complementary counterpart, as both can coexist within the same source code. O
+language boasts minimal abstraction, ensuring seamless integration with C and
+almost predictable machine code.
 
-We, as developers, value the modern programming languages that allow us to
-produce reliable code in a short time span. However, we, as programmers, also
-lament that these same languages have diminished the joy of programming by
-imposing unnecessary constraints and complexities on our creative expression.
+olang is a deterministic system language that follows tree principles:
 
-That is why we are creating a new programming language that may not be suitable
-for most commercial applications, but that can be enjoyed in the places where
-it is meant to be used: on system applications.
-
-olang is a deterministic system language that follows two principles:
-
-- **olang fights complexity** by providing a simple syntax with a low level of abstraction;
-- **olang doesn't babysit programmers** and therefore the compiler only checks semantics.
-
-olang maintainers
-
-### Subscribe olang's development mailing list.
-
-If you want to subscribe to the mailing list, you can achieve it by sending an
-email to
-[~johnnyrichard/olang-devel+subscribe@lists.sr.ht](mailto:~johnnyrichard/olang-devel+subscribe@lists.sr.ht?subject=Subscribe&body=Subscribe)
+- **fights complexity** by providing a simple syntax with a low level of abstraction.
+- **doesn't babysit programmers**, it gives you the freedom of shooting your own foot.
+- **aims easy maintainability** by providing a syntax with a low refactoring overhead.

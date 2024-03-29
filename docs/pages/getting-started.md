@@ -1,3 +1,3 @@
-% Getting stated (WIP)
+% Getting stated
 
 WIP

@@ -21,8 +21,7 @@
     body {
       background: var(--background-color);
       color: var(--text-color);
-      font-family: monospace;
-      font-size: 1.1rem;
+      font-size: 1.4rem;
       margin: 0;
       padding: 0 40px;
     }
@@ -33,8 +32,18 @@
       max-width: 1024px;
       margin: 10px auto;
     }
-    header, footer {
-      margin: 70px auto;
+    header > h1 {
+      font-weight: normal;
+    }
+    nav, header > h1 {
+      text-align: center;
+    }
+    header {
+      margin-top: 70px;
+      margin-bottom: 20px;
+    }
+    footer {
+      margin: 20px auto;
     }
     article {
       line-height: 1.75rem;
@@ -47,19 +56,25 @@
       padding: 10px;
       max-width: 100%;
       overflow: auto;
+      font-size: large;
+    }
+
+    .logo-name {
+      font-size: 3.2rem;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>olang | The O Programming Language</h1>
+    <h1><span class="logo-name">olang</span> | O Programming Language</h1>
     <nav>
-      <a href="/">Index</a> |
-      <a href="/pages/getting-started.html">Getting started (WIP)</a> |
-      <a href="/pages/language-specification.html">Specification</a> |
-      <a href="/pages/hacking.html">Hacking</a> |
-      <a href="https://sr.ht/~johnnyrichard/olang/sources" target="_blank">Sources ↗</a> |
-      <a href="https://sr.ht/~johnnyrichard/olang/lists" target="_blank">Mailing list ↗</a>
+      [ <a href="/">Home</a> ]
+      [ <a href="/pages/getting-started.html">Getting started</a> ]
+      [ <a href="/pages/language-specification.html">Specification</a> ]
+      [ <a href="/pages/contribute.html">Contribute</a> ]
+      [ <a href="https://sr.ht/~johnnyrichard/olang/sources" target="_blank">Sources ↗</a> ]
+      [ <a href="https://sr.ht/~johnnyrichard/olang/lists" target="_blank">Mailing list ↗</a> ]
     </nav>
   </header>
   <article>

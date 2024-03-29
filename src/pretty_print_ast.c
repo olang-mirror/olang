@@ -26,7 +26,10 @@
 
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
 #define ANSI_COLOR_RESET "\x1b[0m"
+
+// clang-format off
 #define PP_IS_BIT_SET(data, index) ((data) & 1 << index)
+// clang-format on
 
 typedef struct pretty_print_node
 {

@@ -22,24 +22,43 @@ language.
 
 ```
 (* Entry Point *)
-<translation-unit>    ::= <ows> <function-definition> <ows> <end-of-file>
+<translation-unit>     ::= (<ows> <external-declaration> <ows> (<end-of-statement> | <end-of-file>))*
+
+<external-declaration> ::= <function-definition> | <variable-definition>
+
+(* Variables *)
+<variable-definition>  ::= <variable-qualifier> <ws> <variable-name> <ows> ':' <ows> <type> (<ows> <assign-operator> <ows> <expression>)?
+<variable-qualifier>   ::= 'var'
+                         | 'const'
+<variable-name>        ::= <identifier>
+
 (* Functions *)
-<function-definition> ::= 'fn' <ws> <function-name> <ows>
-<function-parameters> <ows> ':' <ows> <return-type> <ows> <function-body>
+<function-definition> ::= 'fn' <ws> <function-name> <ows> <function-parameters> <ows> ':' <ows> <return-type> <ows> <function-body>
 <function-name>       ::= <identifier>
 <function-parameters> ::= '(' <ows> ')'
 <return-type>         ::= <type>
 <function-body>       ::= <block>
 
 (* Statements *)
-<block>               ::= '{' <ows> <statement> <ows> (<end-of-statement>
-<ows> <statement> <ows>)* <end-of-statement>? <ows> '}'
+<block>               ::= '{' <ows> <statement> <ows> (<end-of-statement> <ows> <statement> <ows>)* <end-of-statement>? <ows> '}'
 <end-of-statement>    ::= ';' | <line-break>
-<statement>           ::= <return-statement>
+<statement>           ::= <return-statement> | <variable-definition> | <assign-expression>
 <return-statement>    ::= 'return' <ws> <expression>
 
 (* Expressions *)
-<expression>          ::= <integer>
+<expression>          ::= <integer> | <identifier>
+<assign-expression>   ::= <variable-name> <ows> <assign-operator> <ows> <expression>
+<assign-operator>     ::= '='
+                        | '*='
+                        | '/='
+                        | '%='
+                        | '+='
+                        | '-='
+                        | '<<='
+                        | '>>='
+                        | '&='
+                        | '^='
+                        | '|='
 
 (* Identifiers *)
 <type>                ::= 'u32'

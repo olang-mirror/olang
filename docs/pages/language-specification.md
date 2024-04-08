@@ -22,8 +22,7 @@ language.
 
 ```
 (* Entry Point *)
-<program>             ::= <ows> <function-definition> <ows> <end-of-file>
-
+<translation-unit>    ::= <ows> <function-definition> <ows> <end-of-file>
 (* Functions *)
 <function-definition> ::= 'fn' <ws> <function-name> <ows>
 <function-parameters> <ows> ':' <ows> <return-type> <ows> <function-body>

@@ -45,11 +45,8 @@ language.
 
 (* Statements *)
 <end-of-statement>    ::= ';' | <line-break>
-<common-statement>    ::= <variable-definition> | <assignment-expression>
-
-(* Expressions *)
-<expression>            ::= <integer-literal> | <variable-name>
-<assignment-expression> ::= <variable-name> <ows> <assignment-operator> <ows> <expression>
+<common-statement>    ::= <variable-definition> | <constant-definition> | <assignment>
+<assignment>          ::= <variable-name> <ows> <assignment-operator> <ows> <expression>
 <assignment-operator> ::= '='
                         | '*='
                         | '/='
@@ -61,6 +58,9 @@ language.
                         | '&='
                         | '^='
                         | '|='
+
+(* Expressions *)
+<expression>          ::= <integer-literal> | <variable-name>
 
 (* Identifiers *)
 <type>                ::= 'u32'

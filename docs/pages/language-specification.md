@@ -48,6 +48,16 @@ language.
 <common-statement>    ::= <variable-definition> | <constant-definition> | <assignment>
 <assignment>          ::= <variable-name> <ows> <assignment-operator> <ows> <expression>
 <assignment-operator> ::= '='
+                        | '*='
+                        | '/='
+                        | '%='
+                        | '+='
+                        | '-='
+                        | '<<='
+                        | '>>='
+                        | '&='
+                        | '^='
+                        | '|='
 
 (* Expressions *)
 <expression> ::= <binary-expression>

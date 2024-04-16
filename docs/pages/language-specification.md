@@ -24,10 +24,11 @@ language.
 (* Entry Point *)
 <translation-unit>     ::= (<ows> <external-declaration> <ows> (<end-of-statement> | <end-of-file>))*
 
-<external-declaration> ::= <function-definition> | <variable-definition>
+(* Translation Unit *)
+<external-declaration> ::= <common-statement> | <function-definition>
 
 (* Variables *)
-<variable-definition>  ::= <variable-qualifier> <ws> <variable-name> <ows> ':' <ows> <type> (<ows> <assign-operator> <ows> <expression>)?
+<variable-definition>  ::= <variable-qualifier> <ws> <variable-name> <ows> ':' <ows> <type> (<ows> <assignment-operator> <ows> <expression>)?
 <variable-qualifier>   ::= 'var'
                          | 'const'
 <variable-name>        ::= <identifier>
@@ -38,17 +39,18 @@ language.
 <function-parameters> ::= '(' <ows> ')'
 <return-type>         ::= <type>
 <function-body>       ::= <block>
-
-(* Statements *)
 <block>               ::= '{' <ows> <statement> <ows> (<end-of-statement> <ows> <statement> <ows>)* <end-of-statement>? <ows> '}'
-<end-of-statement>    ::= ';' | <line-break>
-<statement>           ::= <return-statement> | <variable-definition> | <assign-expression>
+<statement>           ::= <common-statement> | <return-statement>
 <return-statement>    ::= 'return' <ws> <expression>
 
+(* Statements *)
+<end-of-statement>    ::= ';' | <line-break>
+<common-statement>    ::= <variable-definition> | <assignment-expression>
+
 (* Expressions *)
-<expression>          ::= <integer> | <identifier>
-<assign-expression>   ::= <variable-name> <ows> <assign-operator> <ows> <expression>
-<assign-operator>     ::= '='
+<expression>            ::= <integer-literal> | <variable-name>
+<assignment-expression> ::= <variable-name> <ows> <assignment-operator> <ows> <expression>
+<assignment-operator> ::= '='
                         | '*='
                         | '/='
                         | '%='
@@ -65,7 +67,7 @@ language.
 <identifier>          ::= (<alpha> | '_') (<alpha> | <digit> | '_')*
 
 (* Literals *)
-<integer>             ::= <integer-base10> | <integer-base16>
+<integer-literal>     ::= <integer-base10> | <integer-base16>
 <integer-base10>      ::= #'[1-9]' (<digit> | '_')* | '0'
 <integer-base16>      ::= #'0[Xx]' <hex-digit> (<hex-digit> | '_')*
 

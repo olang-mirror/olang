@@ -28,10 +28,10 @@ language.
 <external-declaration> ::= <common-statement> | <function-definition>
 
 (* Variables *)
-<variable-definition>  ::= <variable-qualifier> <ws> <variable-name> <ows> ':' <ows> <type> (<ows> <assignment-operator> <ows> <expression>)?
-<variable-qualifier>   ::= 'var'
-                         | 'const'
-<variable-name>        ::= <identifier>
+<variable-definition>   ::= 'var' <ws> <variable-name> <ows> ':' <ows> <type> <ows> <variable-initializer>?
+<constant-definition>   ::= 'const' <ws> <variable-name> <ows> ':' <ows> <type> <ows> <variable-initializer>
+<variable-name>         ::= <identifier>
+<variable-initializer>  ::= '=' <ows> <expression>
 
 (* Functions *)
 <function-definition> ::= 'fn' <ws> <function-name> <ows> <function-parameters> <ows> ':' <ows> <return-type> <ows> <function-body>

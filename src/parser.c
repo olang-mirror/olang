@@ -173,8 +173,6 @@ get_binary_op_precedence(token_kind_t kind)
 static ast_node_t *
 parser_parse_expr_1(parser_t *parser, ast_node_t *lhs, size_t prev_precedence)
 {
-    ast_node_t *expr = NULL;
-
     token_t lookahead_token;
     lexer_peek_next(parser->lexer, &lookahead_token);
 
@@ -196,17 +194,13 @@ parser_parse_expr_1(parser_t *parser, ast_node_t *lhs, size_t prev_precedence)
             lexer_peek_next(parser->lexer, &lookahead_token);
         }
 
-        expr = ast_new_node_bin_op(parser->arena, token_kind_to_binary_op_kind(token_op.kind), lhs, rhs);
-        if (expr == NULL) {
+        lhs = ast_new_node_bin_op(parser->arena, token_kind_to_binary_op_kind(token_op.kind), lhs, rhs);
+        if (lhs == NULL) {
             return NULL;
         }
     }
 
-    if (expr == NULL) {
-        return lhs;
-    }
-
-    return expr;
+    return lhs;
 }
 
 static ast_node_t *

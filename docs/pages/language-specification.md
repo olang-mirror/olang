@@ -66,12 +66,12 @@ language.
 <logical-and-expression> ::= <bitwise-or-expression> (<ows> '&&' <ows> <bitwise-or-expression>)*
 <bitwise-or-expression> ::= <bitwise-xor-expression> (<ows> '|' <ows> <bitwise-xor-expression>)*
 <bitwise-xor-expression> ::= <bitwise-and-expression> (<ows> '^' <ows> <bitwise-and-expression>)*
-<bitwise-and-expression> ::= <cmp-eq-and-neq-expression> (<ows> '&' <ows> <cmp-eq-and-neq-expression>)*
-<cmp-eq-and-neq-expression> ::= <cmp-lt-and-gt-expression> (<ows> ('==' | '!=') <ows> <cmp-lt-and-gt-expression>)*
-<cmp-lt-and-gt-expression> ::= <bitwise-shift-expression> (<ows> ('<' | '>') <ows> <bitwise-shift-expression>)*
+<bitwise-and-expression> ::= <cmp-equality-expression> (<ows> '&' <ows> <cmp-equality-expression>)*
+<cmp-equality-expression> ::= <cmp-relational-expression> (<ows> ('==' | '!=') <ows> <cmp-relational-expression>)*
+<cmp-relational-expression> ::= <bitwise-shift-expression> (<ows> ('<' | '>' | '<=' | '>=') <ows> <bitwise-shift-expression>)*
 <bitwise-shift-expression> ::= <additive-expression> (<ows> ('<<' | '>>') <ows> <additive-expression>)*
 <additive-expression> ::= <multiplicative-expression> (<ows> ('+' | '-') <ows> <multiplicative-expression>)*
-<multiplicative-expression> ::= <primary-expression> (<ows> ('*' | '/') <ows> <primary-expression>)*
+<multiplicative-expression> ::= <primary-expression> (<ows> ('*' | '/' | '%') <ows> <primary-expression>)*
 <primary-expression> ::= <integer-literal>
                        | <variable-name>
                        | '(' <ows>  <expression> <ows> ')'

@@ -126,8 +126,8 @@ typedef enum
     BINOP_BITWISE_OR_PREC,
     BINOP_BITWISE_XOR_PREC,
     BINOP_BITWISE_AND_PREC,
-    BINOP_CMP_EQ_AND_NEQ_PREC,
-    BINOP_CMP_LT_AND_GT_PREC,
+    BINOP_CMP_EQUALITY_PREC,
+    BINOP_CMP_RELATIONAL_PREC,
     BINOP_BITWISE_SHIFT_PREC,
     BINOP_ADDITIVE_PREC,
     BINOP_MULTIPLICATIVE_PREC,
@@ -149,10 +149,12 @@ get_binary_op_precedence(token_kind_t kind)
             return BINOP_BITWISE_SHIFT_PREC;
         case TOKEN_LT:
         case TOKEN_GT:
-            return BINOP_CMP_LT_AND_GT_PREC;
+        case TOKEN_CMP_LEQ:
+        case TOKEN_CMP_GEQ:
+            return BINOP_CMP_RELATIONAL_PREC;
         case TOKEN_EQ:
         case TOKEN_CMP_NEQ:
-            return BINOP_CMP_EQ_AND_NEQ_PREC;
+            return BINOP_CMP_EQUALITY_PREC;
         case TOKEN_AND:
             return BINOP_BITWISE_AND_PREC;
         case TOKEN_CIRCUMFLEX:

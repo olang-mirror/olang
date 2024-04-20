@@ -1,0 +1,79 @@
+:root {
+  --background-color: #f4f4f4;
+  --text-color: black;
+  --link-color: #4e5289;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #26282B;
+    --text-color: white;
+    --link-color: #8c91db;
+  }
+}
+
+div.example {
+  margin: 0;
+}
+
+body {
+  background: var(--background-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0 40px;
+  font-size: 11pt;
+  font-family: monospace;
+}
+
+.example-formatted {
+  font-family: monospace;
+}
+
+a {
+  color: var(--link-color);
+}
+
+body > * {
+  max-width: 800px;
+  margin: 10px auto;
+}
+
+header > h1 {
+  font-weight: normal;
+}
+
+nav, header > h1 {
+  text-align: center;
+}
+
+header {
+  margin-top: 70px;
+  margin-bottom: 20px;
+}
+
+footer {
+  margin: 20px auto;
+}
+
+body > * {
+  overflow: hidden;
+}
+
+pre {
+  background: rgba(0,0,0, 0.75);
+  color: white;
+  padding: 1.5rem;
+  max-width: 100%;
+  overflow: auto;
+  font-size: large;
+  line-height: 1;
+}
+
+.logo-name {
+  font-size: 3.2rem;
+  font-weight: bold;
+}
+
+ol {
+  margin-left: 1.5rem;
+}

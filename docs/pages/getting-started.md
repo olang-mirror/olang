@@ -1,3 +1,0 @@
-% Getting stated
-
-WIP

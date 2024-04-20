@@ -1,0 +1,41 @@
+\input texinfo
+
+@settitle Olang Reference Manual 0.0.1
+
+@copying
+This manual documents Olang.
+
+Copyright @copyright{} 2024 olang mantainers.
+@end copying
+
+@titlepage
+@title Olang Reference Manual
+@page
+@vskip 0pt plus 1fill
+@insertcopying
+@end titlepage
+
+@contents
+
+@node Top
+@top Olang Reference Manual
+
+This document describes O programming language (Olang). A simple system
+programming language.
+
+@menu
+* Introduction::
+* Installation::
+* Getting Started::
+* Contribution Guide::
+@end menu
+
+@include introduction.texi
+
+@include installation.texi
+
+@include getting-started.texi
+
+@include contribution-guide.texi
+
+@bye

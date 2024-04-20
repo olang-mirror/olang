@@ -1,0 +1,250 @@
+@node Contribution Guide
+@chapter Contribution Guide
+
+O Programming Language is an independent project developed by volunteers around
+the world. Everyone is welcome to join us. If you want to catch up the language
+development, you can subscribe to our mailing list or join the #olang IRC
+channel on Libera network.
+
+Olang source code is available on @strong{git}
+@url{https://git.sr.ht/~johnnyrichard/olang}
+
+@c ----------------------------------------------------------------------------
+
+@node Building the compiler
+@section Building the compiler
+
+The olang compiler is crafted in C. To build the project, you'll require
+merely three dependencies: @code{make}, @code{gcc} (version 11 or higher), and
+@code{clang-format} (version 14 or higher).
+
+@example
+$ make
+@end example
+
+If everything went well with the compilation, you should find a @code{olang}
+binary on the project root folder.
+
+As an optional step, you can install @code{texinfo}, @code{pandoc} and
+@code{texlive} to refresh this manual and the website. For more information
+read @ref{Writing Documentation}.
+
+@subsection Testing
+
+There are two layers of tests @strong{integration} and @strong{unit}. The
+integration test is going to execute the @code{olang} compiler and check if the
+generated binary acts as expected. Unit tests will test C functions.
+
+To run all tests you can execute:
+
+@example
+$ make check
+@end example
+
+@c ----------------------------------------------------------------------------
+
+@node Code Style
+@section Code Style
+
+Instead of delineating every element of our coding style, we have adopted the
+use of @strong{clang-format} to enforce the olang code style. Please refer to
+the format section below for guidance on its application.
+
+@subsection Code Formatting
+
+Checking for format issues:
+
+@example
+$ make format
+@end example
+
+Most of the common code style mistakes are fixed by:
+
+@example
+$ make format-fix
+@end example
+
+@subsection .editorconfig
+
+We also provide a @strong{.editorconfig} file at project's root. Follow
+@url{https://editorconfig.org/} to learn how to make it work with your favorite
+editor.
+
+@c ----------------------------------------------------------------------------
+
+@node Submitting Patches
+@section Submitting Patches
+
+Patches should be sent via email to @email{~johnnyrichard/olang-devel@@lists.sr.ht}
+mailing list.
+
+Olang uses @strong{git}.  We strongly recommend you to use @strong{git} if you
+want to make your contributor's life easier. The patches should be created with
+@code{git format-patch} and sent via @code{git send-email}.
+
+@subsection Formatting Patches
+
+All contributors are required to "sign-off" their commits (using @code{git
+commit -s}) to indicate that they have agreed to the
+@url{https://developercertificate.org/, Developer Certificate of Origin}.
+
+Before submit the patch, ensure the code follows our coding style and is
+well-tested. (every single patch must pass the test suite)
+
+Unlike many projects, olang has a
+@url{http://www.bitsnbites.eu/git-history-work-log-vs-recipe/, linear, 'recipe'
+style history}.  The patches should be small, digestible, stand-alone and
+functional.  Rather than a purely chronological commit history.
+
+Bellow there is an example of commit subject:
+
+@example
+Subject: [PATCH olang] parser: add bitwise shift binary operator expression
+                ^      ^       ^
+                |      |       |
+                |      |       - patch description
+                |      |
+                |      - module prefix
+                |
+                - project name
+@end example
+
+In the patch body we expect:
+
+@enumerate
+
+@item
+A good explanation on @strong{why} this change has been made
+
+@item
+All lines wrapped at 75 columns, which will be copied to the permanent
+changelog.
+
+@item
+An empty line
+
+@item
+The Signed-off-by: lines
+
+@item
+A marker line containing simply @code{---}
+
+@item
+Any additional comments not suitable for the changelog
+
+@item
+The actual patch (@code{diff} output).
+@end enumerate
+
+Sometimes you might need to break down your patch into multiple patches.  In
+this case a patchset should be sent.
+Patchesets MUST contain a @strong{cover letter} followed by a good description.
+It is easily achievable with the @code{--cover-letter} argument available on
+@code{git format-patch} and @code{git send-email} commands.
+
+@subsection Creating Patches
+
+You can create a patch using the command:
+
+@example
+$ git format-patch --cover-letter --base origin/main -M origin/main -o outgoing/
+@end example
+
+As described on @strong{Formatting Patches} the option @code{--cover-letter} is
+required for patchset.  Check the patches generated on @code{outgoing}
+folder and adjust the cover letter by replacing the "gaps" @strong{SUBJECT HERE}
+and @strong{BLURB HERE}.
+
+We recommend you to add the @code{--base} followed by a commit hash to help
+maintainers to know from where you changes are based on. (Optional but a good
+practice)
+
+@subsection Sending Patches
+
+Before sent patch, we suggest you to set the following properties on your
+@code{.git/config} file (This example assumes you are working on "olang" repository):
+
+@example
+[sendemail]
+    to = ~johnnyrichard/olang-devel@@lists.sr.ht
+[format]
+    subjectPrefix = PATCH olang
+@end example
+
+Make sure you email settings is correctly configured by running the
+@url{https://git-send-email.io} tutorial.  Once you have everything set, you
+can send the patches running the @code{git send-email} command as described
+bellow:
+
+@example
+$ git send-email outgoing/* --to=~johnnyrichard/olang-devel@@lists.sr.ht
+@end example
+
+@subsection The Review Process
+
+IMPORTANT: All emails MUST be written on @code{plain/text} format.
+
+Upon submission, you'll receive an automated email from our pipeline. If
+the check is successful, the olang maintainers will review your patch.
+Subsequently, you'll receive an email indicating whether your patch has
+been approved, requires changes, or has been rejected.
+
+We use a patch management system to track patch status at
+@url{https://lists.sr.ht/~johnnyrichard/olang-devel/patches}.
+
+Patch status meaning:
+
+@table @samp
+
+@item PROPOSED
+A new patch which needs review.
+
+@item NEEDS_REVISION
+The patch has been reviewed and changes was requested.
+
+@item SUPERSEDED
+The patch has been superseded by a new revision.
+
+@item APPROVED
+The patch has been approve and is waiting to be integrated.
+
+@item REJECTED
+The patch has been rejected and the work MUST be abandoned.
+
+@item APPLIED
+The patch has been integrated into the upstream.
+
+@end table
+
+If your patchset requires any modifications, you'll have to submit a new
+version of your patch (git is your friend here, use @code{rebase} to rewrite
+the history according to review comments).  The submission process remains
+unchanged, except for the addition of the version argument to the @code{git
+format-patch} command.
+
+@example
+$ git format-patch --cover-letter -M origin/main -o outgoing/ -v2
+@end example
+
+Whenever you need to reply emails comments, please avoid
+@url{https://en.wikipedia.org/wiki/Posting_style, top posting}, do
+@strong{bottom posting} instead.  Read more about it here
+@url{https://useplaintext.email/#etiquette}.
+
+@c ----------------------------------------------------------------------------
+
+@node Writing Documentation
+@section Writing Documentation
+
+@c ----------------------------------------------------------------------------
+
+@node Development Mailing List
+@section Development Mailing List
+
+Send a @strong{plain text} email to
+@email{~johnnyrichard/olang-devel+subscribe@@lists.sr.ht} to subscribe to our
+dev mailing list.
+
+You should be able to find older threads by searching into our archives, which
+is hosted at @url{https://lists.sr.ht/~johnnyrichard/olang-devel}.
+

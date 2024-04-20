@@ -11,9 +11,9 @@ environment:
 sources:
   - https://git.sr.ht/~johnnyrichard/olang
 tasks:
-  - lint: |
+  - format: |
       cd olang
-      make linter
+      make format
   - build: |
       cd olang
       make

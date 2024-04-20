@@ -18,12 +18,12 @@ clean:
 	$(RM) *.o *_test
 	$(RM) -rfv lib
 
-.PHONY: linter
-linter: $(SRCS)
+.PHONY: format
+format: $(SRCS)
 	clang-format --dry-run --Werror $?
 
-.PHONY: linter-fix
-linter-fix: $(SRCS)
+.PHONY: format-fix
+format-fix: $(SRCS)
 	clang-format -i $?
 
 %_test: $(MUNIT) $(SUBJECT_OBJS) %_test.c

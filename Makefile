@@ -16,17 +16,17 @@ $(TARGET): $(BUILD_DIR) $(OBJS)
 $(BUILD_DIR):
 	@mkdir -p $@
 
-.PHONY: linter
-linter: $(SRCS) $(HEADERS)
+.PHONY: format
+format: $(SRCS) $(HEADERS)
 	clang-format --dry-run --Werror $?
-	$(MAKE) -C tests/integration/ linter
-	$(MAKE) -C tests/unit/ linter
+	$(MAKE) -C tests/integration/ format
+	$(MAKE) -C tests/unit/ format
 
-.PHONY: linter-fix
-linter-fix: $(SRCS) $(HEADERS)
+.PHONY: format-fix
+format-fix: $(SRCS) $(HEADERS)
 	clang-format -i $?
-	$(MAKE) -C tests/integration/ linter-fix
-	$(MAKE) -C tests/unit/ linter-fix
+	$(MAKE) -C tests/integration/ format-fix
+	$(MAKE) -C tests/unit/ format-fix
 
 .PHONY: integration-test
 integration-test:

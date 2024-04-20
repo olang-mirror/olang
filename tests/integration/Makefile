@@ -16,12 +16,12 @@ all: $(MUNIT) proc_exec.o cli_runner.o $(TESTS)
 clean:
 	$(RM) *.o *_test
 
-.PHONY: linter
-linter: $(SRCS)
+.PHONY: format
+format: $(SRCS)
 	clang-format --dry-run --Werror $?
 
-.PHONY: linter-fix
-linter-fix: $(SRCS)
+.PHONY: format-fix
+format-fix: $(SRCS)
 	clang-format -i $?
 
 cli_test: $(MUNIT) proc_exec.o cli_runner.o cli_test.o

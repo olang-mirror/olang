@@ -25,21 +25,21 @@ Code style
 
 Instead of delineating every element of our coding style, we have
 adopted the use of **clang-format** to enforce the olang code style.
-Please refer to the linter section below for guidance on its
+Please refer to the **Format** section below for guidance on its
 application.
 
-### Linter
+### Format
 
-Checking for linter issues:
+Checking for format issues:
 
 ``` {.sh}
-make linter
+make format
 ```
 
 Most of the common code style mistakes are fixed by:
 
 ``` {.sh}
-make linter-fix
+make format-fix
 ```
 
 ### .editorconfig
@@ -92,9 +92,9 @@ the email-driven workflow here, but you can check it out at
 1. Write single-purpose commits.
 2. Write a meaningful commit message.
 3. Every commit must be production ready.
-    - If the tests or the linter fail, you should not create a fix commit.
-      Instead, you should amend the commit that caused the issue and then
-      resend the patchset.
+    - If the tests or the format check fail, you should not create a fix
+      commit. Instead, you should amend the commit that caused the issue and
+      then resend the patchset.
 
 ### Step 2: Create your patch
 

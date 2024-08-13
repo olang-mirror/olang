@@ -45,11 +45,11 @@ parse_program_test(const MunitParameter params[], void *user_data_or_fixture)
     assert_not_null(program_node);
     assert_uint(program_node->kind, ==, AST_NODE_PROGRAM);
 
-    ast_program_t program = program_node->data.as_program;
+    ast_program_t program = program_node->as_program;
     assert_not_null(program.fn);
     assert_uint(program.fn->kind, ==, AST_NODE_FN_DEF);
 
-    ast_fn_definition_t fn = program.fn->data.as_fn_def;
+    ast_fn_definition_t fn = program.fn->as_fn_def;
     assert_memory_equal(fn.identifier.size, fn.identifier.chars, "main");
     assert_uint(fn.return_type, ==, TYPE_U32);
 
@@ -57,8 +57,8 @@ parse_program_test(const MunitParameter params[], void *user_data_or_fixture)
     assert_not_null(block);
 
     assert_uint(block->kind, ==, AST_NODE_BLOCK);
-    assert_uint(list_size(block->data.as_block.nodes), ==, 1);
-    list_item_t *block_item = list_get(block->data.as_block.nodes, 0);
+    assert_uint(list_size(block->as_block.nodes), ==, 1);
+    list_item_t *block_item = list_get(block->as_block.nodes, 0);
     assert_not_null(block_item);
     assert_not_null(block_item->value);
 
@@ -66,11 +66,11 @@ parse_program_test(const MunitParameter params[], void *user_data_or_fixture)
     assert_not_null(node);
     assert_uint(node->kind, ==, AST_NODE_RETURN_STMT);
 
-    ast_node_t *number_node = node->data.as_return_stmt.data;
+    ast_node_t *number_node = node->as_return_stmt.data;
     assert_not_null(number_node);
     assert_uint(number_node->kind, ==, AST_NODE_LITERAL);
-    assert_uint(number_node->data.as_literal.kind, ==, AST_LITERAL_U32);
-    assert_uint(number_node->data.as_literal.as_u32, ==, 69);
+    assert_uint(number_node->as_literal.kind, ==, AST_LITERAL_U32);
+    assert_uint(number_node->as_literal.as_u32, ==, 69);
 
     arena_free(&arena);
 

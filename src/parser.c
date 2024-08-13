@@ -336,9 +336,9 @@ parser_parse_block(parser_t *parser)
         return NULL;
     }
 
-    node_return_stmt->data.as_return_stmt.data = expr;
+    node_return_stmt->as_return_stmt.data = expr;
 
-    list_append(node_block->data.as_block.nodes, node_return_stmt);
+    list_append(node_block->as_block.nodes, node_return_stmt);
     if (!skip_expected_token(parser, TOKEN_LF)) {
         return NULL;
     }

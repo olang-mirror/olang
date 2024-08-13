@@ -35,9 +35,9 @@ codegen_linux_x86_64_emit_program(FILE *out, ast_node_t *node)
     codegen_linux_x86_64_emit_start_entrypoint(out);
 
     assert(node->kind == AST_NODE_PROGRAM);
-    ast_program_t program = node->data.as_program;
+    ast_program_t program = node->as_program;
 
-    ast_fn_definition_t fn = program.fn->data.as_fn_def;
+    ast_fn_definition_t fn = program.fn->as_fn_def;
 
     assert(string_view_eq_to_cstr(fn.identifier, "main"));
     codegen_linux_x86_64_emit_function(out, &fn);
@@ -61,18 +61,18 @@ codegen_linux_x86_64_emit_function(FILE *out, ast_fn_definition_t *fn)
 {
     ast_node_t *block_node = fn->block;
     assert(block_node->kind == AST_NODE_BLOCK);
-    ast_block_t block = block_node->data.as_block;
+    ast_block_t block = block_node->as_block;
 
     assert(list_size(block.nodes) == 1);
 
     list_item_t *nodes_item = list_get(block.nodes, 0);
     ast_node_t *return_node = nodes_item->value;
     assert(return_node->kind == AST_NODE_RETURN_STMT);
-    ast_return_stmt_t return_stmt = return_node->data.as_return_stmt;
+    ast_return_stmt_t return_stmt = return_node->as_return_stmt;
 
     ast_node_t *literal_node = return_stmt.data;
     assert(literal_node->kind == AST_NODE_LITERAL);
-    ast_literal_t literal_u32 = literal_node->data.as_literal;
+    ast_literal_t literal_u32 = literal_node->as_literal;
 
     assert(literal_u32.kind == AST_LITERAL_U32);
     uint32_t exit_code = literal_u32.as_u32;

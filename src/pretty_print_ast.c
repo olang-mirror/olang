@@ -116,13 +116,13 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             pretty_print_node_t *node = pretty_print_node_new(arena);
             node->name = "Translation_Unit";
 
-            pretty_print_node_t *fn_node = ast_node_to_pretty_print_node(ast->data.as_program.fn, arena);
+            pretty_print_node_t *fn_node = ast_node_to_pretty_print_node(ast->as_program.fn, arena);
             list_append(node->children, fn_node);
             return node;
         }
         case AST_NODE_FN_DEF: {
             pretty_print_node_t *node = pretty_print_node_new(arena);
-            ast_fn_definition_t fn_def = ast->data.as_fn_def;
+            ast_fn_definition_t fn_def = ast->as_fn_def;
 
             char name[256];
             sprintf(name,
@@ -138,7 +138,7 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
         }
         case AST_NODE_BLOCK: {
             pretty_print_node_t *node = pretty_print_node_new(arena);
-            ast_block_t block = ast->data.as_block;
+            ast_block_t block = ast->as_block;
 
             node->name = "Block";
 
@@ -152,7 +152,7 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
         }
         case AST_NODE_RETURN_STMT: {
             pretty_print_node_t *node = pretty_print_node_new(arena);
-            ast_return_stmt_t return_stmt = ast->data.as_return_stmt;
+            ast_return_stmt_t return_stmt = ast->as_return_stmt;
 
             node->name = "Return_Statement";
 
@@ -163,7 +163,7 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
         }
         case AST_NODE_LITERAL: {
             pretty_print_node_t *node = pretty_print_node_new(arena);
-            ast_literal_t literal = ast->data.as_literal;
+            ast_literal_t literal = ast->as_literal;
 
             char name[256];
             switch (literal.kind) {
@@ -181,7 +181,7 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
         }
         case AST_NODE_BINARY_OP: {
             pretty_print_node_t *node = pretty_print_node_new(arena);
-            ast_binary_op_t binop = ast->data.as_bin_op;
+            ast_binary_op_t binop = ast->as_bin_op;
 
             switch (binop.kind) {
                 case AST_BINOP_ADDITION: {

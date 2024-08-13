@@ -29,7 +29,7 @@ ast_new_program(arena_t *arena, ast_node_t *fn_def)
     assert(node);
 
     node->kind = AST_NODE_PROGRAM;
-    ast_program_t *program = &node->data.as_program;
+    ast_program_t *program = &node->as_program;
 
     program->fn = fn_def;
 
@@ -43,7 +43,7 @@ ast_new_node_fn_def(arena_t *arena, string_view_t identifier, type_t return_type
     assert(node_fn_def);
 
     node_fn_def->kind = AST_NODE_FN_DEF;
-    ast_fn_definition_t *fn_def = &node_fn_def->data.as_fn_def;
+    ast_fn_definition_t *fn_def = &node_fn_def->as_fn_def;
 
     fn_def->identifier = identifier;
     fn_def->return_type = return_type;
@@ -59,9 +59,9 @@ ast_new_node_bin_op(arena_t *arena, ast_binary_op_kind_t kind, ast_node_t *lhs, 
     assert(node_bin_op);
 
     node_bin_op->kind = AST_NODE_BINARY_OP;
-    node_bin_op->data.as_bin_op.kind = kind;
-    node_bin_op->data.as_bin_op.lhs = lhs;
-    node_bin_op->data.as_bin_op.rhs = rhs;
+    node_bin_op->as_bin_op.kind = kind;
+    node_bin_op->as_bin_op.lhs = lhs;
+    node_bin_op->as_bin_op.rhs = rhs;
 
     return node_bin_op;
 }
@@ -73,8 +73,8 @@ ast_new_node_literal_u32(arena_t *arena, uint32_t value)
     assert(node_literal);
 
     node_literal->kind = AST_NODE_LITERAL;
-    node_literal->data.as_literal.kind = AST_LITERAL_U32;
-    node_literal->data.as_literal.as_u32 = value;
+    node_literal->as_literal.kind = AST_LITERAL_U32;
+    node_literal->as_literal.as_u32 = value;
 
     return node_literal;
 }
@@ -98,10 +98,10 @@ ast_new_node_block(arena_t *arena)
 
     node_block->kind = AST_NODE_BLOCK;
 
-    node_block->data.as_block.nodes = (list_t *)arena_alloc(arena, sizeof(list_t));
-    assert(node_block->data.as_block.nodes);
+    node_block->as_block.nodes = (list_t *)arena_alloc(arena, sizeof(list_t));
+    assert(node_block->as_block.nodes);
 
-    list_init(node_block->data.as_block.nodes, arena);
+    list_init(node_block->as_block.nodes, arena);
 
     return node_block;
 }

@@ -106,20 +106,18 @@ typedef struct ast_return_stmt
     ast_node_t *data;
 } ast_return_stmt_t;
 
-typedef union
-{
-    ast_program_t as_program;
-    ast_fn_definition_t as_fn_def;
-    ast_binary_op_t as_bin_op;
-    ast_literal_t as_literal;
-    ast_block_t as_block;
-    ast_return_stmt_t as_return_stmt;
-} ast_node_data_t;
-
 typedef struct ast_node
 {
     ast_node_kind_t kind;
-    ast_node_data_t data;
+    union
+    {
+        ast_program_t as_program;
+        ast_fn_definition_t as_fn_def;
+        ast_binary_op_t as_bin_op;
+        ast_literal_t as_literal;
+        ast_block_t as_block;
+        ast_return_stmt_t as_return_stmt;
+    };
 } ast_node_t;
 
 ast_node_t *

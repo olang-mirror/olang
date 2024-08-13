@@ -63,15 +63,13 @@ typedef enum
     AST_LITERAL_U32
 } ast_literal_kind_t;
 
-typedef union
-{
-    uint32_t as_u32;
-} ast_literal_value_t;
-
 typedef struct ast_literal
 {
     ast_literal_kind_t kind;
-    ast_literal_value_t value;
+    union
+    {
+        uint32_t as_u32;
+    };
 } ast_literal_t;
 
 typedef enum ast_binary_op_kind

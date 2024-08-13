@@ -70,7 +70,7 @@ parse_program_test(const MunitParameter params[], void *user_data_or_fixture)
     assert_not_null(number_node);
     assert_uint(number_node->kind, ==, AST_NODE_LITERAL);
     assert_uint(number_node->data.as_literal.kind, ==, AST_LITERAL_U32);
-    assert_uint(number_node->data.as_literal.value.as_u32, ==, 69);
+    assert_uint(number_node->data.as_literal.as_u32, ==, 69);
 
     arena_free(&arena);
 

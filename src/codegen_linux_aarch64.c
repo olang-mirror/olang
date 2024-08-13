@@ -86,7 +86,7 @@ codegen_linux_aarch64_emit_function(FILE *out, ast_fn_definition_t *fn)
     ast_literal_t literal_u32 = literal_node->data.as_literal;
 
     assert(literal_u32.kind == AST_LITERAL_U32);
-    uint32_t exit_code = literal_u32.value.as_u32;
+    uint32_t exit_code = literal_u32.as_u32;
 
     fprintf(out, "" SV_FMT ":\n", SV_ARG(fn->identifier));
     fprintf(out, "    mov x0, #%d\n", exit_code);

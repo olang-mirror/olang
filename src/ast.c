@@ -74,7 +74,7 @@ ast_new_node_literal_u32(arena_t *arena, uint32_t value)
 
     node_literal->kind = AST_NODE_LITERAL;
     node_literal->data.as_literal.kind = AST_LITERAL_U32;
-    node_literal->data.as_literal.value.as_u32 = value;
+    node_literal->data.as_literal.as_u32 = value;
 
     return node_literal;
 }

@@ -168,7 +168,7 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             char name[256];
             switch (literal.kind) {
                 case AST_LITERAL_U32: {
-                    sprintf(name, "Literal <kind:u32> <value:%d>", literal.value.as_u32);
+                    sprintf(name, "Literal <kind:u32> <value:%d>", literal.as_u32);
                     node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
                     strcpy(node->name, name);
                     break;

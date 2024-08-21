@@ -19,13 +19,11 @@ $(BUILD_DIR):
 .PHONY: format
 format: $(SRCS) $(HEADERS)
 	clang-format --dry-run --Werror $?
-	$(MAKE) -C tests/integration/ format
 	$(MAKE) -C tests/unit/ format
 
 .PHONY: format-fix
 format-fix: $(SRCS) $(HEADERS)
 	clang-format -i $?
-	$(MAKE) -C tests/integration/ format-fix
 	$(MAKE) -C tests/unit/ format-fix
 
 .PHONY: integration-test
@@ -40,7 +38,6 @@ unit-test:
 
 .PHONY: clean
 clean:
-	$(MAKE) -C tests/integration/ clean
 	$(MAKE) -C tests/unit/ clean
 	@rm -rf build/ $(TARGET)
 

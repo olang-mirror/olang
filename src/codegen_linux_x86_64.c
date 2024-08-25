@@ -23,6 +23,8 @@
 
 #define SYS_exit (60)
 
+size_t label_index;
+
 static void
 codegen_linux_x86_64_emit_start_entrypoint(FILE *out);
 
@@ -32,6 +34,7 @@ codegen_linux_x86_64_emit_function(FILE *out, ast_fn_definition_t *fn);
 void
 codegen_linux_x86_64_emit_program(FILE *out, ast_node_t *node)
 {
+    label_index = 0;
     codegen_linux_x86_64_emit_start_entrypoint(out);
 
     assert(node->kind == AST_NODE_PROGRAM);
@@ -56,6 +59,12 @@ codegen_linux_x86_64_emit_start_entrypoint(FILE *out)
     fprintf(out, "    syscall\n");
 }
 
+static size_t
+codegen_linux_x86_64_get_next_label(void)
+{
+    return ++label_index;
+}
+
 static void
 codegen_linux_x86_64_emit_expression(FILE *out, ast_node_t *expr_node)
 {
@@ -63,14 +72,231 @@ codegen_linux_x86_64_emit_expression(FILE *out, ast_node_t *expr_node)
         case AST_NODE_LITERAL: {
             ast_literal_t literal_u32 = expr_node->as_literal;
             assert(literal_u32.kind == AST_LITERAL_U32);
-            uint32_t exit_code = literal_u32.as_u32;
+            uint32_t n = literal_u32.as_u32;
 
-            fprintf(out, "    mov $%d, %%eax\n", exit_code);
+            fprintf(out, "    mov $%d, %%rax\n", n);
             return;
         }
-        case AST_NODE_BINARY_OP:
+        case AST_NODE_BINARY_OP: {
+            ast_binary_op_t bin_op = expr_node->as_bin_op;
+            switch (bin_op.kind) {
+                case AST_BINOP_ADDITION: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    add %%rcx, %%rax\n");
+
+                    return;
+                }
+                case AST_BINOP_MULTIPLICATION: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    mul %%rcx\n");
+
+                    return;
+                }
+                case AST_BINOP_DIVISION: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    xor %%rdx, %%rdx\n");
+                    fprintf(out, "    div %%rcx\n");
+
+                    return;
+                }
+                case AST_BINOP_REMINDER: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+                    fprintf(out, "    xor %%edx, %%edx\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    xor %%rdx, %%rdx\n");
+                    fprintf(out, "    div %%rcx\n");
+                    fprintf(out, "    mov %%edx, %%eax\n");
+
+                    return;
+                }
+                case AST_BINOP_SUBTRACTION: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    sub %%rcx, %%rax\n");
+
+                    return;
+                }
+                case AST_BINOP_CMP_EQ: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    cmp %%rcx, %%rax\n");
+                    fprintf(out, "    sete %%al\n");
+                    fprintf(out, "    movzb %%al, %%rax\n");
+
+                    return;
+                }
+                case AST_BINOP_CMP_LT: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    cmp %%rcx, %%rax\n");
+                    fprintf(out, "    setl %%al\n");
+                    fprintf(out, "    movzb %%al, %%rax\n");
+
+                    return;
+                }
+                case AST_BINOP_CMP_GT: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    cmp %%rcx, %%rax\n");
+                    fprintf(out, "    setg %%al\n");
+                    fprintf(out, "    movzb %%al, %%rax\n");
+
+                    return;
+                }
+                case AST_BINOP_CMP_NEQ: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    cmp %%rcx, %%rax\n");
+                    fprintf(out, "    setne %%al\n");
+                    fprintf(out, "    movzb %%al, %%rax\n");
+
+                    return;
+                }
+                case AST_BINOP_CMP_LEQ: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    cmp %%rcx, %%rax\n");
+                    fprintf(out, "    setle %%al\n");
+                    fprintf(out, "    movzb %%al, %%rax\n");
+
+                    return;
+                }
+                case AST_BINOP_CMP_GEQ: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    cmp %%rcx, %%rax\n");
+                    fprintf(out, "    setge %%al\n");
+                    fprintf(out, "    movzb %%al, %%rax\n");
+
+                    return;
+                }
+                case AST_BINOP_BITWISE_LSHIFT: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    shl %%cl, %%rax\n");
+
+                    return;
+                }
+                case AST_BINOP_BITWISE_RSHIFT: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    shr %%cl, %%rax\n");
+
+                    return;
+                }
+                case AST_BINOP_BITWISE_XOR: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    xor %%ecx, %%eax\n");
+
+                    return;
+                }
+                case AST_BINOP_BITWISE_AND: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    and %%ecx, %%eax\n");
+
+                    return;
+                }
+                case AST_BINOP_BITWISE_OR: {
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    push %%rax\n");
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    pop %%rcx\n");
+                    fprintf(out, "    or %%ecx, %%eax\n");
+
+                    return;
+                }
+                case AST_BINOP_LOGICAL_AND: {
+                    size_t label_exit = codegen_linux_x86_64_get_next_label();
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    cmp $0, %%rax\n");
+                    fprintf(out, "    je .L%ld\n", label_exit);
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    cmp $0, %%rax\n");
+                    fprintf(out, "    je .L%ld\n", label_exit);
+                    fprintf(out, "    mov $1, %%rax\n");
+                    fprintf(out, ".L%ld:\n", label_exit);
+
+                    return;
+                }
+                case AST_BINOP_LOGICAL_OR: {
+                    size_t label_t = codegen_linux_x86_64_get_next_label();
+                    size_t label_f = codegen_linux_x86_64_get_next_label();
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.lhs);
+                    fprintf(out, "    cmp $0, %%rax\n");
+                    fprintf(out, "    jne .L%ld\n", label_t);
+
+                    codegen_linux_x86_64_emit_expression(out, bin_op.rhs);
+                    fprintf(out, "    cmp $0, %%rax\n");
+                    fprintf(out, "    je .L%ld\n", label_f);
+
+                    fprintf(out, ".L%ld:\n", label_t);
+                    fprintf(out, "    mov $1, %%rax\n");
+                    fprintf(out, ".L%ld:\n", label_f);
+
+                    return;
+                }
+                default: {
+                    assert(0 && "unsupported binary operation");
+                    return;
+                }
+            }
+        }
         default:
-            assert(0 && "NOT IMPLEMENTED");
+            assert(0 && "unsupported expression");
     }
 }
 

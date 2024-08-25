@@ -152,7 +152,7 @@ get_binary_op_precedence(token_kind_t kind)
         case TOKEN_CMP_LEQ:
         case TOKEN_CMP_GEQ:
             return BINOP_CMP_RELATIONAL_PREC;
-        case TOKEN_EQ:
+        case TOKEN_CMP_EQ:
         case TOKEN_CMP_NEQ:
             return BINOP_CMP_EQUALITY_PREC;
         case TOKEN_AND:

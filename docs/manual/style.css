@@ -2,6 +2,7 @@
   --background-color: #f4f4f4;
   --text-color: black;
   --link-color: #4e5289;
+  --text-highlight-color: rgba(1, 1, 1, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -9,6 +10,7 @@
     --background-color: #26282B;
     --text-color: white;
     --link-color: #8c91db;
+    --text-highlight-color: rgba(255, 255, 255, 0.1);
   }
 }
 
@@ -21,7 +23,7 @@ body {
   color: var(--text-color);
   margin: 0;
   padding: 0 40px;
-  font-size: 11pt;
+  font-size: 1rem;
   font-family: monospace;
 }
 
@@ -29,12 +31,17 @@ body {
   font-family: monospace;
 }
 
+.code {
+  white-space: nowrap;
+  background-color: var(--text-highlight-color);
+}
+
 a {
   color: var(--link-color);
 }
 
 body > * {
-  max-width: 800px;
+  max-width: 80ch;
   margin: 10px auto;
 }
 
@@ -55,10 +62,6 @@ footer {
   margin: 20px auto;
 }
 
-body > * {
-  overflow: hidden;
-}
-
 pre {
   background: rgba(0,0,0, 0.75);
   color: white;
@@ -70,8 +73,13 @@ pre {
 }
 
 .logo-name {
-  font-size: 3.2rem;
   font-weight: bold;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background-color: var(--text-color);
 }
 
 ol {

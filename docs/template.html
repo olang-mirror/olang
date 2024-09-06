@@ -11,6 +11,7 @@
       --text-color: black;
       --link-color: #4e5289;
     }
+
     @media (prefers-color-scheme: dark) {
       :root {
         --background-color: #26282B;
@@ -18,35 +19,43 @@
         --link-color: #8c91db;
       }
     }
+
     body {
       background: var(--background-color);
       color: var(--text-color);
-      font-size: 1.4rem;
+      font-family: monospace;
+      font-size: 1rem;
       margin: 0;
       padding: 0 40px;
     }
+
     a {
       color: var(--link-color);
     }
+
     article, nav, header, footer {
-      max-width: 1024px;
+      max-width: 80ch;
       margin: 10px auto;
     }
+
     header > h1 {
       font-weight: normal;
     }
+
     nav, header > h1 {
       text-align: center;
     }
+
     header {
       margin-top: 70px;
       margin-bottom: 20px;
     }
+
     footer {
       margin: 20px auto;
     }
+
     article {
-      line-height: 1.75rem;
       overflow: hidden;
     }
 
@@ -60,7 +69,6 @@
     }
 
     .logo-name {
-      font-size: 3.2rem;
       font-weight: bold;
     }
   </style>
@@ -72,8 +80,8 @@
       [ <a href="/">Home</a> ]
       [ <a href="/manual/">Manual</a> ]
       [ <a href="/pages/language-specification.html">Specification</a> ]
-      [ <a href="https://sr.ht/~johnnyrichard/olang/sources" target="_blank">Sources ↗</a> ]
-      [ <a href="https://sr.ht/~johnnyrichard/olang/lists" target="_blank">Mailing list ↗</a> ]
+      [ <a href="https://sr.ht/~johnnyrichard/olang/sources" target="_blank">Sources &UpperRightArrow;</a> ]
+      [ <a href="https://sr.ht/~johnnyrichard/olang/lists" target="_blank">Mailing list &UpperRightArrow;</a> ]
     </nav>
   </header>
   <article>

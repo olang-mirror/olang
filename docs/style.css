@@ -36,36 +36,42 @@ body {
   background-color: var(--text-highlight-color);
 }
 
+.settitle {
+  text-align: left !important;
+}
+
 a {
   color: var(--link-color);
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-size: 1em;
+  margin: 0;
+  margin-bottom: 1ch;
+}
+
 body > * {
   max-width: 80ch;
-  margin: 10px auto;
+  margin: 0 auto;
+}
+
+header {
+  margin: 6ch auto;
 }
 
 header > h1 {
   font-weight: normal;
-}
-
-nav, header > h1 {
-  text-align: center;
-}
-
-header {
-  margin-top: 70px;
-  margin-bottom: 20px;
+  font-size: 1em;
 }
 
 footer {
-  margin: 20px auto;
+  margin: 4ch auto;
 }
 
 pre {
   background: rgba(0,0,0, 0.75);
   color: white;
-  padding: 1.5rem;
+  padding: 1.5em;
   max-width: 100%;
   overflow: auto;
   font-size: large;
@@ -79,9 +85,10 @@ pre {
 hr {
   border: none;
   height: 1px;
+  opacity: 0.5;
   background-color: var(--text-color);
 }
 
 ol {
-  margin-left: 1.5rem;
+  margin-left: 1.5em;
 }

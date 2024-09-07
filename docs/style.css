@@ -64,6 +64,10 @@ header > h1 {
   font-size: 1em;
 }
 
+header > nav > span {
+  white-space: nowrap;
+}
+
 footer {
   margin: 4ch auto;
 }

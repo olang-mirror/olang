@@ -40,7 +40,8 @@ language.
 <return-type>         ::= <type>
 <function-body>       ::= <block>
 <block>               ::= '{' <ows> <statement> <ows> (<end-of-statement> <ows> <statement> <ows>)* <end-of-statement>? <ows> '}'
-<statement>           ::= <common-statement> | <return-statement>
+<statement>           ::= <common-statement> | <if-statement> | <return-statement>
+<if-statement>        ::= 'if' <ws> <expression> <ows> <block>
 <return-statement>    ::= 'return' <ws> <expression>
 
 (* Statements *)

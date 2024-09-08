@@ -328,6 +328,7 @@ codegen_linux_x86_64_emit_block(FILE *out, ast_block_t *block)
                 size_t end_if_label = codegen_linux_x86_64_get_next_label();
 
                 codegen_linux_x86_64_emit_expression(out, cond);
+                fprintf(out, "    cmp $1, %%rax\n");
                 fprintf(out, "    jnz .L%ld\n", end_if_label);
 
                 assert(then->kind == AST_NODE_BLOCK && "invalid if-then block");

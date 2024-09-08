@@ -299,26 +299,61 @@ codegen_linux_x86_64_emit_expression(FILE *out, ast_node_t *expr_node)
             assert(0 && "unsupported expression");
     }
 }
+static void
+codegen_linux_x86_64_emit_block(FILE *out, ast_block_t *block)
+{
+
+    size_t nodes_len = list_size(block->nodes);
+
+    for (size_t i = 0; i < nodes_len; ++i) {
+        ast_node_t *node = list_get(block->nodes, i)->value;
+        switch (node->kind) {
+            case AST_NODE_RETURN_STMT: {
+                ast_return_stmt_t return_stmt = node->as_return_stmt;
+
+                ast_node_t *expr = return_stmt.data;
+
+                codegen_linux_x86_64_emit_expression(out, expr);
+
+                fprintf(out, "    ret\n");
+
+                break;
+            }
+            case AST_NODE_IF_STMT: {
+                ast_if_stmt_t if_stmt = node->as_if_stmt;
+
+                ast_node_t *cond = if_stmt.cond;
+                ast_node_t *then = if_stmt.then;
+
+                size_t end_if_label = codegen_linux_x86_64_get_next_label();
+
+                codegen_linux_x86_64_emit_expression(out, cond);
+                fprintf(out, "    jnz .L%ld\n", end_if_label);
+
+                assert(then->kind == AST_NODE_BLOCK && "invalid if-then block");
+                ast_block_t then_block = then->as_block;
+
+                codegen_linux_x86_64_emit_block(out, &then_block);
+
+                fprintf(out, ".L%ld:\n", end_if_label);
+                break;
+            }
+            default: {
+                assert(0 && "unsupported block statement");
+                break;
+            }
+        }
+    }
+}
 
 static void
 codegen_linux_x86_64_emit_function(FILE *out, ast_fn_definition_t *fn)
 {
     ast_node_t *block_node = fn->block;
+    fprintf(out, "" SV_FMT ":\n", SV_ARG(fn->identifier));
+
     assert(block_node->kind == AST_NODE_BLOCK);
     ast_block_t block = block_node->as_block;
 
-    assert(list_size(block.nodes) == 1);
-
-    list_item_t *nodes_item = list_get(block.nodes, 0);
-    ast_node_t *return_node = nodes_item->value;
-    assert(return_node->kind == AST_NODE_RETURN_STMT);
-    ast_return_stmt_t return_stmt = return_node->as_return_stmt;
-
-    ast_node_t *expr = return_stmt.data;
-
-    fprintf(out, "" SV_FMT ":\n", SV_ARG(fn->identifier));
-
-    codegen_linux_x86_64_emit_expression(out, expr);
-
-    fprintf(out, "    ret\n");
+    codegen_linux_x86_64_emit_block(out, &block);
 }

@@ -23,3 +23,18 @@ fn main(): u32 {
 # TEST test_contains_tokens WITH
 # ./tests/0020_if_statement.ol:17:3: <if>
 # END
+
+# TEST test_ast WITH
+# Translation_Unit
+# `-Function_Definition <name:main> <return:0>
+#   `-Block
+#     |-If_Statement
+#     | |-Binary_Operation (==)
+#     | | |-Literal <kind:u32> <value:1>
+#     | | `-Literal <kind:u32> <value:1>
+#     | `-Block
+#     |   `-Return_Statement
+#     |     `-Literal <kind:u32> <value:0>
+#     `-Return_Statement
+#       `-Literal <kind:u32> <value:1>
+# END

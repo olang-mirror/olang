@@ -36,6 +36,12 @@ parser_parse_type(parser_t *parser, type_t *type);
 static ast_node_t *
 parser_parse_block(parser_t *parser);
 
+static ast_node_t *
+parser_parse_return_stmt(parser_t *parser);
+
+static ast_node_t *
+parser_parse_if_stmt(parser_t *parser);
+
 ast_node_t *
 parser_parse_fn_definition(parser_t *parser);
 
@@ -324,6 +330,46 @@ parser_parse_block(parser_t *parser)
         return NULL;
     }
 
+    token_t next_token;
+
+StartLoop:
+    lexer_peek_next(parser->lexer, &next_token);
+    ast_node_t *node = NULL;
+
+    switch (next_token.kind) {
+        case TOKEN_RETURN: {
+            node = parser_parse_return_stmt(parser);
+            break;
+        }
+        case TOKEN_IF: {
+            node = parser_parse_if_stmt(parser);
+            break;
+        }
+        default: {
+            goto EndLoop;
+        }
+    }
+
+    if (node == NULL) {
+        return NULL;
+    }
+
+    list_append(node_block->as_block.nodes, node);
+
+    goto StartLoop;
+EndLoop:
+
+    skip_line_feeds(parser->lexer);
+    if (!skip_expected_token(parser, TOKEN_CCURLY)) {
+        return NULL;
+    }
+
+    return node_block;
+}
+
+static ast_node_t *
+parser_parse_return_stmt(parser_t *parser)
+{
     if (!skip_expected_token(parser, TOKEN_RETURN)) {
         return NULL;
     }
@@ -338,17 +384,42 @@ parser_parse_block(parser_t *parser)
 
     node_return_stmt->as_return_stmt.data = expr;
 
-    list_append(node_block->as_block.nodes, node_return_stmt);
     if (!skip_expected_token(parser, TOKEN_LF)) {
         return NULL;
     }
-
     skip_line_feeds(parser->lexer);
-    if (!skip_expected_token(parser, TOKEN_CCURLY)) {
+
+    return node_return_stmt;
+}
+
+static ast_node_t *
+parser_parse_if_stmt(parser_t *parser)
+{
+    if (!skip_expected_token(parser, TOKEN_IF)) {
         return NULL;
     }
 
-    return node_block;
+    ast_node_t *cond = parser_parse_expr(parser);
+
+    if (cond == NULL) {
+        return NULL;
+    }
+
+    ast_node_t *then = parser_parse_block(parser);
+
+    if (then == NULL) {
+        return NULL;
+    }
+
+    ast_node_t *node_if_stmt = ast_new_node_if_stmt(parser->arena, cond, then);
+    assert(node_if_stmt);
+
+    if (!skip_expected_token(parser, TOKEN_LF)) {
+        return NULL;
+    }
+    skip_line_feeds(parser->lexer);
+
+    return node_if_stmt;
 }
 
 static bool

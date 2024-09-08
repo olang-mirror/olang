@@ -161,6 +161,20 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 
             return node;
         }
+        case AST_NODE_IF_STMT: {
+            pretty_print_node_t *node = pretty_print_node_new(arena);
+            ast_if_stmt_t if_stmt = ast->as_if_stmt;
+
+            node->name = "If_Statement";
+
+            pretty_print_node_t *child = ast_node_to_pretty_print_node(if_stmt.cond, arena);
+            list_append(node->children, child);
+
+            child = ast_node_to_pretty_print_node(if_stmt.then, arena);
+            list_append(node->children, child);
+
+            return node;
+        }
         case AST_NODE_LITERAL: {
             pretty_print_node_t *node = pretty_print_node_new(arena);
             ast_literal_t literal = ast->as_literal;

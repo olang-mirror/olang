@@ -32,6 +32,7 @@ typedef enum
     AST_NODE_FN_DEF,
     AST_NODE_BINARY_OP,
     AST_NODE_RETURN_STMT,
+    AST_NODE_IF_STMT,
     AST_NODE_LITERAL,
     AST_NODE_UNKNOWN
 } ast_node_kind_t;
@@ -106,6 +107,12 @@ typedef struct ast_return_stmt
     ast_node_t *data;
 } ast_return_stmt_t;
 
+typedef struct ast_if_stmt
+{
+    ast_node_t *cond;
+    ast_node_t *then;
+} ast_if_stmt_t;
+
 typedef struct ast_node
 {
     ast_node_kind_t kind;
@@ -117,6 +124,7 @@ typedef struct ast_node
         ast_literal_t as_literal;
         ast_block_t as_block;
         ast_return_stmt_t as_return_stmt;
+        ast_if_stmt_t as_if_stmt;
     };
 } ast_node_t;
 
@@ -134,6 +142,9 @@ ast_new_node_literal_u32(arena_t *arena, uint32_t value);
 
 ast_node_t *
 ast_new_node_return_stmt(arena_t *arena);
+
+ast_node_t *
+ast_new_node_if_stmt(arena_t *arena, ast_node_t *cond, ast_node_t *then);
 
 ast_node_t *
 ast_new_node_block(arena_t *arena);

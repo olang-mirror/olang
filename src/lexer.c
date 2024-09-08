@@ -282,6 +282,7 @@ static char *token_kind_str_table[] = {
     [TOKEN_NUMBER] = "number",
     [TOKEN_FN] = "fn",
     [TOKEN_RETURN] = "return",
+    [TOKEN_IF] = "if",
     [TOKEN_LF] = "line_feed",
     [TOKEN_OPAREN] = "(",
     [TOKEN_CPAREN] = ")",
@@ -409,6 +410,10 @@ lexer_init_eof_token(lexer_t *lexer, token_t *token)
 static token_kind_t
 lexer_str_to_token_kind(string_view_t text)
 {
+    if (string_view_eq_to_cstr(text, "if")) {
+        return TOKEN_IF;
+    }
+
     if (string_view_eq_to_cstr(text, "return")) {
         return TOKEN_RETURN;
     }

@@ -38,6 +38,7 @@ typedef enum token_kind
     // Keywords
     TOKEN_FN,
     TOKEN_RETURN,
+    TOKEN_IF,
 
     // Equality operators
     TOKEN_CMP_EQ,

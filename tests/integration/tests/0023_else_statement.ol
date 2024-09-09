@@ -21,6 +21,10 @@ fn main(): u32 {
   }
 }
 
+# TEST test_compile(exit_code=0)
+
+# TEST test_run_binary(exit_code=0)
+
 # TEST test_contains_tokens WITH
 # ./tests/0023_else_statement.ol:19:5: <else>
 # END

@@ -324,8 +324,10 @@ codegen_linux_x86_64_emit_block(FILE *out, ast_block_t *block)
 
                 ast_node_t *cond = if_stmt.cond;
                 ast_node_t *then = if_stmt.then;
+                ast_node_t *_else = if_stmt._else;
 
                 size_t end_if_label = codegen_linux_x86_64_get_next_label();
+                size_t end_else_label = codegen_linux_x86_64_get_next_label();
 
                 codegen_linux_x86_64_emit_expression(out, cond);
                 fprintf(out, "    cmp $1, %%rax\n");
@@ -335,8 +337,17 @@ codegen_linux_x86_64_emit_block(FILE *out, ast_block_t *block)
                 ast_block_t then_block = then->as_block;
 
                 codegen_linux_x86_64_emit_block(out, &then_block);
+                fprintf(out, "    jmp .L%ld\n", end_else_label);
 
                 fprintf(out, ".L%ld:\n", end_if_label);
+
+                if (_else != NULL) {
+                    ast_block_t else_block = _else->as_block;
+                    codegen_linux_x86_64_emit_block(out, &else_block);
+                }
+
+                fprintf(out, ".L%ld:\n", end_else_label);
+
                 break;
             }
             default: {

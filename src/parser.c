@@ -28,6 +28,9 @@ static bool
 skip_expected_token(parser_t *parser, token_kind_t expected_kind);
 
 static bool
+expected_next_token(parser_t *parser, token_t *token, token_kind_t kind);
+
+static bool
 expected_token(parser_t *parser, token_t *token, token_kind_t kind);
 
 static bool
@@ -260,7 +263,7 @@ parser_parse_fn_definition(parser_t *parser)
 
     token_t fn_name_token;
 
-    if (!expected_token(parser, &fn_name_token, TOKEN_IDENTIFIER)) {
+    if (!expected_next_token(parser, &fn_name_token, TOKEN_IDENTIFIER)) {
         return NULL;
     }
 
@@ -304,7 +307,7 @@ parser_parse_type(parser_t *parser, type_t *type)
 {
     token_t token;
 
-    if (!expected_token(parser, &token, TOKEN_IDENTIFIER)) {
+    if (!expected_next_token(parser, &token, TOKEN_IDENTIFIER)) {
         return false;
     }
 
@@ -411,12 +414,30 @@ parser_parse_if_stmt(parser_t *parser)
         return NULL;
     }
 
-    ast_node_t *node_if_stmt = ast_new_node_if_stmt(parser->arena, cond, then);
-    assert(node_if_stmt);
+    ast_node_t *_else = NULL;
 
-    if (!skip_expected_token(parser, TOKEN_LF)) {
+    token_t next_token;
+    lexer_next_token(parser->lexer, &next_token);
+
+    // FIXME: We are not allowing line feed right after if block statement when
+    //        the else branch is present.  We also noticed that if has the same
+    //        problem which will be addressed later.
+
+    if (next_token.kind == TOKEN_ELSE) {
+        _else = parser_parse_block(parser);
+
+        if (_else == NULL) {
+            return NULL;
+        }
+
+    } else if (!expected_token(parser, &next_token, TOKEN_LF)) {
         return NULL;
     }
+
+    ast_node_t *node_if_stmt = ast_new_node_if_stmt(parser->arena, cond, then, _else);
+
+    assert(node_if_stmt);
+
     skip_line_feeds(parser->lexer);
 
     return node_if_stmt;
@@ -426,14 +447,19 @@ static bool
 skip_expected_token(parser_t *parser, token_kind_t expected_kind)
 {
     token_t token;
-    return expected_token(parser, &token, expected_kind);
+    return expected_next_token(parser, &token, expected_kind);
+}
+
+static bool
+expected_next_token(parser_t *parser, token_t *token, token_kind_t expected_kind)
+{
+    lexer_next_token(parser->lexer, token);
+    return expected_token(parser, token, expected_kind);
 }
 
 static bool
 expected_token(parser_t *parser, token_t *token, token_kind_t expected_kind)
 {
-    lexer_next_token(parser->lexer, token);
-
     if (token->kind != expected_kind) {
         fprintf(stderr,
                 "%s:%lu:%lu: error: got '" SV_FMT "' token but expect <%s>\n",

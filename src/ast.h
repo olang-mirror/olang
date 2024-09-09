@@ -111,6 +111,7 @@ typedef struct ast_if_stmt
 {
     ast_node_t *cond;
     ast_node_t *then;
+    ast_node_t *_else;
 } ast_if_stmt_t;
 
 typedef struct ast_node
@@ -144,7 +145,7 @@ ast_node_t *
 ast_new_node_return_stmt(arena_t *arena);
 
 ast_node_t *
-ast_new_node_if_stmt(arena_t *arena, ast_node_t *cond, ast_node_t *then);
+ast_new_node_if_stmt(arena_t *arena, ast_node_t *cond, ast_node_t *then, ast_node_t *_else);
 
 ast_node_t *
 ast_new_node_block(arena_t *arena);

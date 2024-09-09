@@ -24,3 +24,19 @@ fn main(): u32 {
 # TEST test_contains_tokens WITH
 # ./tests/0023_else_statement.ol:19:5: <else>
 # END
+
+# TEST test_ast WITH
+# Translation_Unit
+# `-Function_Definition <name:main> <return:0>
+#   `-Block
+#     `-If_Statement
+#       |-Binary_Operation (!=)
+#       | |-Literal <kind:u32> <value:0>
+#       | `-Literal <kind:u32> <value:0>
+#       |-Block
+#       | `-Return_Statement
+#       |   `-Literal <kind:u32> <value:1>
+#       `-Block
+#         `-Return_Statement
+#           `-Literal <kind:u32> <value:0>
+# END

@@ -173,6 +173,11 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             child = ast_node_to_pretty_print_node(if_stmt.then, arena);
             list_append(node->children, child);
 
+            if (if_stmt._else != NULL) {
+                child = ast_node_to_pretty_print_node(if_stmt._else, arena);
+                list_append(node->children, child);
+            }
+
             return node;
         }
         case AST_NODE_LITERAL: {

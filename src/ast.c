@@ -91,7 +91,7 @@ ast_new_node_return_stmt(arena_t *arena)
 }
 
 ast_node_t *
-ast_new_node_if_stmt(arena_t *arena, ast_node_t *cond, ast_node_t *then)
+ast_new_node_if_stmt(arena_t *arena, ast_node_t *cond, ast_node_t *then, ast_node_t *_else)
 {
     ast_node_t *node_if_stmt = arena_alloc(arena, sizeof(ast_node_t));
     assert(node_if_stmt);
@@ -99,6 +99,7 @@ ast_new_node_if_stmt(arena_t *arena, ast_node_t *cond, ast_node_t *then)
     node_if_stmt->kind = AST_NODE_IF_STMT;
     node_if_stmt->as_if_stmt.cond = cond;
     node_if_stmt->as_if_stmt.then = then;
+    node_if_stmt->as_if_stmt._else = _else;
 
     return node_if_stmt;
 }

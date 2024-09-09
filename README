@@ -1,33 +1,13 @@
-olang
-=====
+O programming language
+======================
 
-The olang compiler.
+This project contains the compiler's source code.
 
-This project is licensed under GPLv3, read more on COPYRIGHT doc.
+For instructions on how to build and run the compiler, please read
+the manual on https://o-lang.org.
 
-For instructions on how to build and run the compiler, read the HACKING
-document.  Please don't use this project in production, it's still under
-development.
+In order to build the documentation locally, use `make docs`.  Once the build
+process is complete, you can find the generated documentation in the
+`docs/build` directory.
 
-CONTRIBUTING
-------------
-
-### CODE AND DISCUSSION
-
-This project uses mailing lists as main medium of communication. All mail
-archives can be found at https://sr.ht/~johnnyrichard/olang/lists.
-
-If you want to contribute to the source code, send plain text patch to:
-
-    ~johnnyrichard/olang-devel@lists.sr.ht
-
-Please use git-sendmail to send the patches.  You might want to configure your
-git to prevent silly mistakes:
-
-    $ git config sendemail.to "~johnnyrichard/olang-devel@lists.sr.ht"
-    $ git config format.subjectPrefix "PATCH olang"
-
-### IRC
-
-If you want to keep in contact with the community, feel free to join our
-channel #olang on LiberaChat IRC.
+NOTICE: The source code is licensed under GPLv3, read more on COPYRIGHT.

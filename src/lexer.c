@@ -284,6 +284,7 @@ static char *token_kind_str_table[] = {
     [TOKEN_RETURN] = "return",
     [TOKEN_IF] = "if",
     [TOKEN_ELSE] = "else",
+    [TOKEN_VAR] = "var",
     [TOKEN_LF] = "line_feed",
     [TOKEN_OPAREN] = "(",
     [TOKEN_CPAREN] = ")",
@@ -417,6 +418,10 @@ lexer_str_to_token_kind(string_view_t text)
 
     if (string_view_eq_to_cstr(text, "else")) {
         return TOKEN_ELSE;
+    }
+
+    if (string_view_eq_to_cstr(text, "var")) {
+        return TOKEN_VAR;
     }
 
     if (string_view_eq_to_cstr(text, "return")) {

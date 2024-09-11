@@ -45,6 +45,9 @@ parser_parse_return_stmt(parser_t *parser);
 static ast_node_t *
 parser_parse_if_stmt(parser_t *parser);
 
+static ast_node_t *
+parser_parse_var_def(parser_t *parser);
+
 ast_node_t *
 parser_parse_fn_definition(parser_t *parser);
 
@@ -233,6 +236,9 @@ parser_parse_factor(parser_t *parser)
         case TOKEN_NUMBER:
             return ast_new_node_literal_u32(parser->arena, string_view_to_u32(token.value));
 
+        case TOKEN_IDENTIFIER:
+            return ast_new_node_ref(parser->arena, token.value);
+
         case TOKEN_OPAREN: {
             ast_node_t *expr = parser_parse_expr(parser);
             if (expr == NULL) {
@@ -348,7 +354,15 @@ StartLoop:
             node = parser_parse_if_stmt(parser);
             break;
         }
+        case TOKEN_VAR: {
+            node = parser_parse_var_def(parser);
+            break;
+        }
+        case TOKEN_CCURLY: {
+            goto EndLoop;
+        }
         default: {
+            // FIXME: write a better error message
             goto EndLoop;
         }
     }
@@ -441,6 +455,44 @@ parser_parse_if_stmt(parser_t *parser)
     skip_line_feeds(parser->lexer);
 
     return node_if_stmt;
+}
+
+static ast_node_t *
+parser_parse_var_def(parser_t *parser)
+{
+    if (!skip_expected_token(parser, TOKEN_VAR)) {
+        return NULL;
+    }
+
+    token_t identifier_token;
+    if (!expected_next_token(parser, &identifier_token, TOKEN_IDENTIFIER)) {
+        return NULL;
+    }
+
+    if (!skip_expected_token(parser, TOKEN_COLON)) {
+        return NULL;
+    }
+
+    type_t var_type;
+    if (!parser_parse_type(parser, &var_type)) {
+        return NULL;
+    }
+
+    // FIXME: assignment must be optional according to the spec
+    if (!skip_expected_token(parser, TOKEN_EQ)) {
+        return NULL;
+    }
+
+    ast_node_t *expr = parser_parse_expr(parser);
+    if (expr == NULL) {
+        return NULL;
+    }
+
+    ast_node_t *var_node = ast_new_node_var_def(parser->arena, identifier_token.value, var_type, expr);
+
+    skip_line_feeds(parser->lexer);
+
+    return var_node;
 }
 
 static bool

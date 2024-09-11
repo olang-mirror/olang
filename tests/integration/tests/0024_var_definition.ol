@@ -14,10 +14,20 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 fn main(): u32 {
-  var code: u32 = 0;
-  return code;
+  var code: u32 = 0
+  return code
 }
 
 # TEST test_contains_tokens WITH
 # ./tests/0024_var_definition.ol:17:3: <var>
+# END
+
+# TEST test_ast WITH
+# Translation_Unit
+# `-Function_Definition <name:main> <return:0>
+#   `-Block
+#     |-Var_Definition <name:code> <kind:u32>
+#     | `-Literal <kind:u32> <value:0>
+#     `-Return_Statement
+#       `-Reference <name:code>
 # END

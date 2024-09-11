@@ -198,6 +198,31 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 
             return node;
         }
+        case AST_NODE_VAR_DEF: {
+            pretty_print_node_t *node = pretty_print_node_new(arena);
+            ast_var_definition_t var = ast->as_var_def;
+
+            char name[256];
+            sprintf(name, "Var_Definition <name:" SV_FMT "> <kind:u32>", SV_ARG(var.identifier));
+            node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
+            strcpy(node->name, name);
+
+            pretty_print_node_t *child = ast_node_to_pretty_print_node(var.value, arena);
+            list_append(node->children, child);
+
+            return node;
+        }
+        case AST_NODE_REF: {
+            pretty_print_node_t *node = pretty_print_node_new(arena);
+            ast_ref_t ref = ast->as_ref;
+
+            char name[256];
+            sprintf(name, "Reference <name:" SV_FMT ">", SV_ARG(ref.identifier));
+            node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
+            strcpy(node->name, name);
+
+            return node;
+        }
         case AST_NODE_BINARY_OP: {
             pretty_print_node_t *node = pretty_print_node_new(arena);
             ast_binary_op_t binop = ast->as_bin_op;

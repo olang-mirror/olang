@@ -30,10 +30,12 @@ typedef enum
     AST_NODE_PROGRAM,
     AST_NODE_BLOCK,
     AST_NODE_FN_DEF,
+    AST_NODE_VAR_DEF,
     AST_NODE_BINARY_OP,
     AST_NODE_RETURN_STMT,
     AST_NODE_IF_STMT,
     AST_NODE_LITERAL,
+    AST_NODE_REF,
     AST_NODE_UNKNOWN
 } ast_node_kind_t;
 
@@ -59,6 +61,13 @@ typedef struct ast_fn_definition
     ast_node_t *block;
 } ast_fn_definition_t;
 
+typedef struct ast_var_definition
+{
+    string_view_t identifier;
+    type_t type;
+    ast_node_t *value;
+} ast_var_definition_t;
+
 typedef enum
 {
     AST_LITERAL_U32
@@ -72,6 +81,11 @@ typedef struct ast_literal
         uint32_t as_u32;
     };
 } ast_literal_t;
+
+typedef struct ast_ref
+{
+    string_view_t identifier;
+} ast_ref_t;
 
 typedef enum ast_binary_op_kind
 {
@@ -121,8 +135,10 @@ typedef struct ast_node
     {
         ast_program_t as_program;
         ast_fn_definition_t as_fn_def;
+        ast_var_definition_t as_var_def;
         ast_binary_op_t as_bin_op;
         ast_literal_t as_literal;
+        ast_ref_t as_ref;
         ast_block_t as_block;
         ast_return_stmt_t as_return_stmt;
         ast_if_stmt_t as_if_stmt;
@@ -136,10 +152,16 @@ ast_node_t *
 ast_new_node_fn_def(arena_t *arena, string_view_t identifier, type_t return_type, ast_node_t *block);
 
 ast_node_t *
+ast_new_node_var_def(arena_t *arena, string_view_t identifier, type_t type, ast_node_t *value);
+
+ast_node_t *
 ast_new_node_bin_op(arena_t *arena, ast_binary_op_kind_t kind, ast_node_t *lhs, ast_node_t *rhs);
 
 ast_node_t *
 ast_new_node_literal_u32(arena_t *arena, uint32_t value);
+
+ast_node_t *
+ast_new_node_ref(arena_t *arena, string_view_t identifier);
 
 ast_node_t *
 ast_new_node_return_stmt(arena_t *arena);

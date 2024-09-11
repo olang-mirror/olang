@@ -53,6 +53,22 @@ ast_new_node_fn_def(arena_t *arena, string_view_t identifier, type_t return_type
 }
 
 ast_node_t *
+ast_new_node_var_def(arena_t *arena, string_view_t identifier, type_t type, ast_node_t *value)
+{
+    ast_node_t *node_var_def = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
+    assert(node_var_def);
+
+    node_var_def->kind = AST_NODE_VAR_DEF;
+    ast_var_definition_t *var_def = &node_var_def->as_var_def;
+
+    var_def->identifier = identifier;
+    var_def->type = type;
+    var_def->value = value;
+
+    return node_var_def;
+}
+
+ast_node_t *
 ast_new_node_bin_op(arena_t *arena, ast_binary_op_kind_t kind, ast_node_t *lhs, ast_node_t *rhs)
 {
     ast_node_t *node_bin_op = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
@@ -77,6 +93,18 @@ ast_new_node_literal_u32(arena_t *arena, uint32_t value)
     node_literal->as_literal.as_u32 = value;
 
     return node_literal;
+}
+
+ast_node_t *
+ast_new_node_ref(arena_t *arena, string_view_t identifier)
+{
+    ast_node_t *node_ref = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
+    assert(node_ref);
+
+    node_ref->kind = AST_NODE_REF;
+    node_ref->as_ref.identifier = identifier;
+
+    return node_ref;
 }
 
 ast_node_t *

@@ -1,7 +1,7 @@
-% O programming language specification
+@node Specification
+@chapter Specification
 
-Abstract
---------
+@section Introduction
 
 This document specifies the semantics and behavior of the O Programming
 Language for compiler designers be informed how the language is designed.
@@ -9,8 +9,7 @@ Language for compiler designers be informed how the language is designed.
 This specification is a DRAFT and will be the discussions drive over olang-dev
 mailing list.
 
-Language Syntax
----------------
+@section Language Syntax
 
 This is the O Programming Language EBNF grammar specification[^1]
 
@@ -20,7 +19,7 @@ This is the O Programming Language EBNF grammar specification[^1]
 NOTE: This grammar spec is a DRAFT and it covers only a small portion of the
 language.
 
-```
+@verbatim
 (* Entry Point *)
 <translation-unit>     ::= (<ows> <external-declaration> <ows> (<end-of-statement> | <end-of-file>))*
 
@@ -96,4 +95,4 @@ language.
 <digit>               ::= #'[0-9]'
 <hex-digit>           ::= <digit> | #'[a-fA-F]'
 <end-of-file>         ::= #'$'
-```
+@end verbatim

@@ -27,6 +27,7 @@ programming language.
 * Introduction::
 * Installation::
 * Getting Started::
+* Language Specification::
 * Contribution Guide::
 @end menu
 
@@ -35,6 +36,8 @@ programming language.
 @include installation.texi
 
 @include getting-started.texi
+
+@include specification.texi
 
 @include contribution-guide.texi
 

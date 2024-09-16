@@ -26,8 +26,8 @@ manpages: $(BUILD_DIR) $(MANPAGES)/olang.1
 manual: $(SITE_DIR)/manual/index.html
 
 
-$(MANPAGES)/%.1: manpages/%.md
-	$(PANDOC) -s -t man $< > $@
+$(MANPAGES)/%.1: manpages/%.1
+	@cp $< $@
 
 $(DIST_FILE): all
 	tar -czf $(DIST_FILE) -C $(SITE_DIR) .

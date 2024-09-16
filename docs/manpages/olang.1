@@ -1,0 +1,53 @@
+.\" Man page for olang
+.\" Contact ~johnnyrichard/olang-devel@lists.sr.ht to report issues
+
+.TH man 1 "Feb 2024" "0.0" "olang man page"
+
+.SH NAME
+
+olang \- O programming language compiler
+
+.SH SYNOPSIS
+
+olang source_file
+
+[ --dump-tokens ] [ --dump-ast ] [ [ -o output_file [ --save-temps ] [ --arch arch ]  [ --sysroot dir] ]
+
+.SH DESCRIPTION
+
+.B olang
+is the official O programming language compiler, it is also a tool that contains
+utilities to help the language development.
+
+.SH OPTIONS
+
+.TP
+.BI \-\-dump-tokens
+Display lexical tokens given a soruce.ol code.
+
+.TP
+.BR \-\-dump-ast
+Display AST tree to stdout right after syntax analyzes
+
+.TP
+.BI \-o\  file
+Compile program into a binary file
+
+.TP
+.BR \-\-save\-temps
+Keep temp files used to compile program
+
+.TP
+.BI \-\-arch\  arch
+
+Binary arch: default to "x86_64", avaliable options ("x86_64" | "aarch64")
+
+.TP
+.BI \-\-sysroot\  dir
+
+System root dir where the GNU Assembler and GNU Linker are located: default to '/'
+
+
+.SH AUTHOR
+
+Olang Maintainers <~johnnyrichard/olang-devel@lists.sr.ht>

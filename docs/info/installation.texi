@@ -1,2 +1,80 @@
 @node Installation
 @chapter Installation
+
+This installation assumes you are running an unix like operation system and
+requires @code{make}, @code{makeinfo} and a @strong{c compiler} installed.
+
+The following commands will compile the the code and install @code{olang}
+binary, @code{man} pages and @code{info} docs into your system.
+
+@verbatim
+$ make
+$ make install
+@end verbatim
+
+And for uninstall the program run
+
+@verbatim
+$ make uninstall
+@end verbatim
+
+@section Custom Installation
+
+There are few @code{make} variables which can be used to customize your
+installation as described bellow.
+
+@table @samp
+
+@item PREFIX
+
+The prefix where the compiler and docs should be installed, it is set to
+@code{/usr/local} if not specified.
+
+@item BINDIR
+
+The path where the compiler binary will be installed, it is set to
+@code{$PREFIX/bin} if not specified.
+
+@item DATADIR
+
+The path where the read-only documents will be installed, it is set to
+@code{$PREFIX/share} if not specified.
+
+@item MANDIR
+
+The path where the man documents will be installed, it is set to
+@code{$DATADIR/man} if not specified.
+
+@item MAN1DIR
+
+The path where the man1 documents will be installed, it is set to
+@code{$MANDIR/man1} if not specified.
+
+@item INFODIR
+
+The path where the info documents will be installed, it is set to
+@code{$DATADIR/info} if not specified.
+
+@item DESTDIR
+
+In case you are installing the compiler on different root than @code{/} (by
+default the install assumes the destination dir as root), you can set the
+variable @strong{DESTDIR} on @code{make} for example:
+
+@verbatim
+$ make DESTDIR=/mnt/linux-root install
+@end verbatim
+
+@end table
+
+@section Developer Tips
+
+If you want to install the compiler but do not want to make it system
+available, you might want to have it installed on the @code{XDG}
+@strong{~/.local} directory.  Make sure you have set @code{PATH},
+@code{MANPATH} and @code{INFOPATH} correctly so you can have the resources
+installed available on your shell.
+
+@verbatim
+$ make PREFIX=~/.local install
+@end verbatim

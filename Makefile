@@ -14,6 +14,7 @@ BINDIR ?= ${PREFIX}/bin
 DATADIR ?= ${PREFIX}/share
 INFODIR ?= ${DATADIR}/info
 MANDIR ?= ${DATADIR}/man
+MAN1DIR ?= ${MANDIR}/man1
 SRCDIR := src
 BUILDDIR := build
 
@@ -30,7 +31,15 @@ info: olang.info
 # install target
 
 .PHONY: install
-install: install-info
+install: install-man install-info
+
+.PHONY: install-man
+install-man: install-man1
+
+.PHONY: install-man1
+install-man1: docs/man/man1/olang.1
+	install -Dm 644 docs/man/man1/olang.1 ${DESTDIR}${MAN1DIR}/olang.1
+	gzip -f ${DESTDIR}${MAN1DIR}/olang.1
 
 .PHONY: install-info
 install-info: olang.info
@@ -40,7 +49,14 @@ install-info: olang.info
 # uninstall target
 
 .PHONY: uninstall
-uninstall: uninstall-info
+uninstall: uninstall-man uninstall-info
+
+.PHONY: uninstall-man
+uninstall-man: uninstall-man1
+
+.PHONY: uninstall-man1
+uninstall-man1:
+	@rm -f ${DESTDIR}${MAN1DIR}/olang.1.gz
 
 .PHONY: uninstall-info
 uninstall-info:

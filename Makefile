@@ -31,7 +31,11 @@ info: olang.info
 # install target
 
 .PHONY: install
-install: install-man install-info
+install: install-bin install-man install-info
+
+.PHONY: install-bin
+install-bin: $(TARGET)
+	install -Dm755 $< ${DESTDIR}${BINDIR}/$<
 
 .PHONY: install-man
 install-man: install-man1
@@ -49,7 +53,11 @@ install-info: olang.info
 # uninstall target
 
 .PHONY: uninstall
-uninstall: uninstall-man uninstall-info
+uninstall: uninstall-bin uninstall-man uninstall-info
+
+.PHONY: uninstall-bin
+uninstall-bin: ${DESTDIR}${BINDIR}/olang
+	@rm -f ${DESTDIR}${BINDIR}/olang
 
 .PHONY: uninstall-man
 uninstall-man: uninstall-man1

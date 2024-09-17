@@ -164,14 +164,24 @@ handle_codegen_linux(cli_opts_t *opts)
 
     char command[512];
     sprintf(command, "%s/bin/as %s -o " SV_FMT ".o", opts->sysroot, asm_file, SV_ARG(opts->output_bin));
-    system(command);
+
+    int exit_code = system(command);
+
+    if (exit_code != 0) {
+        exit(exit_code);
+    }
 
     sprintf(command,
             "%s/bin/ld " SV_FMT ".o -o " SV_FMT "",
             opts->sysroot,
             SV_ARG(opts->output_bin),
             SV_ARG(opts->output_bin));
-    system(command);
+
+    exit_code = system(command);
+
+    if (exit_code != 0) {
+        exit(exit_code);
+    }
 
     if (!(opts->options & CLI_OPT_SAVE_TEMPS)) {
         char output_file[256];
@@ -211,7 +221,13 @@ read_entire_file(char *file_path, arena_t *arena)
         exit(EXIT_FAILURE);
     }
 
-    fread(file_content.chars, 1, file_content.size, stream);
+    size_t read_bytes = fread(file_content.chars, 1, file_content.size, stream);
+
+    if (read_bytes != file_content.size) {
+        fprintf(stderr, "error: failed to read all file bytes %s\n", file_path);
+        exit(EXIT_FAILURE);
+    }
+
     fclose(stream);
 
     return file_content;

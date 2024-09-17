@@ -1,5 +1,6 @@
 olang
 build
 *.o
+*.info
 docs/site.tar.gz
 tests/*/*_test

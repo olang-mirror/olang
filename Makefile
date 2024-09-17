@@ -1,19 +1,58 @@
-TARGET    := olang
-SRC_DIR   := src
-BUILD_DIR := build
-CFLAGS    := -Werror -Wall -Wextra -Wmissing-declarations -pedantic -std=c11 -ggdb
+.POSIX:
 
-SRCS      := $(wildcard $(SRC_DIR)/*.c)
-HEADERS   := $(wildcard $(SRC_DIR)/*.h)
-OBJS      := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
+CC := gcc
+
+CFLAGS := ${CFLAGS}
+CFLAGS += -Werror -Wall -Wextra -Wmissing-declarations
+CFLAGS += -pedantic -std=c11 -ggdb
+
+TARGET := olang
+
+PREFIX ?= /usr/local
+
+BINDIR ?= ${PREFIX}/bin
+DATADIR ?= ${PREFIX}/share
+INFODIR ?= ${DATADIR}/info
+MANDIR ?= ${DATADIR}/man
+SRCDIR := src
+BUILDDIR := build
+
+SRCS := $(wildcard $(SRCDIR)/*.c)
+HEADERS := $(wildcard $(SRCDIR)/*.h)
+OBJS := $(patsubst $(SRCDIR)/%.c, $(BUILDDIR)/%.o, $(SRCS))
 
 .PHONY: all
 all: $(TARGET)
 
-$(TARGET): $(BUILD_DIR) $(OBJS)
+.PHONY: info
+info: olang.info
+
+# install target
+
+.PHONY: install
+install: install-info
+
+.PHONY: install-info
+install-info: olang.info
+	install -Dm 644 olang.info ${DESTDIR}${INFODIR}/olang.info
+	gzip -f ${DESTDIR}${INFODIR}/olang.info
+
+# uninstall target
+
+.PHONY: uninstall
+uninstall: uninstall-info
+
+.PHONY: uninstall-info
+uninstall-info:
+	@rm -f ${DESTDIR}${INFODIR}/olang.info.gz
+
+olang.info: docs/info/*.texi
+	$(MAKEINFO) docs/info/olang.texi
+
+$(TARGET): $(BUILDDIR) $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
 
-$(BUILD_DIR):
+$(BUILDDIR):
 	@mkdir -p $@
 
 .PHONY: format
@@ -38,6 +77,7 @@ unit-test:
 
 .PHONY: clean
 clean:
+	@rm -f olang.info
 	$(MAKE) -C tests/unit/ clean
 	@rm -rf build/ $(TARGET)
 
@@ -55,5 +95,5 @@ docs:
 docs-dist:
 	$(MAKE) -C docs dist
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+$(BUILDDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@

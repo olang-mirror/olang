@@ -14,7 +14,7 @@ all:  $(BUILD_DIR) $(STYLE) $(TARGET) manpages manual
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -f $(DIST_FILE)
-	make -C manual clean
+	make -C info clean
 
 .PHONY: dist
 dist: $(DIST_FILE)
@@ -43,7 +43,7 @@ $(BUILD_DIR):
 $(STYLE): $(BUILD_DIR)
 	cp style.css $(SITE_DIR)
 
-$(SITE_DIR)/manual/index.html: manual/*.texi
-	make -C manual
+$(SITE_DIR)/manual/index.html: info/*.texi
+	make -C info
 	rm -rf $(SITE_DIR)/manual
-	mv manual/html $(SITE_DIR)/manual
+	mv info/html $(SITE_DIR)/manual

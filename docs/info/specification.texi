@@ -1,4 +1,4 @@
-@node Specification
+@node Language Specification
 @chapter Specification
 
 @section Introduction

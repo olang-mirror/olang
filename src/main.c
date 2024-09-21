@@ -147,10 +147,14 @@ handle_codegen_linux(cli_opts_t *opts)
     assert(out);
 
     if (!(opts->options & CLI_OPT_ARCH)) {
-        codegen_linux_x86_64_emit_program(out, ast);
+        codegen_x86_64_t codegen = { 0 };
+        codegen_linux_x86_64_init(&codegen, &arena, out);
+        codegen_linux_x86_64_emit_program(&codegen, ast);
     } else {
         if (strcmp(opts->arch, "x86_64") == 0) {
-            codegen_linux_x86_64_emit_program(out, ast);
+            codegen_x86_64_t codegen = { 0 };
+            codegen_linux_x86_64_init(&codegen, &arena, out);
+            codegen_linux_x86_64_emit_program(&codegen, ast);
         } else if (strcmp(opts->arch, "aarch64") == 0) {
             codegen_linux_aarch64_emit_program(out, ast);
         } else {

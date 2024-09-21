@@ -17,9 +17,23 @@
 #ifndef CODEGEN_X86_64_H
 #define CODEGEN_X86_64_H
 
+#include "arena.h"
 #include "ast.h"
+#include "map.h"
+#include <stdio.h>
+
+typedef struct codegen_x86_64
+{
+    arena_t *arena;
+    size_t base_offset;
+    map_t *symbols_stack_offset;
+    FILE *out;
+} codegen_x86_64_t;
 
 void
-codegen_linux_x86_64_emit_program(FILE *out, ast_node_t *prog);
+codegen_linux_x86_64_init(codegen_x86_64_t *codegen, arena_t *arena, FILE *out);
+
+void
+codegen_linux_x86_64_emit_program(codegen_x86_64_t *codegen, ast_node_t *prog);
 
 #endif /* CODEGEN_X86_64_H */

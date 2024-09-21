@@ -18,6 +18,10 @@ fn main(): u32 {
   return code
 }
 
+# TEST test_compile(exit_code=0)
+
+# TEST test_run_binary(exit_code=0)
+
 # TEST test_contains_tokens WITH
 # ./tests/0024_var_definition.ol:17:3: <var>
 # END

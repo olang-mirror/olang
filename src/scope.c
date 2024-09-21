@@ -33,6 +33,18 @@ scope_new(arena_t *arena)
     }
     scope->arena = arena;
     scope->symbols = map_new(arena);
+
+    // FIXME: create a list_new function to avoid spreading this.
+    list_t *children = (list_t *)arena_alloc(arena, sizeof(list_t));
+
+    if (children == NULL) {
+        fprintf(stderr, "[FATAL] Out of memory: scope_new: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    list_init(children, arena);
+
+    scope->children = children;
     return scope;
 }
 
@@ -88,6 +100,8 @@ scope_push(scope_t *scope)
 
     scope_t *child = scope_new(scope->arena);
     child->parent = scope;
+
+    list_append(scope->children, child);
 
     return child;
 }

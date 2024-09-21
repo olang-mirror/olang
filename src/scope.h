@@ -18,6 +18,7 @@
 #define SCOPE_H
 
 #include "arena.h"
+#include "list.h"
 #include "map.h"
 #include "string_view.h"
 
@@ -29,6 +30,7 @@ typedef struct symbol
 typedef struct scope
 {
     struct scope *parent;
+    list_t *children;
     arena_t *arena;
     map_t *symbols;
 } scope_t;

@@ -333,7 +333,7 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
 static void
 codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
 {
-
+    size_t block_offset = codegen->base_offset;
     size_t nodes_len = list_size(block->nodes);
 
     for (size_t i = 0; i < nodes_len; ++i) {
@@ -414,6 +414,8 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
             }
         }
     }
+
+    codegen->base_offset = block_offset;
 }
 
 static void

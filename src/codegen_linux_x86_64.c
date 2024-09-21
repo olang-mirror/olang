@@ -346,6 +346,7 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
 
                 codegen_linux_x86_64_emit_expression(codegen, expr);
 
+                fprintf(codegen->out, "    mov %%rbp, %%rsp\n");
                 fprintf(codegen->out, "    ret\n");
 
                 break;
@@ -418,6 +419,40 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
     codegen->base_offset = block_offset;
 }
 
+static size_t
+calculate_fn_local_size(scope_t *scope)
+{
+    assert(scope);
+
+    size_t local_size = 0;
+
+    map_kv_t kvs[scope->symbols->size];
+
+    map_get_kvs(scope->symbols, (map_kv_t **)kvs);
+
+    for (size_t i = 0; i < scope->symbols->size; ++i) {
+        // FIXME: symbols must have their types. Since we just have 8bytes
+        //        variables it is hard coded.
+        local_size += 8;
+    }
+
+    size_t max_child_local_size = 0;
+
+    list_item_t *item = list_head(scope->children);
+
+    while (item != NULL) {
+        size_t child_local_size = calculate_fn_local_size((scope_t *)item->value);
+
+        if (child_local_size > max_child_local_size) {
+            max_child_local_size = child_local_size;
+        }
+
+        item = list_next(item);
+    }
+
+    return local_size + max_child_local_size;
+}
+
 static void
 codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_t *fn)
 {
@@ -426,6 +461,14 @@ codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_
     fprintf(codegen->out, "" SV_FMT ":\n", SV_ARG(fn->identifier));
 
     fprintf(codegen->out, "    mov %%rsp, %%rbp\n");
+
+    size_t local_size = calculate_fn_local_size(fn->scope);
+
+    // TODO: get the local_size from function scope
+
+    if (local_size != 0) {
+        fprintf(codegen->out, "    sub $%ld, %%rsp\n", local_size);
+    }
 
     assert(block_node->kind == AST_NODE_BLOCK);
     ast_block_t block = block_node->as_block;

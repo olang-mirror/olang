@@ -60,6 +60,7 @@ typedef struct ast_fn_definition
     string_view_t identifier;
     type_t return_type;
     ast_node_t *block;
+    scope_t *scope;
 } ast_fn_definition_t;
 
 typedef struct ast_var_definition

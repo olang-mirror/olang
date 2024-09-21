@@ -59,6 +59,7 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
         }
 
         case AST_NODE_FN_DEF: {
+            ast->as_fn_def.scope = scope;
             // FIXME: insert function symbol to scope
             populate_scope(checker, scope, ast->as_fn_def.block);
             return;

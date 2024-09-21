@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "arena.h"
+#include "checker.h"
 #include "cli.h"
 #include "codegen_linux_aarch64.h"
 #include "codegen_linux_x86_64.h"
@@ -135,6 +136,9 @@ handle_codegen_linux(cli_opts_t *opts)
     parser_init(&parser, &lexer, &arena, opts->file_path);
 
     ast_node_t *ast = parser_parse_program(&parser);
+
+    checker_t *checker = checker_new(&arena);
+    checker_check(checker, ast);
 
     char asm_file[opts->output_bin.size + 3];
     sprintf(asm_file, "" SV_FMT ".s", SV_ARG(opts->output_bin));

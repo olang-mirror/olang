@@ -21,6 +21,7 @@
 
 #include "arena.h"
 #include "list.h"
+#include "scope.h"
 #include "string_view.h"
 
 typedef struct ast_node ast_node_t;
@@ -66,6 +67,7 @@ typedef struct ast_var_definition
     string_view_t identifier;
     type_t type;
     ast_node_t *value;
+    scope_t *scope;
 } ast_var_definition_t;
 
 typedef enum
@@ -85,6 +87,7 @@ typedef struct ast_literal
 typedef struct ast_ref
 {
     string_view_t identifier;
+    scope_t *scope;
 } ast_ref_t;
 
 typedef enum ast_binary_op_kind
@@ -118,6 +121,7 @@ typedef struct ast_binary_op
 
 typedef struct ast_return_stmt
 {
+    // FIXME: rename to a meaningful name like expr
     ast_node_t *data;
 } ast_return_stmt_t;
 

@@ -80,6 +80,8 @@ bool
 map_put(map_t *map, char *key, void *value)
 {
     assert(map && key);
+    map->size++;
+
     uint32_t hash = u32_fnv1a_hash(key);
     map_entry_t *entry = map->entries + map_get_index(map, hash);
 
@@ -124,6 +126,21 @@ map_get_index(map_t *map, uint32_t hash)
 {
     uint32_t capacity_mask = map->capacity - 1;
     return hash & capacity_mask;
+}
+
+void
+map_get_kvs(map_t *map, map_kv_t **kvs)
+{
+    size_t index = 0;
+
+    for (size_t j = 0; j < map->capacity; ++j) {
+        map_entry_t *entry = map->entries + j;
+
+        while (entry != NULL && entry->key != NULL) {
+            kvs[index++] = (map_kv_t *)entry;
+            entry = entry->next;
+        }
+    }
 }
 
 static char *

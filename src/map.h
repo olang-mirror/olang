@@ -37,7 +37,14 @@ typedef struct map
     arena_t *arena;
     map_entry_t *entries;
     size_t capacity;
+    size_t size;
 } map_t;
+
+typedef struct map_kv
+{
+    char *key;
+    void *value;
+} map_kv_t;
 
 typedef struct map_entry
 {
@@ -55,5 +62,8 @@ map_put(map_t *map, char *key, void *value);
 
 void *
 map_get(map_t *map, char *key);
+
+void
+map_get_kvs(map_t *map, map_kv_t **kvs);
 
 #endif /* MAP_H */

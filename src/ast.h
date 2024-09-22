@@ -23,6 +23,7 @@
 #include "list.h"
 #include "scope.h"
 #include "string_view.h"
+#include "type.h"
 
 typedef struct ast_node ast_node_t;
 

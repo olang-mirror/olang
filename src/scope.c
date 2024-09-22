@@ -49,7 +49,7 @@ scope_new(arena_t *arena)
 }
 
 symbol_t *
-symbol_new(arena_t *arena, string_view_t id)
+symbol_new(arena_t *arena, string_view_t id, type_t type)
 {
     assert(arena);
     symbol_t *symbol = (symbol_t *)arena_alloc(arena, sizeof(symbol_t));
@@ -58,6 +58,7 @@ symbol_new(arena_t *arena, string_view_t id)
         exit(EXIT_FAILURE);
     }
     symbol->id = id;
+    symbol->type = type;
     return symbol;
 }
 

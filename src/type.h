@@ -14,45 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef SCOPE_H
-#define SCOPE_H
-
-#include "arena.h"
-#include "list.h"
-#include "map.h"
+#ifndef TYPE_H
+#define TYPE_H
 #include "string_view.h"
-#include "type.h"
+typedef enum
+{
+    TYPE_PRIMITIVE
+} type_kind_t;
 
-typedef struct symbol
+typedef enum
+{
+    TYPE_U32
+} type_primitive_kind_t;
+
+typedef struct type_primitive
+{
+    short size;
+    type_primitive_kind_t kind;
+} type_primitive_t;
+
+typedef struct type
 {
     string_view_t id;
-    type_t type;
-} symbol_t;
+    type_kind_t kind;
+    union
+    {
+        type_primitive_t as_primitive;
+    };
+} type_t;
 
-typedef struct scope
-{
-    struct scope *parent;
-    list_t *children;
-    arena_t *arena;
-    map_t *symbols;
-} scope_t;
-
-scope_t *
-scope_new(arena_t *arena);
-
-symbol_t *
-symbol_new(arena_t *arena, string_view_t id, type_t type);
-
-symbol_t *
-scope_lookup(scope_t *scope, string_view_t id);
-
-void
-scope_insert(scope_t *scope, symbol_t *symbol);
-
-scope_t *
-scope_push(scope_t *scope);
-
-scope_t *
-scope_pop(scope_t *scope);
-
-#endif /* SCOPE_H */
+type_t
+type_from_id(string_view_t id);
+#endif

@@ -14,45 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef SCOPE_H
-#define SCOPE_H
-
-#include "arena.h"
-#include "list.h"
-#include "map.h"
-#include "string_view.h"
 #include "type.h"
+#include "assert.h"
 
-typedef struct symbol
+type_t
+type_from_id(string_view_t id)
 {
-    string_view_t id;
-    type_t type;
-} symbol_t;
+    type_t type = { 0 };
+    if (string_view_eq_to_cstr(id, "u32")) {
+        type.kind = TYPE_PRIMITIVE;
+        type.as_primitive.size = 4;
+        type.as_primitive.kind = TYPE_U32;
+        return type;
+    }
 
-typedef struct scope
-{
-    struct scope *parent;
-    list_t *children;
-    arena_t *arena;
-    map_t *symbols;
-} scope_t;
-
-scope_t *
-scope_new(arena_t *arena);
-
-symbol_t *
-symbol_new(arena_t *arena, string_view_t id, type_t type);
-
-symbol_t *
-scope_lookup(scope_t *scope, string_view_t id);
-
-void
-scope_insert(scope_t *scope, symbol_t *symbol);
-
-scope_t *
-scope_push(scope_t *scope);
-
-scope_t *
-scope_pop(scope_t *scope);
-
-#endif /* SCOPE_H */
+    // FIXME: handle user defined types
+    assert(0 && "unknown type");
+}

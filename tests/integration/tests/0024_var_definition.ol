@@ -28,7 +28,7 @@ fn main(): u32 {
 
 # TEST test_ast WITH
 # Translation_Unit
-# `-Function_Definition <name:main> <return:0>
+# `-Function_Definition <name:main> <return:u32>
 #   `-Block
 #     |-Var_Definition <name:code> <kind:u32>
 #     | `-Literal <kind:u32> <value:0>

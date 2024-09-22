@@ -31,7 +31,7 @@ fn main(): u32 {
 
 # TEST test_ast WITH
 # Translation_Unit
-# `-Function_Definition <name:main> <return:0>
+# `-Function_Definition <name:main> <return:u32>
 #   `-Block
 #     `-If_Statement
 #       |-Binary_Operation (!=)

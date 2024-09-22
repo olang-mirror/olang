@@ -126,9 +126,9 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 
             char name[256];
             sprintf(name,
-                    "Function_Definition <name:" SV_FMT "> <return:%d>",
+                    "Function_Definition <name:" SV_FMT "> <return:" SV_FMT ">",
                     SV_ARG(fn_def.identifier),
-                    fn_def.return_type);
+                    SV_ARG(fn_def.return_type));
             node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
             strcpy(node->name, name);
 

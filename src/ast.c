@@ -37,7 +37,7 @@ ast_new_program(arena_t *arena, ast_node_t *fn_def)
 }
 
 ast_node_t *
-ast_new_node_fn_def(arena_t *arena, string_view_t identifier, type_t return_type, ast_node_t *block)
+ast_new_node_fn_def(arena_t *arena, string_view_t identifier, string_view_t return_type, ast_node_t *block)
 {
     ast_node_t *node_fn_def = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_fn_def);
@@ -53,7 +53,7 @@ ast_new_node_fn_def(arena_t *arena, string_view_t identifier, type_t return_type
 }
 
 ast_node_t *
-ast_new_node_var_def(arena_t *arena, string_view_t identifier, type_t type, ast_node_t *value)
+ast_new_node_var_def(arena_t *arena, string_view_t identifier, string_view_t type, ast_node_t *value)
 {
     ast_node_t *node_var_def = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_var_def);

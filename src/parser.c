@@ -34,7 +34,7 @@ static bool
 expected_token(parser_t *parser, token_t *token, token_kind_t kind);
 
 static bool
-parser_parse_type(parser_t *parser, type_t *type);
+parser_parse_type(parser_t *parser, string_view_t *type);
 
 static ast_node_t *
 parser_parse_block(parser_t *parser);
@@ -285,15 +285,7 @@ parser_parse_fn_definition(parser_t *parser)
         return NULL;
     }
 
-    skip_line_feeds(parser->lexer);
-
-    if (!skip_expected_token(parser, TOKEN_COLON)) {
-        return NULL;
-    }
-
-    skip_line_feeds(parser->lexer);
-
-    type_t fn_return_type;
+    string_view_t fn_return_type;
     if (!parser_parse_type(parser, &fn_return_type)) {
         return NULL;
     }
@@ -309,20 +301,25 @@ parser_parse_fn_definition(parser_t *parser)
 }
 
 static bool
-parser_parse_type(parser_t *parser, type_t *type)
+parser_parse_type(parser_t *parser, string_view_t *type)
 {
+    skip_line_feeds(parser->lexer);
+
+    if (!skip_expected_token(parser, TOKEN_COLON)) {
+        return false;
+    }
+
+    skip_line_feeds(parser->lexer);
+
     token_t token;
 
     if (!expected_next_token(parser, &token, TOKEN_IDENTIFIER)) {
         return false;
     }
 
-    if (string_view_eq_to_cstr(token.value, "u32")) {
-        *type = TYPE_U32;
-        return true;
-    }
+    *type = token.value;
 
-    return false;
+    return true;
 }
 
 static ast_node_t *
@@ -469,11 +466,7 @@ parser_parse_var_def(parser_t *parser)
         return NULL;
     }
 
-    if (!skip_expected_token(parser, TOKEN_COLON)) {
-        return NULL;
-    }
-
-    type_t var_type;
+    string_view_t var_type;
     if (!parser_parse_type(parser, &var_type)) {
         return NULL;
     }

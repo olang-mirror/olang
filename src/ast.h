@@ -40,11 +40,6 @@ typedef enum
     AST_NODE_UNKNOWN
 } ast_node_kind_t;
 
-typedef enum
-{
-    TYPE_U32
-} type_t;
-
 typedef struct ast_block
 {
     list_t *nodes;
@@ -58,7 +53,7 @@ typedef struct ast_program
 typedef struct ast_fn_definition
 {
     string_view_t identifier;
-    type_t return_type;
+    string_view_t return_type;
     ast_node_t *block;
     scope_t *scope;
 } ast_fn_definition_t;
@@ -66,7 +61,7 @@ typedef struct ast_fn_definition
 typedef struct ast_var_definition
 {
     string_view_t identifier;
-    type_t type;
+    string_view_t type;
     ast_node_t *value;
     scope_t *scope;
 } ast_var_definition_t;
@@ -154,10 +149,10 @@ ast_node_t *
 ast_new_program(arena_t *arena, ast_node_t *fn_def);
 
 ast_node_t *
-ast_new_node_fn_def(arena_t *arena, string_view_t identifier, type_t return_type, ast_node_t *block);
+ast_new_node_fn_def(arena_t *arena, string_view_t identifier, string_view_t return_type, ast_node_t *block);
 
 ast_node_t *
-ast_new_node_var_def(arena_t *arena, string_view_t identifier, type_t type, ast_node_t *value);
+ast_new_node_var_def(arena_t *arena, string_view_t identifier, string_view_t type, ast_node_t *value);
 
 ast_node_t *
 ast_new_node_bin_op(arena_t *arena, ast_binary_op_kind_t kind, ast_node_t *lhs, ast_node_t *rhs);

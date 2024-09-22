@@ -89,10 +89,9 @@ format-fix: $(SRCS) $(HEADERS)
 	clang-format -i $?
 	$(MAKE) -C tests/unit/ format-fix
 
-.PHONY: integration-test
-integration-test:
-	$(MAKE)
-	$(MAKE) -C tests/integration/
+.PHONY: check-olc
+check-olc: $(TARGET)
+	$(MAKE) -C tests/olc/
 
 .PHONY: unit-test
 unit-test:
@@ -106,9 +105,8 @@ clean:
 	@rm -rf build/ $(TARGET)
 
 .PHONY: check
-check:
+check: check-olc
 	$(MAKE)
-	$(MAKE) -C tests/integration/
 	$(MAKE) -C tests/unit/
 
 .PHONY: docs

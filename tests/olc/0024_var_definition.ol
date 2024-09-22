@@ -23,7 +23,7 @@ fn main(): u32 {
 # TEST test_run_binary(exit_code=0)
 
 # TEST test_contains_tokens WITH
-# ./tests/0024_var_definition.ol:17:3: <var>
+# ./0024_var_definition.ol:17:3: <var>
 # END
 
 # TEST test_ast WITH

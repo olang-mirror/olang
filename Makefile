@@ -6,7 +6,7 @@ CFLAGS := ${CFLAGS}
 CFLAGS += -Werror -Wall -Wextra -Wmissing-declarations
 CFLAGS += -pedantic -std=c11 -ggdb
 
-TARGET := olang
+TARGET := olc
 
 PREFIX ?= /usr/local
 
@@ -41,9 +41,9 @@ install-bin: $(TARGET)
 install-man: install-man1
 
 .PHONY: install-man1
-install-man1: docs/man/man1/olang.1
-	install -Dm 644 docs/man/man1/olang.1 ${DESTDIR}${MAN1DIR}/olang.1
-	gzip -f ${DESTDIR}${MAN1DIR}/olang.1
+install-man1: docs/man/man1/olc.1
+	install -Dm 644 docs/man/man1/olc.1 ${DESTDIR}${MAN1DIR}/olc.1
+	gzip -f ${DESTDIR}${MAN1DIR}/olc.1
 
 .PHONY: install-info
 install-info: olang.info
@@ -56,15 +56,15 @@ install-info: olang.info
 uninstall: uninstall-bin uninstall-man uninstall-info
 
 .PHONY: uninstall-bin
-uninstall-bin: ${DESTDIR}${BINDIR}/olang
-	@rm -f ${DESTDIR}${BINDIR}/olang
+uninstall-bin: ${DESTDIR}${BINDIR}/$(TARGET)
+	@rm -f ${DESTDIR}${BINDIR}/$(TARGET)
 
 .PHONY: uninstall-man
 uninstall-man: uninstall-man1
 
 .PHONY: uninstall-man1
 uninstall-man1:
-	@rm -f ${DESTDIR}${MAN1DIR}/olang.1.gz
+	@rm -f ${DESTDIR}${MAN1DIR}/olc.1.gz
 
 .PHONY: uninstall-info
 uninstall-info:

@@ -4,8 +4,8 @@
 This installation assumes you are running an unix like operation system and
 requires @code{make}, @code{makeinfo} and a @strong{c compiler} installed.
 
-The following commands will compile the the code and install @code{olang}
-binary, @code{man} pages and @code{info} docs into your system.
+The following commands will compile the the code and install @code{olc} binary
+(olang compiler), @code{man} pages and @code{info} docs into your system.
 
 @verbatim
 $ make

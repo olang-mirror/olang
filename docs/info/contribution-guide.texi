@@ -22,7 +22,7 @@ merely three dependencies: @code{make}, @code{gcc} (version 11 or higher), and
 $ make
 @end example
 
-If everything went well with the compilation, you should find a @code{olang}
+If everything went well with the compilation, you should find a @code{olc}
 binary on the project root folder.
 
 As an optional step, you can install @code{texinfo}, @code{pandoc} and
@@ -32,7 +32,7 @@ read @ref{Writing Documentation}.
 @subsection Testing
 
 There are two layers of tests @strong{integration} and @strong{unit}. The
-integration test is going to execute the @code{olang} compiler and check if the
+integration test is going to execute the @code{olc} compiler and check if the
 generated binary acts as expected. Unit tests will test C functions.
 
 To run all tests you can execute:
@@ -53,7 +53,6 @@ the format section below for guidance on its application.
 @subsection Code Formatting
 
 Checking for format issues:
-
 @example
 $ make format
 @end example

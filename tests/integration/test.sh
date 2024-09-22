@@ -16,7 +16,7 @@
 
 # Ignores variables been modified in a subshell
 # shellcheck disable=SC2030,SC2031
-OLANG_PATH="../../olang"
+OLANG_PATH="../../olc"
 TEST_FILE="$1"
 
 TEST_TMP_FILES="$TEST_FILE.test"

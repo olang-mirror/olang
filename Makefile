@@ -93,9 +93,8 @@ format-fix: $(SRCS) $(HEADERS)
 check-olc: $(TARGET)
 	$(MAKE) -C tests/olc/
 
-.PHONY: unit-test
-unit-test:
-	$(MAKE)
+.PHONY: check-unit
+check-unit: $(TARGET)
 	$(MAKE) -C tests/unit/
 
 .PHONY: clean
@@ -105,9 +104,7 @@ clean:
 	@rm -rf build/ $(TARGET)
 
 .PHONY: check
-check: check-olc
-	$(MAKE)
-	$(MAKE) -C tests/unit/
+check: check-unit check-olc
 
 .PHONY: docs
 docs:

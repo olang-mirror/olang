@@ -426,9 +426,9 @@ calculate_fn_local_size(scope_t *scope)
 
     size_t local_size = 0;
 
-    map_kv_t kvs[scope->symbols->size];
+    map_kv_t *kvs[scope->symbols->size];
 
-    map_get_kvs(scope->symbols, (map_kv_t **)kvs);
+    map_get_kvs(scope->symbols, kvs);
 
     for (size_t i = 0; i < scope->symbols->size; ++i) {
         // FIXME: symbols must have their types. Since we just have 8bytes

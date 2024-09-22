@@ -26,6 +26,10 @@
 #define SYS_exit (60)
 #define PTR_HEX_CSTR_SIZE (18 + 1)
 
+// The call instruction pushes EIP into stack so the first 8 bytes from stack
+// must be preserved else the ret instruction will jump to nowere.
+#define X86_CALL_EIP_STACK_OFFSET (8)
+
 // FIXME: move label_index to codegen_linux_x86_64_t structure
 size_t label_index;
 
@@ -34,6 +38,12 @@ codegen_linux_x86_64_emit_start_entrypoint(codegen_x86_64_t *codegen);
 
 static void
 codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_t *fn);
+
+static size_t
+type_to_bytes(type_t *type);
+
+static char *
+get_accumulator_reg_for(size_t bytes);
 
 void
 codegen_linux_x86_64_init(codegen_x86_64_t *codegen, arena_t *arena, FILE *out)
@@ -105,7 +115,10 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
             size_t *offset = (size_t *)map_get(codegen->symbols_stack_offset, symbol_ptr);
             assert(offset);
 
-            fprintf(codegen->out, "    mov -%ld(%%rbp), %%rax\n", *offset);
+            fprintf(codegen->out,
+                    "    mov -%ld(%%rbp), %s\n",
+                    *offset,
+                    get_accumulator_reg_for(type_to_bytes(&symbol->type)));
             return;
         }
         case AST_NODE_BINARY_OP: {
@@ -366,12 +379,18 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                     codegen_linux_x86_64_emit_expression(codegen, var_def.value);
                 }
 
-                codegen->base_offset += 8;
                 size_t *offset = arena_alloc(codegen->arena, sizeof(size_t));
                 *offset = codegen->base_offset;
 
                 map_put(codegen->symbols_stack_offset, symbol_ptr, offset);
-                fprintf(codegen->out, "    mov %%rax, -%ld(%%rbp)\n", codegen->base_offset);
+
+                size_t type_size = type_to_bytes(&symbol->type);
+
+                fprintf(codegen->out,
+                        "    mov %s, -%ld(%%rbp)\n",
+                        get_accumulator_reg_for(type_size),
+                        codegen->base_offset);
+                codegen->base_offset += type_size;
 
                 break;
             }
@@ -420,6 +439,18 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
 }
 
 static size_t
+type_to_bytes(type_t *type)
+{
+    switch (type->kind) {
+        case TYPE_PRIMITIVE: {
+            return type->as_primitive.size;
+        }
+    }
+
+    assert(0 && "unreachable");
+}
+
+static size_t
 calculate_fn_local_size(scope_t *scope)
 {
     assert(scope);
@@ -431,9 +462,8 @@ calculate_fn_local_size(scope_t *scope)
     map_get_kvs(scope->symbols, kvs);
 
     for (size_t i = 0; i < scope->symbols->size; ++i) {
-        // FIXME: symbols must have their types. Since we just have 8bytes
-        //        variables it is hard coded.
-        local_size += 8;
+        symbol_t *symbol = (symbol_t *)kvs[i]->value;
+        local_size += type_to_bytes(&symbol->type);
     }
 
     size_t max_child_local_size = 0;
@@ -456,15 +486,14 @@ calculate_fn_local_size(scope_t *scope)
 static void
 codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_t *fn)
 {
-    codegen->base_offset = 0;
+    codegen->base_offset = X86_CALL_EIP_STACK_OFFSET;
+
     ast_node_t *block_node = fn->block;
     fprintf(codegen->out, "" SV_FMT ":\n", SV_ARG(fn->identifier));
 
     fprintf(codegen->out, "    mov %%rsp, %%rbp\n");
 
     size_t local_size = calculate_fn_local_size(fn->scope);
-
-    // TODO: get the local_size from function scope
 
     if (local_size != 0) {
         fprintf(codegen->out, "    sub $%ld, %%rsp\n", local_size);
@@ -474,4 +503,17 @@ codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_
     ast_block_t block = block_node->as_block;
 
     codegen_linux_x86_64_emit_block(codegen, &block);
+}
+
+static char *
+get_accumulator_reg_for(size_t bytes)
+{
+    if (bytes <= 1) {
+        return "%ah";
+    } else if (bytes <= 2) {
+        return "%ax";
+    } else if (bytes <= 4) {
+        return "%eax";
+    }
+    return "%rax";
 }

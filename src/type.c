@@ -21,10 +21,28 @@ type_t
 type_from_id(string_view_t id)
 {
     type_t type = { 0 };
+    if (string_view_eq_to_cstr(id, "u8")) {
+        type.kind = TYPE_PRIMITIVE;
+        type.as_primitive.size = 1;
+        type.as_primitive.kind = TYPE_U8;
+        return type;
+    }
+    if (string_view_eq_to_cstr(id, "u16")) {
+        type.kind = TYPE_PRIMITIVE;
+        type.as_primitive.size = 2;
+        type.as_primitive.kind = TYPE_U16;
+        return type;
+    }
     if (string_view_eq_to_cstr(id, "u32")) {
         type.kind = TYPE_PRIMITIVE;
         type.as_primitive.size = 4;
         type.as_primitive.kind = TYPE_U32;
+        return type;
+    }
+    if (string_view_eq_to_cstr(id, "u64")) {
+        type.kind = TYPE_PRIMITIVE;
+        type.as_primitive.size = 8;
+        type.as_primitive.kind = TYPE_U64;
         return type;
     }
 

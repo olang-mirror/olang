@@ -24,7 +24,10 @@ typedef enum
 
 typedef enum
 {
-    TYPE_U32
+    TYPE_U8,
+    TYPE_U16,
+    TYPE_U32,
+    TYPE_U64
 } type_primitive_kind_t;
 
 typedef struct type_primitive

@@ -73,6 +73,7 @@ typedef enum token_kind
     TOKEN_OPAREN,
     TOKEN_CPAREN,
     TOKEN_COLON,
+    TOKEN_COMMA,
     TOKEN_OCURLY,
     TOKEN_CCURLY,
     TOKEN_EOF

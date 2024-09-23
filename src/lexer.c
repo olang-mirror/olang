@@ -227,6 +227,11 @@ lexer_next_token(lexer_t *lexer, token_t *token)
                 lexer_skip_char(lexer);
                 return;
             }
+            case ',': {
+                lexer_init_char_value_token(lexer, token, TOKEN_COMMA);
+                lexer_skip_char(lexer);
+                return;
+            }
             case '{': {
                 lexer_init_char_value_token(lexer, token, TOKEN_OCURLY);
                 lexer_skip_char(lexer);
@@ -289,6 +294,7 @@ static char *token_kind_str_table[] = {
     [TOKEN_OPAREN] = "(",
     [TOKEN_CPAREN] = ")",
     [TOKEN_COLON] = ":",
+    [TOKEN_COMMA] = ",",
     [TOKEN_OCURLY] = "{",
     [TOKEN_CCURLY] = "}",
     [TOKEN_PLUS] = "+",

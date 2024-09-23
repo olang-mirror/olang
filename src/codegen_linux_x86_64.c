@@ -30,9 +30,6 @@
 // must be preserved else the ret instruction will jump to nowere.
 #define X86_CALL_EIP_STACK_OFFSET (8)
 
-// FIXME: move label_index to codegen_linux_x86_64_t structure
-size_t label_index;
-
 static void
 codegen_linux_x86_64_emit_start_entrypoint(codegen_x86_64_t *codegen);
 
@@ -60,7 +57,7 @@ codegen_linux_x86_64_init(codegen_x86_64_t *codegen, arena_t *arena, FILE *out)
 void
 codegen_linux_x86_64_emit_program(codegen_x86_64_t *codegen, ast_node_t *node)
 {
-    label_index = 0;
+    codegen->label_index = 0;
     codegen_linux_x86_64_emit_start_entrypoint(codegen);
 
     assert(node->kind == AST_NODE_PROGRAM);
@@ -86,9 +83,9 @@ codegen_linux_x86_64_emit_start_entrypoint(codegen_x86_64_t *codegen)
 }
 
 static size_t
-codegen_linux_x86_64_get_next_label(void)
+codegen_linux_x86_64_get_next_label(codegen_x86_64_t *codegen)
 {
-    return ++label_index;
+    return ++codegen->label_index;
 }
 
 static void
@@ -301,7 +298,7 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                     return;
                 }
                 case AST_BINOP_LOGICAL_AND: {
-                    size_t label_exit = codegen_linux_x86_64_get_next_label();
+                    size_t label_exit = codegen_linux_x86_64_get_next_label(codegen);
 
                     codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
                     fprintf(codegen->out, "    cmp $0, %%rax\n");
@@ -316,8 +313,8 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                     return;
                 }
                 case AST_BINOP_LOGICAL_OR: {
-                    size_t label_t = codegen_linux_x86_64_get_next_label();
-                    size_t label_f = codegen_linux_x86_64_get_next_label();
+                    size_t label_t = codegen_linux_x86_64_get_next_label(codegen);
+                    size_t label_f = codegen_linux_x86_64_get_next_label(codegen);
 
                     codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
                     fprintf(codegen->out, "    cmp $0, %%rax\n");
@@ -402,8 +399,8 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                 ast_node_t *then = if_stmt.then;
                 ast_node_t *_else = if_stmt._else;
 
-                size_t end_if_label = codegen_linux_x86_64_get_next_label();
-                size_t end_else_label = codegen_linux_x86_64_get_next_label();
+                size_t end_if_label = codegen_linux_x86_64_get_next_label(codegen);
+                size_t end_else_label = codegen_linux_x86_64_get_next_label(codegen);
 
                 codegen_linux_x86_64_emit_expression(codegen, cond);
                 fprintf(codegen->out, "    cmp $1, %%rax\n");

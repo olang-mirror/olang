@@ -26,6 +26,7 @@ typedef struct codegen_x86_64
 {
     arena_t *arena;
     size_t base_offset;
+    size_t label_index;
     map_t *symbols_stack_offset;
     FILE *out;
 } codegen_x86_64_t;

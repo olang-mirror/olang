@@ -118,8 +118,7 @@ typedef struct ast_binary_op
 
 typedef struct ast_return_stmt
 {
-    // FIXME: rename to a meaningful name like expr
-    ast_node_t *data;
+    ast_node_t *expr;
 } ast_return_stmt_t;
 
 typedef struct ast_if_stmt
@@ -165,7 +164,7 @@ ast_node_t *
 ast_new_node_ref(arena_t *arena, string_view_t identifier);
 
 ast_node_t *
-ast_new_node_return_stmt(arena_t *arena);
+ast_new_node_return_stmt(arena_t *arena, ast_node_t *expr);
 
 ast_node_t *
 ast_new_node_if_stmt(arena_t *arena, ast_node_t *cond, ast_node_t *then, ast_node_t *_else);

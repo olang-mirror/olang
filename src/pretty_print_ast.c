@@ -156,7 +156,7 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 
             node->name = "Return_Statement";
 
-            pretty_print_node_t *child = ast_node_to_pretty_print_node(return_stmt.data, arena);
+            pretty_print_node_t *child = ast_node_to_pretty_print_node(return_stmt.expr, arena);
             list_append(node->children, child);
 
             return node;

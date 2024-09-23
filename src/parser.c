@@ -388,15 +388,13 @@ parser_parse_return_stmt(parser_t *parser)
         return NULL;
     }
 
-    ast_node_t *node_return_stmt = ast_new_node_return_stmt(parser->arena);
-    assert(node_return_stmt);
-
     ast_node_t *expr = parser_parse_expr(parser);
     if (expr == NULL) {
         return NULL;
     }
 
-    node_return_stmt->as_return_stmt.data = expr;
+    ast_node_t *node_return_stmt = ast_new_node_return_stmt(parser->arena, expr);
+    assert(node_return_stmt);
 
     if (!skip_expected_token(parser, TOKEN_LF)) {
         return NULL;

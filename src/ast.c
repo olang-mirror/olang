@@ -108,12 +108,13 @@ ast_new_node_ref(arena_t *arena, string_view_t identifier)
 }
 
 ast_node_t *
-ast_new_node_return_stmt(arena_t *arena)
+ast_new_node_return_stmt(arena_t *arena, ast_node_t *expr)
 {
     ast_node_t *node_return_stmt = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_return_stmt);
 
     node_return_stmt->kind = AST_NODE_RETURN_STMT;
+    node_return_stmt->as_return_stmt.expr = expr;
 
     return node_return_stmt;
 }

@@ -81,7 +81,7 @@ codegen_linux_aarch64_emit_function(FILE *out, ast_fn_definition_t *fn)
     assert(return_node->kind == AST_NODE_RETURN_STMT);
     ast_return_stmt_t return_stmt = return_node->as_return_stmt;
 
-    ast_node_t *literal_node = return_stmt.data;
+    ast_node_t *literal_node = return_stmt.expr;
     assert(literal_node->kind == AST_NODE_LITERAL);
     ast_literal_t literal_u32 = literal_node->as_literal;
 

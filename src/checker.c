@@ -87,7 +87,7 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
         case AST_NODE_RETURN_STMT: {
             ast_return_stmt_t return_stmt = ast->as_return_stmt;
 
-            populate_scope(checker, scope, return_stmt.data);
+            populate_scope(checker, scope, return_stmt.expr);
             return;
         }
 

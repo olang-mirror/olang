@@ -355,7 +355,7 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
             case AST_NODE_RETURN_STMT: {
                 ast_return_stmt_t return_stmt = node->as_return_stmt;
 
-                ast_node_t *expr = return_stmt.data;
+                ast_node_t *expr = return_stmt.expr;
 
                 codegen_linux_x86_64_emit_expression(codegen, expr);
 

@@ -66,7 +66,7 @@ parse_program_test(const MunitParameter params[], void *user_data_or_fixture)
     assert_not_null(node);
     assert_uint(node->kind, ==, AST_NODE_RETURN_STMT);
 
-    ast_node_t *number_node = node->as_return_stmt.data;
+    ast_node_t *number_node = node->as_return_stmt.expr;
     assert_not_null(number_node);
     assert_uint(number_node->kind, ==, AST_NODE_LITERAL);
     assert_uint(number_node->as_literal.kind, ==, AST_LITERAL_U32);

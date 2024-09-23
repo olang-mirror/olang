@@ -37,7 +37,7 @@ ast_new_program(arena_t *arena, ast_node_t *fn_def)
 }
 
 ast_node_t *
-ast_new_node_fn_def(arena_t *arena, string_view_t identifier, string_view_t return_type, ast_node_t *block)
+ast_new_node_fn_def(arena_t *arena, string_view_t id, string_view_t return_type, ast_node_t *block)
 {
     ast_node_t *node_fn_def = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_fn_def);
@@ -45,7 +45,7 @@ ast_new_node_fn_def(arena_t *arena, string_view_t identifier, string_view_t retu
     node_fn_def->kind = AST_NODE_FN_DEF;
     ast_fn_definition_t *fn_def = &node_fn_def->as_fn_def;
 
-    fn_def->identifier = identifier;
+    fn_def->id = id;
     fn_def->return_type = return_type;
     fn_def->block = block;
 
@@ -53,7 +53,7 @@ ast_new_node_fn_def(arena_t *arena, string_view_t identifier, string_view_t retu
 }
 
 ast_node_t *
-ast_new_node_var_def(arena_t *arena, string_view_t identifier, string_view_t type, ast_node_t *value)
+ast_new_node_var_def(arena_t *arena, string_view_t id, string_view_t type, ast_node_t *value)
 {
     ast_node_t *node_var_def = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_var_def);
@@ -61,7 +61,7 @@ ast_new_node_var_def(arena_t *arena, string_view_t identifier, string_view_t typ
     node_var_def->kind = AST_NODE_VAR_DEF;
     ast_var_definition_t *var_def = &node_var_def->as_var_def;
 
-    var_def->identifier = identifier;
+    var_def->id = id;
     var_def->type = type;
     var_def->value = value;
 
@@ -96,13 +96,13 @@ ast_new_node_literal_u32(arena_t *arena, uint32_t value)
 }
 
 ast_node_t *
-ast_new_node_ref(arena_t *arena, string_view_t identifier)
+ast_new_node_ref(arena_t *arena, string_view_t id)
 {
     ast_node_t *node_ref = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_ref);
 
     node_ref->kind = AST_NODE_REF;
-    node_ref->as_ref.identifier = identifier;
+    node_ref->as_ref.id = id;
 
     return node_ref;
 }

@@ -68,7 +68,7 @@ codegen_linux_x86_64_emit_program(codegen_x86_64_t *codegen, ast_node_t *node)
 
     ast_fn_definition_t fn = program.fn->as_fn_def;
 
-    assert(string_view_eq_to_cstr(fn.identifier, "main"));
+    assert(string_view_eq_to_cstr(fn.id, "main"));
     codegen_linux_x86_64_emit_function(codegen, &fn);
 }
 
@@ -106,7 +106,7 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
         case AST_NODE_REF: {
             ast_ref_t ref = expr_node->as_ref;
 
-            symbol_t *symbol = scope_lookup(ref.scope, ref.identifier);
+            symbol_t *symbol = scope_lookup(ref.scope, ref.id);
             assert(symbol);
 
             char symbol_ptr[PTR_HEX_CSTR_SIZE];
@@ -369,7 +369,7 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                 ast_var_definition_t var_def = node->as_var_def;
                 scope_t *scope = var_def.scope;
 
-                symbol_t *symbol = scope_lookup(scope, var_def.identifier);
+                symbol_t *symbol = scope_lookup(scope, var_def.id);
                 assert(symbol);
 
                 char symbol_ptr[PTR_HEX_CSTR_SIZE];
@@ -489,7 +489,7 @@ codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_
     codegen->base_offset = X86_CALL_EIP_STACK_OFFSET;
 
     ast_node_t *block_node = fn->block;
-    fprintf(codegen->out, "" SV_FMT ":\n", SV_ARG(fn->identifier));
+    fprintf(codegen->out, "" SV_FMT ":\n", SV_ARG(fn->id));
 
     fprintf(codegen->out, "    mov %%rsp, %%rbp\n");
 

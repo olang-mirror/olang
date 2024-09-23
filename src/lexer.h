@@ -32,7 +32,7 @@ typedef struct lexer
 typedef enum token_kind
 {
     TOKEN_UNKNOWN,
-    TOKEN_IDENTIFIER,
+    TOKEN_ID,
     TOKEN_NUMBER,
 
     // Keywords

@@ -106,7 +106,7 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
         }
 
         case AST_NODE_VAR_DEF: {
-            string_view_t id = ast->as_var_def.identifier;
+            string_view_t id = ast->as_var_def.id;
 
             symbol_t *symbol = symbol_new(checker->arena, id, type_from_id(ast->as_var_def.type));
 

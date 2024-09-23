@@ -278,7 +278,7 @@ lexer_next_token(lexer_t *lexer, token_t *token)
 
 static char *token_kind_str_table[] = {
     [TOKEN_UNKNOWN] = "unknown",
-    [TOKEN_IDENTIFIER] = "identifier",
+    [TOKEN_ID] = "identifier",
     [TOKEN_NUMBER] = "number",
     [TOKEN_FN] = "fn",
     [TOKEN_RETURN] = "return",
@@ -432,7 +432,7 @@ lexer_str_to_token_kind(string_view_t text)
         return TOKEN_FN;
     }
 
-    return TOKEN_IDENTIFIER;
+    return TOKEN_ID;
 }
 
 void

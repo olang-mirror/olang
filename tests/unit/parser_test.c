@@ -50,7 +50,7 @@ parse_program_test(const MunitParameter params[], void *user_data_or_fixture)
     assert_uint(program.fn->kind, ==, AST_NODE_FN_DEF);
 
     ast_fn_definition_t fn = program.fn->as_fn_def;
-    assert_memory_equal(fn.identifier.size, fn.identifier.chars, "main");
+    assert_memory_equal(fn.id.size, fn.id.chars, "main");
     assert_memory_equal(fn.return_type.size, fn.return_type.chars, "u32");
 
     ast_node_t *block = fn.block;

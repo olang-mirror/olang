@@ -127,7 +127,7 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             char name[256];
             sprintf(name,
                     "Function_Definition <name:" SV_FMT "> <return:" SV_FMT ">",
-                    SV_ARG(fn_def.identifier),
+                    SV_ARG(fn_def.id),
                     SV_ARG(fn_def.return_type));
             node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
             strcpy(node->name, name);
@@ -203,7 +203,7 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             ast_var_definition_t var = ast->as_var_def;
 
             char name[256];
-            sprintf(name, "Var_Definition <name:" SV_FMT "> <kind:u32>", SV_ARG(var.identifier));
+            sprintf(name, "Var_Definition <name:" SV_FMT "> <kind:u32>", SV_ARG(var.id));
             node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
             strcpy(node->name, name);
 
@@ -217,7 +217,7 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             ast_ref_t ref = ast->as_ref;
 
             char name[256];
-            sprintf(name, "Reference <name:" SV_FMT ">", SV_ARG(ref.identifier));
+            sprintf(name, "Reference <name:" SV_FMT ">", SV_ARG(ref.id));
             node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
             strcpy(node->name, name);
 

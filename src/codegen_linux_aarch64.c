@@ -51,7 +51,7 @@ codegen_linux_aarch64_emit_program(FILE *out, ast_node_t *node)
 
     ast_fn_definition_t fn = program.fn->as_fn_def;
 
-    assert(string_view_eq_to_cstr(fn.identifier, "main"));
+    assert(string_view_eq_to_cstr(fn.id, "main"));
     codegen_linux_aarch64_emit_function(out, &fn);
 }
 
@@ -88,7 +88,7 @@ codegen_linux_aarch64_emit_function(FILE *out, ast_fn_definition_t *fn)
     assert(literal_u32.kind == AST_LITERAL_U32);
     uint32_t exit_code = literal_u32.as_u32;
 
-    fprintf(out, "" SV_FMT ":\n", SV_ARG(fn->identifier));
+    fprintf(out, "" SV_FMT ":\n", SV_ARG(fn->id));
     fprintf(out, "    mov x0, #%d\n", exit_code);
     fprintf(out, "    ret\n");
 }

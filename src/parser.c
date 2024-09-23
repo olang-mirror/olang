@@ -236,7 +236,7 @@ parser_parse_factor(parser_t *parser)
         case TOKEN_NUMBER:
             return ast_new_node_literal_u32(parser->arena, string_view_to_u32(token.value));
 
-        case TOKEN_IDENTIFIER:
+        case TOKEN_ID:
             return ast_new_node_ref(parser->arena, token.value);
 
         case TOKEN_OPAREN: {
@@ -269,7 +269,7 @@ parser_parse_fn_definition(parser_t *parser)
 
     token_t fn_name_token;
 
-    if (!expected_next_token(parser, &fn_name_token, TOKEN_IDENTIFIER)) {
+    if (!expected_next_token(parser, &fn_name_token, TOKEN_ID)) {
         return NULL;
     }
 
@@ -313,7 +313,7 @@ parser_parse_type(parser_t *parser, string_view_t *type)
 
     token_t token;
 
-    if (!expected_next_token(parser, &token, TOKEN_IDENTIFIER)) {
+    if (!expected_next_token(parser, &token, TOKEN_ID)) {
         return false;
     }
 
@@ -459,8 +459,8 @@ parser_parse_var_def(parser_t *parser)
         return NULL;
     }
 
-    token_t identifier_token;
-    if (!expected_next_token(parser, &identifier_token, TOKEN_IDENTIFIER)) {
+    token_t id_token;
+    if (!expected_next_token(parser, &id_token, TOKEN_ID)) {
         return NULL;
     }
 
@@ -479,7 +479,7 @@ parser_parse_var_def(parser_t *parser)
         return NULL;
     }
 
-    ast_node_t *var_node = ast_new_node_var_def(parser->arena, identifier_token.value, var_type, expr);
+    ast_node_t *var_node = ast_new_node_var_def(parser->arena, id_token.value, var_type, expr);
 
     skip_line_feeds(parser->lexer);
 

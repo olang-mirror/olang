@@ -116,8 +116,17 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             pretty_print_node_t *node = pretty_print_node_new(arena);
             node->name = "Translation_Unit";
 
-            pretty_print_node_t *fn_node = ast_node_to_pretty_print_node(ast->as_translation_unit.fn, arena);
-            list_append(node->children, fn_node);
+            list_item_t *item = list_head(ast->as_translation_unit.decls);
+
+            while (item != NULL) {
+                ast_node_t *decl = (ast_node_t *)item->value;
+
+                pretty_print_node_t *fn_node = ast_node_to_pretty_print_node(decl, arena);
+                list_append(node->children, fn_node);
+
+                item = list_next(item);
+            }
+
             return node;
         }
         case AST_NODE_FN_DEF: {

@@ -46,10 +46,15 @@ parse_translation_unit_test(const MunitParameter params[], void *user_data_or_fi
     assert_uint(translation_unit_node->kind, ==, AST_NODE_TRANSLATION_UNIT);
 
     ast_translation_unit_t translation_unit = translation_unit_node->as_translation_unit;
-    assert_not_null(translation_unit.fn);
-    assert_uint(translation_unit.fn->kind, ==, AST_NODE_FN_DEF);
 
-    ast_fn_definition_t fn = translation_unit.fn->as_fn_def;
+    assert_uint(list_size(translation_unit.decls), ==, 1);
+
+    ast_node_t *fn_node = (ast_node_t *)list_head(translation_unit.decls)->value;
+
+    assert_not_null(fn_node);
+    assert_uint(fn_node->kind, ==, AST_NODE_FN_DEF);
+
+    ast_fn_definition_t fn = fn_node->as_fn_def;
     assert_memory_equal(fn.id.size, fn.id.chars, "main");
     assert_memory_equal(fn.return_type.size, fn.return_type.chars, "u32");
 

@@ -54,7 +54,12 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
 {
     switch (ast->kind) {
         case AST_NODE_TRANSLATION_UNIT: {
-            populate_scope(checker, scope, ast->as_translation_unit.fn);
+            list_item_t *item = list_head(ast->as_translation_unit.decls);
+
+            while (item != NULL) {
+                populate_scope(checker, scope, (ast_node_t *)item->value);
+                item = list_next(item);
+            }
             return;
         }
 

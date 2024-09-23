@@ -80,7 +80,11 @@ parser_parse_translation_unit(parser_t *parser)
         return NULL;
     }
 
-    return ast_new_translation_unit(parser->arena, fn);
+    ast_node_t *translation_unit_node = ast_new_translation_unit(parser->arena);
+
+    list_append(translation_unit_node->as_translation_unit.decls, fn);
+
+    return translation_unit_node;
 }
 
 static ast_binary_op_kind_t

@@ -48,7 +48,7 @@ typedef struct ast_block
 
 typedef struct ast_translation_unit
 {
-    ast_node_t *fn;
+    list_t *decls;
 } ast_translation_unit_t;
 
 typedef struct ast_fn_definition
@@ -146,7 +146,7 @@ typedef struct ast_node
 } ast_node_t;
 
 ast_node_t *
-ast_new_translation_unit(arena_t *arena, ast_node_t *fn_def);
+ast_new_translation_unit(arena_t *arena);
 
 ast_node_t *
 ast_new_node_fn_def(arena_t *arena, string_view_t id, string_view_t return_type, ast_node_t *block);

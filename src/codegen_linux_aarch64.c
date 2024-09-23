@@ -49,10 +49,26 @@ codegen_linux_aarch64_emit_translation_unit(FILE *out, ast_node_t *node)
     assert(node->kind == AST_NODE_TRANSLATION_UNIT);
     ast_translation_unit_t translation_unit = node->as_translation_unit;
 
-    ast_fn_definition_t fn = translation_unit.fn->as_fn_def;
+    list_item_t *item = list_head(translation_unit.decls);
 
-    assert(string_view_eq_to_cstr(fn.id, "main"));
-    codegen_linux_aarch64_emit_function(out, &fn);
+    bool main_found = false;
+
+    while (item != NULL) {
+        ast_node_t *decl = (ast_node_t *)item->value;
+
+        if (decl->kind == AST_NODE_FN_DEF) {
+            ast_fn_definition_t fn = decl->as_fn_def;
+            codegen_linux_aarch64_emit_function(out, &fn);
+
+            main_found = main_found || string_view_eq_to_cstr(fn.id, "main");
+        } else {
+            assert(0 && "translation unit only supports function declarations");
+        }
+
+        item = list_next(item);
+    }
+
+    assert(main_found && "main function is required.");
 }
 
 static void

@@ -23,7 +23,7 @@
 #include "string_view.h"
 
 ast_node_t *
-ast_new_translation_unit(arena_t *arena, ast_node_t *fn_def)
+ast_new_translation_unit(arena_t *arena)
 {
     ast_node_t *node = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node);
@@ -31,7 +31,10 @@ ast_new_translation_unit(arena_t *arena, ast_node_t *fn_def)
     node->kind = AST_NODE_TRANSLATION_UNIT;
     ast_translation_unit_t *translation_unit = &node->as_translation_unit;
 
-    translation_unit->fn = fn_def;
+    translation_unit->decls = (list_t *)arena_alloc(arena, sizeof(list_t));
+    assert(translation_unit->decls);
+
+    list_init(translation_unit->decls, arena);
 
     return node;
 }

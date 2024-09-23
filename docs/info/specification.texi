@@ -33,13 +33,15 @@ language.
 <variable-initializer>  ::= '=' <ows> <expression>
 
 (* Functions *)
-<function-definition> ::= 'fn' <ws> <function-name> <ows> <function-parameters> <ows> ':' <ows> <return-type> <ows> <function-body>
+<function-definition> ::= 'fn' <ws> <function-name> <ows> '(' ( <ows> | <ows> <function-params> <ows> ) ')' <ows> ':' <ows> <return-type> <ows> <function-body>
 <function-name>       ::= <identifier>
-<function-parameters> ::= '(' <ows> ')'
+<function-params>     ::= <identifier> <ows> ':' <ows> <type> ( <ows> ',' <function-params>)*
 <return-type>         ::= <type>
 <function-body>       ::= <block>
 <block>               ::= '{' <ows> <statement> <ows> (<end-of-statement> <ows> <statement> <ows>)* <end-of-statement>? <ows> '}'
-<statement>           ::= <common-statement> | <if-statement> | <return-statement>
+<function-args>       ::= <expression> (<ows> ',' <function-args>)*
+<function-call>       ::= <function-name> <ows> '(' ( <ows> | <ows> <function-args> <ows> ) ')'
+<statement>           ::= <common-statement> | <if-statement> | <return-statement> | <function-call>
 <if-statement>        ::= 'if' <ws> <expression> <ows> <block>
 <return-statement>    ::= 'return' <ws> <expression>
 
@@ -74,6 +76,7 @@ language.
 <multiplicative-expression> ::= <primary-expression> (<ows> ('*' | '/' | '%') <ows> <primary-expression>)*
 <primary-expression> ::= <integer-literal>
                        | <variable-name>
+                       | <function-call>
                        | '(' <ows>  <expression> <ows> ')'
 
 (* Identifiers *)

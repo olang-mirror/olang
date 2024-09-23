@@ -16,6 +16,7 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -48,8 +49,11 @@ parser_parse_if_stmt(parser_t *parser);
 static ast_node_t *
 parser_parse_var_def(parser_t *parser);
 
-ast_node_t *
+static ast_node_t *
 parser_parse_fn_definition(parser_t *parser);
+
+static list_t *
+parser_parse_fn_params(parser_t *parser);
 
 static ast_node_t *
 parser_parse_expr(parser_t *parser);
@@ -262,6 +266,55 @@ parser_parse_factor(parser_t *parser)
     }
 }
 
+static list_t *
+parser_parse_fn_params(parser_t *parser)
+{
+    if (!skip_expected_token(parser, TOKEN_OPAREN)) {
+        return NULL;
+    }
+
+    list_t *params = arena_alloc(parser->arena, sizeof(list_t));
+    if (params == NULL) {
+        fprintf(stderr, "[FATAL] Out of memory: parser_parse_fn_params: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    list_init(params, parser->arena);
+
+    skip_line_feeds(parser->lexer);
+
+    token_t token;
+    lexer_next_token(parser->lexer, &token);
+
+    bool is_not_first_param = false;
+
+    while (token.kind != TOKEN_CPAREN && token.kind != TOKEN_EOF) {
+        if (is_not_first_param && expected_token(parser, &token, TOKEN_COMMA)) {
+            lexer_next_token(parser->lexer, &token);
+        }
+
+        if (!expected_token(parser, &token, TOKEN_ID)) {
+            return NULL;
+        }
+
+        string_view_t type_id;
+        parser_parse_type(parser, &type_id);
+
+        ast_fn_param_t *param = ast_new_fn_param(parser->arena, token.value, type_id);
+        list_append(params, param);
+
+        skip_line_feeds(parser->lexer);
+        lexer_next_token(parser->lexer, &token);
+        is_not_first_param = true;
+    }
+
+    if (!expected_token(parser, &token, TOKEN_CPAREN)) {
+        return NULL;
+    }
+
+    return params;
+}
+
 ast_node_t *
 parser_parse_fn_definition(parser_t *parser)
 {
@@ -279,13 +332,8 @@ parser_parse_fn_definition(parser_t *parser)
 
     skip_line_feeds(parser->lexer);
 
-    if (!skip_expected_token(parser, TOKEN_OPAREN)) {
-        return NULL;
-    }
-
-    skip_line_feeds(parser->lexer);
-
-    if (!skip_expected_token(parser, TOKEN_CPAREN)) {
+    list_t *params = parser_parse_fn_params(parser);
+    if (params == NULL) {
         return NULL;
     }
 
@@ -301,7 +349,7 @@ parser_parse_fn_definition(parser_t *parser)
         return NULL;
     }
 
-    return ast_new_node_fn_def(parser->arena, fn_name_token.value, fn_return_type, block);
+    return ast_new_node_fn_def(parser->arena, fn_name_token.value, params, fn_return_type, block);
 }
 
 static bool

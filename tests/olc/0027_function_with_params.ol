@@ -39,3 +39,12 @@ fn main(argc: u8, argv: u64): u8 {
 # ./0027_function_with_params.ol:18:1: <}>
 # END
 
+# TEST test_ast WITH
+# Translation_Unit
+# `-Function_Definition <name:main> <return:u8>
+#   |-Param_Definition <name:argc> <type:u8>
+#   |-Param_Definition <name:argv> <type:u64>
+#   `-Block
+#     `-Return_Statement
+#       `-Literal <kind:u32> <value:0>
+# END

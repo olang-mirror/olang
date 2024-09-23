@@ -109,6 +109,17 @@ pretty_print_node_new(arena_t *arena)
 }
 
 static pretty_print_node_t *
+pretty_print_new_fn_param(ast_fn_param_t *param, arena_t *arena)
+{
+    pretty_print_node_t *node = pretty_print_node_new(arena);
+    char name[256];
+    sprintf(name, "Param_Definition <name:" SV_FMT "> <type:" SV_FMT ">", SV_ARG(param->id), SV_ARG(param->type_id));
+    node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
+    strcpy(node->name, name);
+    return node;
+}
+
+static pretty_print_node_t *
 ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 {
     switch (ast->kind) {
@@ -140,6 +151,12 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
                     SV_ARG(fn_def.return_type));
             node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
             strcpy(node->name, name);
+
+            list_item_t *param = list_head(fn_def.params);
+            while (param != NULL) {
+                list_append(node->children, pretty_print_new_fn_param(param->value, arena));
+                param = list_next(param);
+            }
 
             pretty_print_node_t *block = ast_node_to_pretty_print_node(fn_def.block, arena);
             list_append(node->children, block);

@@ -40,8 +40,12 @@ ast_new_translation_unit(arena_t *arena)
 }
 
 ast_node_t *
-ast_new_node_fn_def(arena_t *arena, string_view_t id, string_view_t return_type, ast_node_t *block)
+ast_new_node_fn_def(arena_t *arena, string_view_t id, list_t *params, string_view_t return_type, ast_node_t *block)
 {
+    assert(arena);
+    assert(params);
+    assert(block);
+
     ast_node_t *node_fn_def = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_fn_def);
 
@@ -51,6 +55,7 @@ ast_new_node_fn_def(arena_t *arena, string_view_t id, string_view_t return_type,
     fn_def->id = id;
     fn_def->return_type = return_type;
     fn_def->block = block;
+    fn_def->params = params;
 
     return node_fn_def;
 }
@@ -150,4 +155,16 @@ ast_new_node_block(arena_t *arena)
     list_init(node_block->as_block.nodes, arena);
 
     return node_block;
+}
+
+ast_fn_param_t *
+ast_new_fn_param(arena_t *arena, string_view_t id, string_view_t type_id)
+{
+    ast_fn_param_t *fn_param = (ast_fn_param_t *)arena_alloc(arena, sizeof(ast_fn_param_t));
+    assert(fn_param);
+
+    fn_param->id = id;
+    fn_param->type_id = type_id;
+
+    return fn_param;
 }

@@ -51,9 +51,16 @@ typedef struct ast_translation_unit
     list_t *decls;
 } ast_translation_unit_t;
 
+typedef struct ast_fn_param
+{
+    string_view_t id;
+    string_view_t type_id;
+} ast_fn_param_t;
+
 typedef struct ast_fn_definition
 {
     string_view_t id;
+    list_t *params;
     string_view_t return_type;
     ast_node_t *block;
     scope_t *scope;
@@ -149,7 +156,7 @@ ast_node_t *
 ast_new_translation_unit(arena_t *arena);
 
 ast_node_t *
-ast_new_node_fn_def(arena_t *arena, string_view_t id, string_view_t return_type, ast_node_t *block);
+ast_new_node_fn_def(arena_t *arena, string_view_t id, list_t *params, string_view_t return_type, ast_node_t *block);
 
 ast_node_t *
 ast_new_node_var_def(arena_t *arena, string_view_t id, string_view_t type, ast_node_t *value);
@@ -171,5 +178,8 @@ ast_new_node_if_stmt(arena_t *arena, ast_node_t *cond, ast_node_t *then, ast_nod
 
 ast_node_t *
 ast_new_node_block(arena_t *arena);
+
+ast_fn_param_t *
+ast_new_fn_param(arena_t *arena, string_view_t id, string_view_t type_id);
 
 #endif /* AST_H */

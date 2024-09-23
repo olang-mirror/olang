@@ -72,7 +72,7 @@ parser_init(parser_t *parser, lexer_t *lexer, arena_t *arena, char *file_path)
 }
 
 ast_node_t *
-parser_parse_program(parser_t *parser)
+parser_parse_translation_unit(parser_t *parser)
 {
     skip_line_feeds(parser->lexer);
     ast_node_t *fn = parser_parse_fn_definition(parser);
@@ -80,7 +80,7 @@ parser_parse_program(parser_t *parser)
         return NULL;
     }
 
-    return ast_new_program(parser->arena, fn);
+    return ast_new_translation_unit(parser->arena, fn);
 }
 
 static ast_binary_op_kind_t

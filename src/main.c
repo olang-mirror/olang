@@ -114,7 +114,7 @@ handle_dump_ast(cli_opts_t *opts)
     lexer_init(&lexer, file_content);
     parser_init(&parser, &lexer, &arena, opts->file_path);
 
-    ast_node_t *ast = parser_parse_program(&parser);
+    ast_node_t *ast = parser_parse_translation_unit(&parser);
 
     pretty_print_ast(ast);
 }
@@ -135,7 +135,7 @@ handle_codegen_linux(cli_opts_t *opts)
     lexer_init(&lexer, file_content);
     parser_init(&parser, &lexer, &arena, opts->file_path);
 
-    ast_node_t *ast = parser_parse_program(&parser);
+    ast_node_t *ast = parser_parse_translation_unit(&parser);
 
     checker_t *checker = checker_new(&arena);
     checker_check(checker, ast);
@@ -149,14 +149,14 @@ handle_codegen_linux(cli_opts_t *opts)
     if (!(opts->options & CLI_OPT_ARCH)) {
         codegen_x86_64_t codegen = { 0 };
         codegen_linux_x86_64_init(&codegen, &arena, out);
-        codegen_linux_x86_64_emit_program(&codegen, ast);
+        codegen_linux_x86_64_emit_translation_unit(&codegen, ast);
     } else {
         if (strcmp(opts->arch, "x86_64") == 0) {
             codegen_x86_64_t codegen = { 0 };
             codegen_linux_x86_64_init(&codegen, &arena, out);
-            codegen_linux_x86_64_emit_program(&codegen, ast);
+            codegen_linux_x86_64_emit_translation_unit(&codegen, ast);
         } else if (strcmp(opts->arch, "aarch64") == 0) {
-            codegen_linux_aarch64_emit_program(out, ast);
+            codegen_linux_aarch64_emit_translation_unit(out, ast);
         } else {
             fprintf(stderr, "error: architecture '%s' not supported\n", opts->arch);
             cli_print_usage(stderr, opts->compiler_path);

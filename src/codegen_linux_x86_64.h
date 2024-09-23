@@ -35,6 +35,6 @@ void
 codegen_linux_x86_64_init(codegen_x86_64_t *codegen, arena_t *arena, FILE *out);
 
 void
-codegen_linux_x86_64_emit_program(codegen_x86_64_t *codegen, ast_node_t *prog);
+codegen_linux_x86_64_emit_translation_unit(codegen_x86_64_t *codegen, ast_node_t *prog);
 
 #endif /* CODEGEN_X86_64_H */

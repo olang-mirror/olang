@@ -29,7 +29,7 @@ typedef struct ast_node ast_node_t;
 
 typedef enum
 {
-    AST_NODE_PROGRAM,
+    AST_NODE_TRANSLATION_UNIT,
     AST_NODE_BLOCK,
     AST_NODE_FN_DEF,
     AST_NODE_VAR_DEF,
@@ -46,10 +46,10 @@ typedef struct ast_block
     list_t *nodes;
 } ast_block_t;
 
-typedef struct ast_program
+typedef struct ast_translation_unit
 {
     ast_node_t *fn;
-} ast_program_t;
+} ast_translation_unit_t;
 
 typedef struct ast_fn_definition
 {
@@ -133,7 +133,7 @@ typedef struct ast_node
     ast_node_kind_t kind;
     union
     {
-        ast_program_t as_program;
+        ast_translation_unit_t as_translation_unit;
         ast_fn_definition_t as_fn_def;
         ast_var_definition_t as_var_def;
         ast_binary_op_t as_bin_op;
@@ -146,7 +146,7 @@ typedef struct ast_node
 } ast_node_t;
 
 ast_node_t *
-ast_new_program(arena_t *arena, ast_node_t *fn_def);
+ast_new_translation_unit(arena_t *arena, ast_node_t *fn_def);
 
 ast_node_t *
 ast_new_node_fn_def(arena_t *arena, string_view_t id, string_view_t return_type, ast_node_t *block);

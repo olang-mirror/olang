@@ -27,7 +27,7 @@
 #define ARENA_CAPACITY (1024 * 1024)
 
 static MunitResult
-parse_program_test(const MunitParameter params[], void *user_data_or_fixture)
+parse_translation_unit_test(const MunitParameter params[], void *user_data_or_fixture)
 {
     arena_t arena = arena_new(ARENA_CAPACITY);
 
@@ -41,15 +41,15 @@ parse_program_test(const MunitParameter params[], void *user_data_or_fixture)
     parser_t parser;
     parser_init(&parser, &lexer, &arena, file_path);
 
-    ast_node_t *program_node = parser_parse_program(&parser);
-    assert_not_null(program_node);
-    assert_uint(program_node->kind, ==, AST_NODE_PROGRAM);
+    ast_node_t *translation_unit_node = parser_parse_translation_unit(&parser);
+    assert_not_null(translation_unit_node);
+    assert_uint(translation_unit_node->kind, ==, AST_NODE_TRANSLATION_UNIT);
 
-    ast_program_t program = program_node->as_program;
-    assert_not_null(program.fn);
-    assert_uint(program.fn->kind, ==, AST_NODE_FN_DEF);
+    ast_translation_unit_t translation_unit = translation_unit_node->as_translation_unit;
+    assert_not_null(translation_unit.fn);
+    assert_uint(translation_unit.fn->kind, ==, AST_NODE_FN_DEF);
 
-    ast_fn_definition_t fn = program.fn->as_fn_def;
+    ast_fn_definition_t fn = translation_unit.fn->as_fn_def;
     assert_memory_equal(fn.id.size, fn.id.chars, "main");
     assert_memory_equal(fn.return_type.size, fn.return_type.chars, "u32");
 
@@ -77,8 +77,10 @@ parse_program_test(const MunitParameter params[], void *user_data_or_fixture)
     return MUNIT_OK;
 }
 
-static MunitTest tests[] = { { "/parse_program", parse_program_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-                             { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL } };
+static MunitTest tests[] = {
+    { "/parse_translation_unit", parse_translation_unit_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+};
 
 static const MunitSuite suite = { "/parser", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE };
 

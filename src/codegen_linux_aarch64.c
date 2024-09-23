@@ -42,14 +42,14 @@ static void
 codegen_linux_aarch64_emit_function(FILE *out, ast_fn_definition_t *fn);
 
 void
-codegen_linux_aarch64_emit_program(FILE *out, ast_node_t *node)
+codegen_linux_aarch64_emit_translation_unit(FILE *out, ast_node_t *node)
 {
     codegen_linux_aarch64_emit_start_entrypoint(out);
 
-    assert(node->kind == AST_NODE_PROGRAM);
-    ast_program_t program = node->as_program;
+    assert(node->kind == AST_NODE_TRANSLATION_UNIT);
+    ast_translation_unit_t translation_unit = node->as_translation_unit;
 
-    ast_fn_definition_t fn = program.fn->as_fn_def;
+    ast_fn_definition_t fn = translation_unit.fn->as_fn_def;
 
     assert(string_view_eq_to_cstr(fn.id, "main"));
     codegen_linux_aarch64_emit_function(out, &fn);

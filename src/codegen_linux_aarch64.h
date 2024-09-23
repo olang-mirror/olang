@@ -20,6 +20,6 @@
 #include "ast.h"
 
 void
-codegen_linux_aarch64_emit_program(FILE *out, ast_node_t *prog);
+codegen_linux_aarch64_emit_translation_unit(FILE *out, ast_node_t *prog);
 
 #endif /* CODEGEN_LINUX_AARCH64_H */

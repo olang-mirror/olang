@@ -112,11 +112,11 @@ static pretty_print_node_t *
 ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 {
     switch (ast->kind) {
-        case AST_NODE_PROGRAM: {
+        case AST_NODE_TRANSLATION_UNIT: {
             pretty_print_node_t *node = pretty_print_node_new(arena);
             node->name = "Translation_Unit";
 
-            pretty_print_node_t *fn_node = ast_node_to_pretty_print_node(ast->as_program.fn, arena);
+            pretty_print_node_t *fn_node = ast_node_to_pretty_print_node(ast->as_translation_unit.fn, arena);
             list_append(node->children, fn_node);
             return node;
         }

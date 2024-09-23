@@ -53,8 +53,8 @@ static void
 populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
 {
     switch (ast->kind) {
-        case AST_NODE_PROGRAM: {
-            populate_scope(checker, scope, ast->as_program.fn);
+        case AST_NODE_TRANSLATION_UNIT: {
+            populate_scope(checker, scope, ast->as_translation_unit.fn);
             return;
         }
 

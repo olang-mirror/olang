@@ -55,15 +55,15 @@ codegen_linux_x86_64_init(codegen_x86_64_t *codegen, arena_t *arena, FILE *out)
 }
 
 void
-codegen_linux_x86_64_emit_program(codegen_x86_64_t *codegen, ast_node_t *node)
+codegen_linux_x86_64_emit_translation_unit(codegen_x86_64_t *codegen, ast_node_t *node)
 {
     codegen->label_index = 0;
     codegen_linux_x86_64_emit_start_entrypoint(codegen);
 
-    assert(node->kind == AST_NODE_PROGRAM);
-    ast_program_t program = node->as_program;
+    assert(node->kind == AST_NODE_TRANSLATION_UNIT);
+    ast_translation_unit_t translation_unit = node->as_translation_unit;
 
-    ast_fn_definition_t fn = program.fn->as_fn_def;
+    ast_fn_definition_t fn = translation_unit.fn->as_fn_def;
 
     assert(string_view_eq_to_cstr(fn.id, "main"));
     codegen_linux_x86_64_emit_function(codegen, &fn);

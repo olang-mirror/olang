@@ -78,15 +78,24 @@ parser_init(parser_t *parser, lexer_t *lexer, arena_t *arena, char *file_path)
 ast_node_t *
 parser_parse_translation_unit(parser_t *parser)
 {
-    skip_line_feeds(parser->lexer);
-    ast_node_t *fn = parser_parse_fn_definition(parser);
-    if (fn == NULL) {
-        return NULL;
-    }
-
+    token_t token;
     ast_node_t *translation_unit_node = ast_new_translation_unit(parser->arena);
 
-    list_append(translation_unit_node->as_translation_unit.decls, fn);
+    skip_line_feeds(parser->lexer);
+    lexer_peek_next(parser->lexer, &token);
+
+    while (token.kind != TOKEN_EOF) {
+        ast_node_t *fn = parser_parse_fn_definition(parser);
+
+        if (fn == NULL) {
+            return NULL;
+        }
+
+        list_append(translation_unit_node->as_translation_unit.decls, fn);
+
+        skip_line_feeds(parser->lexer);
+        lexer_peek_next(parser->lexer, &token);
+    }
 
     return translation_unit_node;
 }

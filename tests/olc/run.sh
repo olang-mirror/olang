@@ -108,7 +108,7 @@ diff_output() {
   fi
 
   print_failed "match failed"
-  diff "$actual_file" "$expected_file" -u --color
+  diff "$expected_file" "$actual_file" -u --color
   exit 1
 }
 

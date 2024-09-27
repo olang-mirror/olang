@@ -64,9 +64,34 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
         }
 
         case AST_NODE_FN_DEF: {
-            ast->as_fn_def.scope = scope;
-            // FIXME: insert function symbol to scope
+            ast_fn_definition_t *fn_def = &ast->as_fn_def;
+            fn_def->scope = scope;
+
+            list_item_t *item = list_head(fn_def->params);
+
+            while (item != NULL) {
+                ast_fn_param_t *param = (ast_fn_param_t *)item->value;
+
+                symbol_t *symbol = symbol_new(checker->arena, param->id, type_from_id(param->type_id));
+                scope_insert(scope, symbol);
+
+                item = list_next(item);
+            }
+
             populate_scope(checker, scope, ast->as_fn_def.block);
+            return;
+        }
+
+        case AST_NODE_FN_CALL: {
+            ast->as_fn_call.scope = scope;
+
+            list_item_t *item = list_head(ast->as_fn_call.args);
+
+            while (item != NULL) {
+                populate_scope(checker, scope, (ast_node_t *)item->value);
+                item = list_next(item);
+            }
+
             return;
         }
 
@@ -127,7 +152,6 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
 
         case AST_NODE_LITERAL:
         case AST_NODE_UNKNOWN:
-        case AST_NODE_FN_CALL:
             return;
     }
 }

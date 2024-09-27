@@ -14,8 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 fn main(): u8 {
-  # TODO: call the function once function call is implemented
-  return 0
+  return add(40, 2) 
 }
 
 fn add(a: u32, b: u32): u8 {
@@ -27,7 +26,9 @@ fn add(a: u32, b: u32): u8 {
 # |-Function_Definition <name:main> <return:u8>
 # | `-Block
 # |   `-Return_Statement
-# |     `-Literal <kind:u32> <value:0>
+# |     `-Function_Call <name:add>
+# |       |-Literal <kind:u32> <value:40>
+# |       `-Literal <kind:u32> <value:2>
 # `-Function_Definition <name:add> <return:u8>
 #   |-Param_Definition <name:a> <type:u32>
 #   |-Param_Definition <name:b> <type:u32>

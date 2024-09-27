@@ -53,6 +53,9 @@ static ast_node_t *
 parser_parse_fn_definition(parser_t *parser);
 
 static list_t *
+parser_parse_fn_args(parser_t *parser);
+
+static list_t *
 parser_parse_fn_params(parser_t *parser);
 
 static ast_node_t *
@@ -253,8 +256,18 @@ parser_parse_factor(parser_t *parser)
         case TOKEN_NUMBER:
             return ast_new_node_literal_u32(parser->arena, string_view_to_u32(token.value));
 
-        case TOKEN_ID:
-            return ast_new_node_ref(parser->arena, token.value);
+        case TOKEN_ID: {
+            string_view_t id = token.value;
+
+            lexer_peek_next(parser->lexer, &token);
+
+            if (token.kind == TOKEN_OPAREN) {
+                list_t *args = parser_parse_fn_args(parser);
+                return ast_new_node_fn_call(parser->arena, id, args);
+            }
+
+            return ast_new_node_ref(parser->arena, id);
+        }
 
         case TOKEN_OPAREN: {
             ast_node_t *expr = parser_parse_expr(parser);
@@ -273,6 +286,48 @@ parser_parse_factor(parser_t *parser)
             assert(false);
         }
     }
+}
+
+static list_t *
+parser_parse_fn_args(parser_t *parser)
+{
+    if (!skip_expected_token(parser, TOKEN_OPAREN)) {
+        return NULL;
+    }
+
+    list_t *args = arena_alloc(parser->arena, sizeof(list_t));
+    if (args == NULL) {
+        fprintf(stderr, "[FATAL] Out of memory: parser_parse_fn_args: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    list_init(args, parser->arena);
+
+    skip_line_feeds(parser->lexer);
+
+    token_t token;
+    lexer_peek_next(parser->lexer, &token);
+
+    bool is_not_first_arg = false;
+
+    while (token.kind != TOKEN_CPAREN && token.kind != TOKEN_EOF) {
+        if (is_not_first_arg && expected_token(parser, &token, TOKEN_COMMA)) {
+            lexer_next_token(parser->lexer, &token);
+        }
+
+        ast_node_t *expr = parser_parse_expr(parser);
+        list_append(args, expr);
+
+        skip_line_feeds(parser->lexer);
+        lexer_peek_next(parser->lexer, &token);
+        is_not_first_arg = true;
+    }
+
+    if (!skip_expected_token(parser, TOKEN_CPAREN)) {
+        return NULL;
+    }
+
+    return args;
 }
 
 static list_t *

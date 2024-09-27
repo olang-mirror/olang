@@ -162,6 +162,23 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             list_append(node->children, block);
             return node;
         }
+        case AST_NODE_FN_CALL: {
+            pretty_print_node_t *node = pretty_print_node_new(arena);
+            ast_fn_call_t fn_call = ast->as_fn_call;
+
+            char name[256];
+            sprintf(name, "Function_Call <name:" SV_FMT ">", SV_ARG(fn_call.id));
+            node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
+            strcpy(node->name, name);
+
+            list_item_t *item = list_head(fn_call.args);
+            while (item != NULL) {
+                list_append(node->children, ast_node_to_pretty_print_node(item->value, arena));
+                item = list_next(item);
+            }
+
+            return node;
+        }
         case AST_NODE_BLOCK: {
             pretty_print_node_t *node = pretty_print_node_new(arena);
             ast_block_t block = ast->as_block;

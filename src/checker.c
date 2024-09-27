@@ -127,6 +127,7 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
 
         case AST_NODE_LITERAL:
         case AST_NODE_UNKNOWN:
+        case AST_NODE_FN_CALL:
             return;
     }
 }

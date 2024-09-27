@@ -32,6 +32,7 @@ typedef enum
     AST_NODE_TRANSLATION_UNIT,
     AST_NODE_BLOCK,
     AST_NODE_FN_DEF,
+    AST_NODE_FN_CALL,
     AST_NODE_VAR_DEF,
     AST_NODE_BINARY_OP,
     AST_NODE_RETURN_STMT,
@@ -65,6 +66,13 @@ typedef struct ast_fn_definition
     ast_node_t *block;
     scope_t *scope;
 } ast_fn_definition_t;
+
+typedef struct ast_fn_call
+{
+    string_view_t id;
+    list_t *args;
+    scope_t *scope;
+} ast_fn_call_t;
 
 typedef struct ast_var_definition
 {
@@ -142,6 +150,7 @@ typedef struct ast_node
     {
         ast_translation_unit_t as_translation_unit;
         ast_fn_definition_t as_fn_def;
+        ast_fn_call_t as_fn_call;
         ast_var_definition_t as_var_def;
         ast_binary_op_t as_bin_op;
         ast_literal_t as_literal;
@@ -157,6 +166,9 @@ ast_new_translation_unit(arena_t *arena);
 
 ast_node_t *
 ast_new_node_fn_def(arena_t *arena, string_view_t id, list_t *params, string_view_t return_type, ast_node_t *block);
+
+ast_node_t *
+ast_new_node_fn_call(arena_t *arena, string_view_t id, list_t *args);
 
 ast_node_t *
 ast_new_node_var_def(arena_t *arena, string_view_t id, string_view_t type, ast_node_t *value);

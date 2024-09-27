@@ -61,6 +61,24 @@ ast_new_node_fn_def(arena_t *arena, string_view_t id, list_t *params, string_vie
 }
 
 ast_node_t *
+ast_new_node_fn_call(arena_t *arena, string_view_t id, list_t *args)
+{
+    assert(arena);
+    assert(args);
+
+    ast_node_t *node_fn_call = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
+    assert(node_fn_call);
+
+    node_fn_call->kind = AST_NODE_FN_CALL;
+    ast_fn_call_t *fn_call = &node_fn_call->as_fn_call;
+
+    fn_call->id = id;
+    fn_call->args = args;
+
+    return node_fn_call;
+}
+
+ast_node_t *
 ast_new_node_var_def(arena_t *arena, string_view_t id, string_view_t type, ast_node_t *value)
 {
     ast_node_t *node_var_def = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));

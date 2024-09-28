@@ -25,7 +25,7 @@
 #include "string_view.h"
 #include "type.h"
 
-typedef struct ast_node ast_node_t;
+typedef union ast_node ast_node_t;
 
 typedef enum
 {
@@ -44,11 +44,13 @@ typedef enum
 
 typedef struct ast_block
 {
+    ast_node_kind_t node_kind;
     list_t *nodes;
 } ast_block_t;
 
 typedef struct ast_translation_unit
 {
+    ast_node_kind_t node_kind;
     list_t *decls;
 } ast_translation_unit_t;
 
@@ -60,6 +62,7 @@ typedef struct ast_fn_param
 
 typedef struct ast_fn_definition
 {
+    ast_node_kind_t node_kind;
     string_view_t id;
     list_t *params;
     string_view_t return_type;
@@ -69,6 +72,7 @@ typedef struct ast_fn_definition
 
 typedef struct ast_fn_call
 {
+    ast_node_kind_t node_kind;
     string_view_t id;
     list_t *args;
     scope_t *scope;
@@ -76,6 +80,7 @@ typedef struct ast_fn_call
 
 typedef struct ast_var_definition
 {
+    ast_node_kind_t node_kind;
     string_view_t id;
     string_view_t type;
     ast_node_t *value;
@@ -89,6 +94,7 @@ typedef enum
 
 typedef struct ast_literal
 {
+    ast_node_kind_t node_kind;
     ast_literal_kind_t kind;
     union
     {
@@ -98,6 +104,7 @@ typedef struct ast_literal
 
 typedef struct ast_ref
 {
+    ast_node_kind_t node_kind;
     string_view_t id;
     scope_t *scope;
 } ast_ref_t;
@@ -126,6 +133,7 @@ typedef enum ast_binary_op_kind
 
 typedef struct ast_binary_op
 {
+    ast_node_kind_t node_kind;
     ast_binary_op_kind_t kind;
     ast_node_t *lhs;
     ast_node_t *rhs;
@@ -133,32 +141,31 @@ typedef struct ast_binary_op
 
 typedef struct ast_return_stmt
 {
+    ast_node_kind_t node_kind;
     ast_node_t *expr;
 } ast_return_stmt_t;
 
 typedef struct ast_if_stmt
 {
+    ast_node_kind_t node_kind;
     ast_node_t *cond;
     ast_node_t *then;
     ast_node_t *_else;
 } ast_if_stmt_t;
 
-typedef struct ast_node
+typedef union ast_node
 {
     ast_node_kind_t kind;
-    union
-    {
-        ast_translation_unit_t as_translation_unit;
-        ast_fn_definition_t as_fn_def;
-        ast_fn_call_t as_fn_call;
-        ast_var_definition_t as_var_def;
-        ast_binary_op_t as_bin_op;
-        ast_literal_t as_literal;
-        ast_ref_t as_ref;
-        ast_block_t as_block;
-        ast_return_stmt_t as_return_stmt;
-        ast_if_stmt_t as_if_stmt;
-    };
+    ast_translation_unit_t as_translation_unit;
+    ast_fn_definition_t as_fn_def;
+    ast_fn_call_t as_fn_call;
+    ast_var_definition_t as_var_def;
+    ast_binary_op_t as_bin_op;
+    ast_literal_t as_literal;
+    ast_ref_t as_ref;
+    ast_block_t as_block;
+    ast_return_stmt_t as_return_stmt;
+    ast_if_stmt_t as_if_stmt;
 } ast_node_t;
 
 ast_node_t *

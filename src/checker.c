@@ -65,7 +65,7 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
 
         case AST_NODE_FN_DEF: {
             ast_fn_definition_t *fn_def = &ast->as_fn_def;
-            fn_def->scope = scope;
+            fn_def->scope = scope_push(scope);
 
             list_item_t *item = list_head(fn_def->params);
 
@@ -73,12 +73,12 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
                 ast_fn_param_t *param = (ast_fn_param_t *)item->value;
 
                 symbol_t *symbol = symbol_new(checker->arena, param->id, type_from_id(param->type_id));
-                scope_insert(scope, symbol);
+                scope_insert(fn_def->scope, symbol);
 
                 item = list_next(item);
             }
 
-            populate_scope(checker, scope, ast->as_fn_def.block);
+            populate_scope(checker, fn_def->scope, ast->as_fn_def.block);
             return;
         }
 

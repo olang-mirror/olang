@@ -29,6 +29,34 @@
 // The call instruction pushes EIP into stack so the first 8 bytes from stack
 // must be preserved else the ret instruction will jump to nowere.
 #define X86_CALL_EIP_STACK_OFFSET (8)
+#define X86_CALL_ARG_SIZE 6
+
+typedef enum x86_64_register_type
+{
+    REG_ACCUMULATOR,
+    REG_BASE,
+    REG_COUNTER,
+    REG_DATA,
+    REG_SRC_IDX,
+    REG_DEST_IDX,
+    REG_STACK_PTR,
+    REG_BASE_PTR,
+    REG_R8,
+    REG_R9,
+    REG_R10,
+    REG_R11,
+    REG_R12,
+    REG_R13,
+    REG_R14,
+    REG_R15
+} x86_64_register_type_t;
+
+/**
+ * Arch/ABI      arg1  arg2  arg3  arg4  arg5  arg6  arg7  Notes
+ * ──────────────────────────────────────────────────────────────
+ * x86-64        rdi   rsi   rdx   r10   r8    r9    -
+ */
+static int x86_call_args[X86_CALL_ARG_SIZE] = { REG_DEST_IDX, REG_SRC_IDX, REG_DATA, REG_R10, REG_R8, REG_R9 };
 
 static void
 codegen_linux_x86_64_emit_start_entrypoint(codegen_x86_64_t *codegen);
@@ -40,7 +68,7 @@ static size_t
 type_to_bytes(type_t *type);
 
 static char *
-get_accumulator_reg_for(size_t bytes);
+get_reg_for(x86_64_register_type_t type, size_t bytes);
 
 void
 codegen_linux_x86_64_init(codegen_x86_64_t *codegen, arena_t *arena, FILE *out)
@@ -131,7 +159,31 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
             fprintf(codegen->out,
                     "    mov -%ld(%%rbp), %s\n",
                     *offset,
-                    get_accumulator_reg_for(type_to_bytes(&symbol->type)));
+                    get_reg_for(REG_ACCUMULATOR, type_to_bytes(&symbol->type)));
+            return;
+        }
+        case AST_NODE_FN_CALL: {
+            ast_fn_call_t fn_call = expr_node->as_fn_call;
+
+            size_t i = 0;
+            for (list_item_t *item = list_head(fn_call.args); item != NULL; item = list_next(item)) {
+                // FIXME: add support for more args than X86_CALL_ARG_SIZE
+                assert(i < X86_CALL_ARG_SIZE);
+
+                ast_node_t *arg_node = (ast_node_t *)item->value;
+
+                codegen_linux_x86_64_emit_expression(codegen, arg_node);
+
+                // FIXME: should get the correct size according to the ast node
+                fprintf(codegen->out, "    push %s\n", get_reg_for(REG_ACCUMULATOR, 8));
+                ++i;
+            }
+
+            for (; i > 0; --i) {
+                fprintf(codegen->out, "    pop %s\n", get_reg_for(x86_call_args[i - 1], 8));
+            }
+
+            fprintf(codegen->out, "    call " SV_FMT "\n", SV_ARG(fn_call.id));
             return;
         }
         case AST_NODE_BINARY_OP: {
@@ -373,6 +425,7 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                 codegen_linux_x86_64_emit_expression(codegen, expr);
 
                 fprintf(codegen->out, "    mov %%rbp, %%rsp\n");
+                fprintf(codegen->out, "    pop %%rbp\n");
                 fprintf(codegen->out, "    ret\n");
 
                 break;
@@ -401,7 +454,7 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
 
                 fprintf(codegen->out,
                         "    mov %s, -%ld(%%rbp)\n",
-                        get_accumulator_reg_for(type_size),
+                        get_reg_for(REG_ACCUMULATOR, type_size),
                         codegen->base_offset);
                 codegen->base_offset += type_size;
 
@@ -497,16 +550,45 @@ calculate_fn_local_size(scope_t *scope)
 }
 
 static void
-codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_t *fn)
+codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_t *fn_def)
 {
     codegen->base_offset = X86_CALL_EIP_STACK_OFFSET;
 
-    ast_node_t *block_node = fn->block;
-    fprintf(codegen->out, "" SV_FMT ":\n", SV_ARG(fn->id));
+    ast_node_t *block_node = fn_def->block;
+    fprintf(codegen->out, "" SV_FMT ":\n", SV_ARG(fn_def->id));
 
+    fprintf(codegen->out, "    push %%rbp\n");
     fprintf(codegen->out, "    mov %%rsp, %%rbp\n");
 
-    size_t local_size = calculate_fn_local_size(fn->scope);
+    size_t i = 0;
+    for (list_item_t *item = list_head(fn_def->params); item != NULL; item = list_next(item)) {
+        assert(i < X86_CALL_ARG_SIZE);
+
+        ast_fn_param_t *param = item->value;
+
+        size_t *offset = arena_alloc(codegen->arena, sizeof(size_t));
+        *offset = codegen->base_offset;
+
+        symbol_t *symbol = scope_lookup(fn_def->scope, param->id);
+        assert(symbol);
+
+        char symbol_ptr[PTR_HEX_CSTR_SIZE];
+        sprintf(symbol_ptr, "%p", (void *)symbol);
+
+        map_put(codegen->symbols_stack_offset, symbol_ptr, offset);
+
+        fprintf(codegen->out,
+                "    mov %s, -%ld(%s)\n",
+                get_reg_for(x86_call_args[i], 8),
+                *offset,
+                get_reg_for(REG_BASE_PTR, 8));
+
+        // FIXME: add offset according to the param size
+        codegen->base_offset += 8;
+        ++i;
+    }
+
+    size_t local_size = calculate_fn_local_size(fn_def->scope);
 
     if (local_size != 0) {
         fprintf(codegen->out, "    sub $%ld, %%rsp\n", local_size);
@@ -519,14 +601,170 @@ codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_
 }
 
 static char *
-get_accumulator_reg_for(size_t bytes)
+get_reg_for(x86_64_register_type_t type, size_t bytes)
 {
-    if (bytes <= 1) {
-        return "%ah";
-    } else if (bytes <= 2) {
-        return "%ax";
-    } else if (bytes <= 4) {
-        return "%eax";
+    switch (type) {
+        case REG_ACCUMULATOR: {
+            if (bytes <= 1) {
+                return "%ah";
+            } else if (bytes <= 2) {
+                return "%ax";
+            } else if (bytes <= 4) {
+                return "%eax";
+            }
+            return "%rax";
+        }
+        case REG_BASE: {
+            if (bytes <= 1) {
+                return "%bh";
+            } else if (bytes <= 2) {
+                return "%bx";
+            } else if (bytes <= 4) {
+                return "%ebx";
+            }
+            return "%rbx";
+        }
+        case REG_COUNTER: {
+            if (bytes <= 1) {
+                return "%ch";
+            } else if (bytes <= 2) {
+                return "%cx";
+            } else if (bytes <= 4) {
+                return "%ecx";
+            }
+            return "%rcx";
+        }
+        case REG_DATA: {
+            if (bytes <= 1) {
+                return "%dh";
+            } else if (bytes <= 2) {
+                return "%dx";
+            } else if (bytes <= 4) {
+                return "%edx";
+            }
+            return "%rdx";
+        }
+        case REG_SRC_IDX: {
+            if (bytes <= 1) {
+                return "%sil";
+            } else if (bytes <= 2) {
+                return "%si";
+            } else if (bytes <= 4) {
+                return "%esi";
+            }
+            return "%rsi";
+        }
+        case REG_DEST_IDX: {
+            if (bytes <= 1) {
+                return "%sil";
+            } else if (bytes <= 2) {
+                return "%di";
+            } else if (bytes <= 4) {
+                return "%edi";
+            }
+            return "%rdi";
+        }
+        case REG_STACK_PTR: {
+            if (bytes <= 1) {
+                return "%spl";
+            } else if (bytes <= 2) {
+                return "%sp";
+            } else if (bytes <= 4) {
+                return "%esp";
+            }
+            return "%rsp";
+        }
+        case REG_BASE_PTR: {
+            if (bytes <= 1) {
+                return "%bpl";
+            } else if (bytes <= 2) {
+                return "%bp";
+            } else if (bytes <= 4) {
+                return "%ebp";
+            }
+            return "%rbp";
+        }
+        case REG_R8: {
+            if (bytes <= 1) {
+                return "%r8b";
+            } else if (bytes <= 2) {
+                return "%r8w";
+            } else if (bytes <= 4) {
+                return "%r8d";
+            }
+            return "%r8";
+        }
+        case REG_R9: {
+            if (bytes <= 1) {
+                return "%r9b";
+            } else if (bytes <= 2) {
+                return "%r9w";
+            } else if (bytes <= 4) {
+                return "%r9d";
+            }
+            return "%r9";
+        }
+        case REG_R10: {
+            if (bytes <= 1) {
+                return "%r10b";
+            } else if (bytes <= 2) {
+                return "%r10w";
+            } else if (bytes <= 4) {
+                return "%r10d";
+            }
+            return "%r10";
+        }
+        case REG_R11: {
+            if (bytes <= 1) {
+                return "%r11b";
+            } else if (bytes <= 2) {
+                return "%r11w";
+            } else if (bytes <= 4) {
+                return "%r11d";
+            }
+            return "%r11";
+        }
+        case REG_R12: {
+            if (bytes <= 1) {
+                return "%r12b";
+            } else if (bytes <= 2) {
+                return "%r12w";
+            } else if (bytes <= 4) {
+                return "%r12d";
+            }
+            return "%r12";
+        }
+        case REG_R13: {
+            if (bytes <= 1) {
+                return "%r13b";
+            } else if (bytes <= 2) {
+                return "%r13w";
+            } else if (bytes <= 4) {
+                return "%r13d";
+            }
+            return "%r13";
+        }
+        case REG_R14: {
+            if (bytes <= 1) {
+                return "%r14b";
+            } else if (bytes <= 2) {
+                return "%r14w";
+            } else if (bytes <= 4) {
+                return "%r14d";
+            }
+            return "%r14";
+        }
+        case REG_R15: {
+            if (bytes <= 1) {
+                return "%r15b";
+            } else if (bytes <= 2) {
+                return "%r15w";
+            } else if (bytes <= 4) {
+                return "%r15d";
+            }
+            return "%r15";
+        }
     }
-    return "%rax";
+    assert(0 && "invalid register");
+    return NULL;
 }

@@ -17,9 +17,13 @@ fn main(): u8 {
   return add(40, 2) 
 }
 
-fn add(a: u32, b: u32): u8 {
+fn add(a: u64, b: u64): u8 {
   return a + b
 }
+
+# TEST test_compile(exit_code=0)
+
+# TEST test_run_binary(exit_code=42)
 
 # TEST test_ast WITH
 # Translation_Unit
@@ -30,8 +34,8 @@ fn add(a: u32, b: u32): u8 {
 # |       |-Literal <kind:u32> <value:40>
 # |       `-Literal <kind:u32> <value:2>
 # `-Function_Definition <name:add> <return:u8>
-#   |-Param_Definition <name:a> <type:u32>
-#   |-Param_Definition <name:b> <type:u32>
+#   |-Param_Definition <name:a> <type:u64>
+#   |-Param_Definition <name:b> <type:u64>
 #   `-Block
 #     `-Return_Statement
 #       `-Binary_Operation (+)

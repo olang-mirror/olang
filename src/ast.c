@@ -40,7 +40,12 @@ ast_new_translation_unit(arena_t *arena)
 }
 
 ast_node_t *
-ast_new_node_fn_def(arena_t *arena, string_view_t id, list_t *params, string_view_t return_type, ast_node_t *block)
+ast_new_node_fn_def(arena_t *arena,
+                    token_loc_t loc,
+                    string_view_t id,
+                    list_t *params,
+                    string_view_t return_type,
+                    ast_node_t *block)
 {
     assert(arena);
     assert(params);
@@ -50,6 +55,7 @@ ast_new_node_fn_def(arena_t *arena, string_view_t id, list_t *params, string_vie
     assert(node_fn_def);
 
     node_fn_def->kind = AST_NODE_FN_DEF;
+    node_fn_def->loc = loc;
     ast_fn_definition_t *fn_def = &node_fn_def->as_fn_def;
 
     fn_def->id = id;
@@ -61,7 +67,7 @@ ast_new_node_fn_def(arena_t *arena, string_view_t id, list_t *params, string_vie
 }
 
 ast_node_t *
-ast_new_node_fn_call(arena_t *arena, string_view_t id, list_t *args)
+ast_new_node_fn_call(arena_t *arena, token_loc_t loc, string_view_t id, list_t *args)
 {
     assert(arena);
     assert(args);
@@ -70,6 +76,7 @@ ast_new_node_fn_call(arena_t *arena, string_view_t id, list_t *args)
     assert(node_fn_call);
 
     node_fn_call->kind = AST_NODE_FN_CALL;
+    node_fn_call->loc = loc;
     ast_fn_call_t *fn_call = &node_fn_call->as_fn_call;
 
     fn_call->id = id;
@@ -79,12 +86,13 @@ ast_new_node_fn_call(arena_t *arena, string_view_t id, list_t *args)
 }
 
 ast_node_t *
-ast_new_node_var_def(arena_t *arena, string_view_t id, string_view_t type, ast_node_t *value)
+ast_new_node_var_def(arena_t *arena, token_loc_t loc, string_view_t id, string_view_t type, ast_node_t *value)
 {
     ast_node_t *node_var_def = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_var_def);
 
     node_var_def->kind = AST_NODE_VAR_DEF;
+    node_var_def->loc = loc;
     ast_var_definition_t *var_def = &node_var_def->as_var_def;
 
     var_def->id = id;
@@ -95,12 +103,13 @@ ast_new_node_var_def(arena_t *arena, string_view_t id, string_view_t type, ast_n
 }
 
 ast_node_t *
-ast_new_node_bin_op(arena_t *arena, ast_binary_op_kind_t kind, ast_node_t *lhs, ast_node_t *rhs)
+ast_new_node_bin_op(arena_t *arena, token_loc_t loc, ast_binary_op_kind_t kind, ast_node_t *lhs, ast_node_t *rhs)
 {
     ast_node_t *node_bin_op = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_bin_op);
 
     node_bin_op->kind = AST_NODE_BINARY_OP;
+    node_bin_op->loc = loc;
     node_bin_op->as_bin_op.kind = kind;
     node_bin_op->as_bin_op.lhs = lhs;
     node_bin_op->as_bin_op.rhs = rhs;
@@ -109,12 +118,13 @@ ast_new_node_bin_op(arena_t *arena, ast_binary_op_kind_t kind, ast_node_t *lhs, 
 }
 
 ast_node_t *
-ast_new_node_literal_u32(arena_t *arena, uint32_t value)
+ast_new_node_literal_u32(arena_t *arena, token_loc_t loc, uint32_t value)
 {
     ast_node_t *node_literal = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_literal);
 
     node_literal->kind = AST_NODE_LITERAL;
+    node_literal->loc = loc;
     node_literal->as_literal.kind = AST_LITERAL_U32;
     node_literal->as_literal.as_u32 = value;
 
@@ -122,36 +132,39 @@ ast_new_node_literal_u32(arena_t *arena, uint32_t value)
 }
 
 ast_node_t *
-ast_new_node_ref(arena_t *arena, string_view_t id)
+ast_new_node_ref(arena_t *arena, token_loc_t loc, string_view_t id)
 {
     ast_node_t *node_ref = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_ref);
 
     node_ref->kind = AST_NODE_REF;
+    node_ref->loc = loc;
     node_ref->as_ref.id = id;
 
     return node_ref;
 }
 
 ast_node_t *
-ast_new_node_return_stmt(arena_t *arena, ast_node_t *expr)
+ast_new_node_return_stmt(arena_t *arena, token_loc_t loc, ast_node_t *expr)
 {
     ast_node_t *node_return_stmt = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_return_stmt);
 
     node_return_stmt->kind = AST_NODE_RETURN_STMT;
+    node_return_stmt->loc = loc;
     node_return_stmt->as_return_stmt.expr = expr;
 
     return node_return_stmt;
 }
 
 ast_node_t *
-ast_new_node_if_stmt(arena_t *arena, ast_node_t *cond, ast_node_t *then, ast_node_t *_else)
+ast_new_node_if_stmt(arena_t *arena, token_loc_t loc, ast_node_t *cond, ast_node_t *then, ast_node_t *_else)
 {
     ast_node_t *node_if_stmt = arena_alloc(arena, sizeof(ast_node_t));
     assert(node_if_stmt);
 
     node_if_stmt->kind = AST_NODE_IF_STMT;
+    node_if_stmt->loc = loc;
     node_if_stmt->as_if_stmt.cond = cond;
     node_if_stmt->as_if_stmt.then = then;
     node_if_stmt->as_if_stmt._else = _else;

@@ -246,7 +246,7 @@ print_token(char *file_path, token_t *token)
 {
     printf("%s:%lu:%lu: <%s>\n",
            file_path,
-           token->location.row + 1,
-           (token->location.offset - token->location.bol) + 1,
+           token->cur.row + 1,
+           (token->cur.offset - token->cur.bol) + 1,
            token_kind_to_cstr(token->kind));
 }

@@ -21,12 +21,17 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef struct lexer
+typedef struct lexer_cursor
 {
-    string_view_t source;
     size_t offset;
     size_t row;
     size_t bol;
+} lexer_cursor_t;
+
+typedef struct lexer
+{
+    string_view_t source;
+    lexer_cursor_t cur;
 } lexer_t;
 
 typedef enum token_kind
@@ -79,18 +84,11 @@ typedef enum token_kind
     TOKEN_EOF
 } token_kind_t;
 
-typedef struct token_loc
-{
-    size_t offset;
-    size_t row;
-    size_t bol;
-} token_loc_t;
-
 typedef struct token
 {
     token_kind_t kind;
     string_view_t value;
-    token_loc_t location;
+    lexer_cursor_t cur;
 } token_t;
 
 void

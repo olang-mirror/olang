@@ -31,15 +31,15 @@ parse_translation_unit_test(const MunitParameter params[], void *user_data_or_fi
 {
     arena_t arena = arena_new(ARENA_CAPACITY);
 
-    char *file_path = "main.0";
+    char *filepath = "main.0";
     char *source_value = "fn main(): u32 {\n\treturn 69\n}";
 
     lexer_t lexer;
-    string_view_t source = { .chars = source_value, .size = strlen(source_value) };
-    lexer_init(&lexer, source);
+    string_view_t code = { .chars = source_value, .size = strlen(source_value) };
+    lexer_init(&lexer, (source_code_t){ .code = code, .filepath = filepath });
 
     parser_t parser;
-    parser_init(&parser, &lexer, &arena, file_path);
+    parser_init(&parser, &lexer, &arena, filepath);
 
     ast_node_t *translation_unit_node = parser_parse_translation_unit(&parser);
     assert_not_null(translation_unit_node);

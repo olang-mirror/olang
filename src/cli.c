@@ -57,7 +57,7 @@ cli_parse_args(int argc, char **argv)
             opts.options |= CLI_OPT_SYSROOT;
             cli_opts_parse_sysroot(&opts, &args);
         } else {
-            opts.file_path = arg;
+            opts.filepath = arg;
         }
         arg = cli_args_shift(&args);
     }

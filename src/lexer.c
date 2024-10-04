@@ -22,10 +22,10 @@
 #include <stdio.h>
 
 void
-lexer_init(lexer_t *lexer, string_view_t source)
+lexer_init(lexer_t *lexer, source_code_t src)
 {
     assert(lexer);
-    lexer->source = source;
+    lexer->src = src;
     lexer->cur.offset = 0;
     lexer->cur.row = 0;
     lexer->cur.bol = 0;
@@ -90,7 +90,7 @@ lexer_next_token(lexer_t *lexer, token_t *token)
                 current_char = lexer_current_char(lexer);
             }
 
-            string_view_t text = { .chars = lexer->source.chars + start_cur.offset,
+            string_view_t text = { .chars = lexer->src.code.chars + start_cur.offset,
                                    .size = lexer->cur.offset - start_cur.offset };
 
             lexer_init_str_value_token(lexer, token, lexer_str_to_token_kind(text), start_cur);
@@ -359,13 +359,13 @@ token_kind_is_binary_op(token_kind_t kind)
 static char
 lexer_current_char(lexer_t *lexer)
 {
-    return lexer->source.chars[lexer->cur.offset];
+    return lexer->src.code.chars[lexer->cur.offset];
 }
 
 static void
 lexer_skip_char(lexer_t *lexer)
 {
-    assert(lexer->cur.offset < lexer->source.size);
+    assert(lexer->cur.offset < lexer->src.code.size);
     if (lexer_current_char(lexer) == '\n') {
         lexer->cur.row++;
         lexer->cur.bol = ++lexer->cur.offset;
@@ -377,7 +377,7 @@ lexer_skip_char(lexer_t *lexer)
 static bool
 lexer_is_eof(lexer_t *lexer)
 {
-    return lexer->cur.offset >= lexer->source.size;
+    return lexer->cur.offset >= lexer->src.code.size;
 }
 
 static bool
@@ -395,14 +395,14 @@ _isspace(char c)
 static void
 lexer_init_char_value_token(lexer_t *lexer, token_t *token, token_kind_t kind)
 {
-    string_view_t str = { .chars = lexer->source.chars + lexer->cur.offset, .size = 1 };
+    string_view_t str = { .chars = lexer->src.code.chars + lexer->cur.offset, .size = 1 };
     *token = (token_t){ .kind = kind, .value = str, .cur = lexer->cur };
 }
 
 static void
 lexer_init_str_value_token(lexer_t *lexer, token_t *token, token_kind_t kind, lexer_cursor_t cur)
 {
-    string_view_t str = { .chars = lexer->source.chars + cur.offset, .size = lexer->cur.offset - cur.offset };
+    string_view_t str = { .chars = lexer->src.code.chars + cur.offset, .size = lexer->cur.offset - cur.offset };
     *token = (token_t){ .kind = kind, .value = str, .cur = cur };
 }
 
@@ -461,9 +461,9 @@ string_view_t
 lexer_get_token_line(lexer_t *lexer, token_t *token)
 {
     size_t offset = token->cur.bol;
-    string_view_t line = { .chars = lexer->source.chars + offset, .size = 0 };
+    string_view_t line = { .chars = lexer->src.code.chars + offset, .size = 0 };
 
-    while ((line.size + offset) < lexer->source.size && line.chars[line.size] != '\n' && line.chars[line.size] != 0) {
+    while ((line.size + offset) < lexer->src.code.size && line.chars[line.size] != '\n' && line.chars[line.size] != 0) {
         ++line.size;
     }
 

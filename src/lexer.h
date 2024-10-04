@@ -17,6 +17,7 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+#include "source_code.h"
 #include "string_view.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -30,7 +31,7 @@ typedef struct lexer_cursor
 
 typedef struct lexer
 {
-    string_view_t source;
+    source_code_t src;
     lexer_cursor_t cur;
 } lexer_t;
 
@@ -92,7 +93,7 @@ typedef struct token
 } token_t;
 
 void
-lexer_init(lexer_t *lexer, string_view_t source);
+lexer_init(lexer_t *lexer, source_code_t src);
 
 void
 lexer_next_token(lexer_t *lexer, token_t *token);

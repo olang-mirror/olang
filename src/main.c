@@ -44,10 +44,10 @@ void
 handle_codegen_linux(cli_opts_t *opts);
 
 static void
-print_token(char *file_path, token_t *token);
+print_token(char *filepath, token_t *token);
 
-string_view_t
-read_entire_file(char *file_path, arena_t *arena);
+source_code_t
+read_entire_file(char *filepath, arena_t *arena);
 
 int
 main(int argc, char **argv)
@@ -75,24 +75,24 @@ main(int argc, char **argv)
 void
 handle_dump_tokens(cli_opts_t *opts)
 {
-    if (opts->file_path == NULL) {
+    if (opts->filepath == NULL) {
         cli_print_usage(stderr, opts->compiler_path);
         exit(EXIT_FAILURE);
     }
 
     arena_t arena = arena_new(ARENA_CAPACITY);
-    string_view_t file_content = read_entire_file(opts->file_path, &arena);
+    source_code_t src = read_entire_file(opts->filepath, &arena);
 
     lexer_t lexer = { 0 };
-    lexer_init(&lexer, file_content);
+    lexer_init(&lexer, src);
 
     token_t token = { 0 };
     lexer_next_token(&lexer, &token);
     while (token.kind != TOKEN_EOF) {
-        print_token(opts->file_path, &token);
+        print_token(opts->filepath, &token);
         lexer_next_token(&lexer, &token);
     }
-    print_token(opts->file_path, &token);
+    print_token(opts->filepath, &token);
 
     arena_free(&arena);
 }
@@ -100,7 +100,7 @@ handle_dump_tokens(cli_opts_t *opts)
 void
 handle_dump_ast(cli_opts_t *opts)
 {
-    if (opts->file_path == NULL) {
+    if (opts->filepath == NULL) {
         cli_print_usage(stderr, opts->compiler_path);
         exit(EXIT_FAILURE);
     }
@@ -109,10 +109,10 @@ handle_dump_ast(cli_opts_t *opts)
     lexer_t lexer = { 0 };
     parser_t parser = { 0 };
 
-    string_view_t file_content = read_entire_file(opts->file_path, &arena);
+    source_code_t src = read_entire_file(opts->filepath, &arena);
 
-    lexer_init(&lexer, file_content);
-    parser_init(&parser, &lexer, &arena, opts->file_path);
+    lexer_init(&lexer, src);
+    parser_init(&parser, &lexer, &arena, opts->filepath);
 
     ast_node_t *ast = parser_parse_translation_unit(&parser);
 
@@ -122,7 +122,7 @@ handle_dump_ast(cli_opts_t *opts)
 void
 handle_codegen_linux(cli_opts_t *opts)
 {
-    if (opts->file_path == NULL) {
+    if (opts->filepath == NULL) {
         cli_print_usage(stderr, opts->compiler_path);
         exit(EXIT_FAILURE);
     }
@@ -131,9 +131,9 @@ handle_codegen_linux(cli_opts_t *opts)
     lexer_t lexer = { 0 };
     parser_t parser = { 0 };
 
-    string_view_t file_content = read_entire_file(opts->file_path, &arena);
-    lexer_init(&lexer, file_content);
-    parser_init(&parser, &lexer, &arena, opts->file_path);
+    source_code_t src = read_entire_file(opts->filepath, &arena);
+    lexer_init(&lexer, src);
+    parser_init(&parser, &lexer, &arena, opts->filepath);
 
     ast_node_t *ast = parser_parse_translation_unit(&parser);
 
@@ -204,48 +204,48 @@ handle_codegen_linux(cli_opts_t *opts)
     arena_free(&arena);
 }
 
-string_view_t
-read_entire_file(char *file_path, arena_t *arena)
+source_code_t
+read_entire_file(char *filepath, arena_t *arena)
 {
-    FILE *stream = fopen(file_path, "rb");
+    FILE *stream = fopen(filepath, "rb");
 
     if (stream == NULL) {
-        fprintf(stderr, "error: could not open file %s: %s\n", file_path, strerror(errno));
+        fprintf(stderr, "error: could not open file %s: %s\n", filepath, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    string_view_t file_content = { 0 };
+    string_view_t code = { 0 };
 
     fseek(stream, 0, SEEK_END);
-    file_content.size = ftell(stream);
+    code.size = ftell(stream);
     fseek(stream, 0, SEEK_SET);
 
-    assert(file_content.size * 2 < ARENA_CAPACITY);
+    assert(code.size * 2 < ARENA_CAPACITY);
 
-    file_content.chars = (char *)arena_alloc(arena, (size_t)file_content.size);
+    code.chars = (char *)arena_alloc(arena, (size_t)code.size);
 
-    if (file_content.chars == NULL) {
-        fprintf(stderr, "error: could not read file %s: %s\n", file_path, strerror(errno));
+    if (code.chars == NULL) {
+        fprintf(stderr, "error: could not read file %s: %s\n", filepath, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    size_t read_bytes = fread(file_content.chars, 1, file_content.size, stream);
+    size_t read_bytes = fread(code.chars, 1, code.size, stream);
 
-    if (read_bytes != file_content.size) {
-        fprintf(stderr, "error: failed to read all file bytes %s\n", file_path);
+    if (read_bytes != code.size) {
+        fprintf(stderr, "error: failed to read all file bytes %s\n", filepath);
         exit(EXIT_FAILURE);
     }
 
     fclose(stream);
 
-    return file_content;
+    return (source_code_t){ .filepath = filepath, .code = code };
 }
 
 static void
-print_token(char *file_path, token_t *token)
+print_token(char *filepath, token_t *token)
 {
     printf("%s:%lu:%lu: <%s>\n",
-           file_path,
+           filepath,
            token->cur.row + 1,
            (token->cur.offset - token->cur.bol) + 1,
            token_kind_to_cstr(token->kind));

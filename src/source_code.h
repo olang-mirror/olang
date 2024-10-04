@@ -14,42 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef CLI_H
-#define CLI_H
 #include "string_view.h"
-#include <stdint.h>
-#include <stdio.h>
 
-typedef struct cli_args
-{
-    int argc;
-    char **argv;
-} cli_args_t;
+#ifndef SOURCE_CODE_H
+#define SOURCE_CODE_H
 
-typedef struct cli_opts
+typedef struct source_code
 {
-    uint32_t options;
-    char *arch;
-    char *sysroot;
-    char *compiler_path;
     char *filepath;
-    string_view_t output_bin;
-} cli_opts_t;
+    string_view_t code;
+} source_code_t;
 
-typedef enum
-{
-    CLI_OPT_DUMP_TOKENS = 1 << 0,
-    CLI_OPT_OUTPUT = 1 << 1,
-    CLI_OPT_SAVE_TEMPS = 1 << 2,
-    CLI_OPT_ARCH = 1 << 3,
-    CLI_OPT_SYSROOT = 1 << 4,
-    CLI_OPT_DUMP_AST = 1 << 5
-} cli_opt_t;
-
-cli_opts_t
-cli_parse_args(int argc, char **argv);
-
-void
-cli_print_usage(FILE *stream, char *compiler_path);
-
-#endif /* CLI_H */
+#endif

@@ -25,12 +25,10 @@ typedef struct parser
 {
     lexer_t *lexer;
     arena_t *arena;
-    // TODO: we should define a better place to file_path string
-    char *file_path;
 } parser_t;
 
 void
-parser_init(parser_t *parser, lexer_t *lexer, arena_t *arena, char *file_path);
+parser_init(parser_t *parser, lexer_t *lexer, arena_t *arena);
 
 ast_node_t *
 parser_parse_translation_unit(parser_t *parser);

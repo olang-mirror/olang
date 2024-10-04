@@ -39,7 +39,7 @@ parse_translation_unit_test(const MunitParameter params[], void *user_data_or_fi
     lexer_init(&lexer, (source_code_t){ .code = code, .filepath = filepath });
 
     parser_t parser;
-    parser_init(&parser, &lexer, &arena, filepath);
+    parser_init(&parser, &lexer, &arena);
 
     ast_node_t *translation_unit_node = parser_parse_translation_unit(&parser);
     assert_not_null(translation_unit_node);

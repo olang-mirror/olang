@@ -44,7 +44,7 @@ void
 handle_codegen_linux(cli_opts_t *opts);
 
 static void
-print_token(char *filepath, token_t *token);
+print_token(token_t *token);
 
 source_code_t
 read_entire_file(char *filepath, arena_t *arena);
@@ -89,10 +89,10 @@ handle_dump_tokens(cli_opts_t *opts)
     token_t token = { 0 };
     lexer_next_token(&lexer, &token);
     while (token.kind != TOKEN_EOF) {
-        print_token(opts->filepath, &token);
+        print_token(&token);
         lexer_next_token(&lexer, &token);
     }
-    print_token(opts->filepath, &token);
+    print_token(&token);
 
     arena_free(&arena);
 }
@@ -112,7 +112,7 @@ handle_dump_ast(cli_opts_t *opts)
     source_code_t src = read_entire_file(opts->filepath, &arena);
 
     lexer_init(&lexer, src);
-    parser_init(&parser, &lexer, &arena, opts->filepath);
+    parser_init(&parser, &lexer, &arena);
 
     ast_node_t *ast = parser_parse_translation_unit(&parser);
 
@@ -133,7 +133,7 @@ handle_codegen_linux(cli_opts_t *opts)
 
     source_code_t src = read_entire_file(opts->filepath, &arena);
     lexer_init(&lexer, src);
-    parser_init(&parser, &lexer, &arena, opts->filepath);
+    parser_init(&parser, &lexer, &arena);
 
     ast_node_t *ast = parser_parse_translation_unit(&parser);
 
@@ -242,11 +242,11 @@ read_entire_file(char *filepath, arena_t *arena)
 }
 
 static void
-print_token(char *filepath, token_t *token)
+print_token(token_t *token)
 {
     printf("%s:%lu:%lu: <%s>\n",
-           filepath,
-           token->cur.row + 1,
-           (token->cur.offset - token->cur.bol) + 1,
+           token->loc.src.filepath,
+           token_loc_to_lineno(token->loc),
+           token_loc_to_colno(token->loc),
            token_kind_to_cstr(token->kind));
 }

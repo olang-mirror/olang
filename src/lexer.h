@@ -17,10 +17,15 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include "source_code.h"
 #include "string_view.h"
 #include <stdint.h>
 #include <stdio.h>
+
+typedef struct source_code
+{
+    char *filepath;
+    string_view_t code;
+} source_code_t;
 
 typedef struct lexer_cursor
 {
@@ -85,12 +90,24 @@ typedef enum token_kind
     TOKEN_EOF
 } token_kind_t;
 
+typedef struct token_loc
+{
+    source_code_t src;
+    lexer_cursor_t cur;
+} token_loc_t;
+
 typedef struct token
 {
     token_kind_t kind;
     string_view_t value;
-    lexer_cursor_t cur;
+    token_loc_t loc;
 } token_t;
+
+size_t
+token_loc_to_lineno(token_loc_t loc);
+
+size_t
+token_loc_to_colno(token_loc_t loc);
 
 void
 lexer_init(lexer_t *lexer, source_code_t src);
@@ -111,6 +128,6 @@ bool
 token_kind_is_binary_op(token_kind_t kind);
 
 string_view_t
-lexer_get_token_line(lexer_t *lexer, token_t *token);
+token_loc_to_line(token_loc_t loc);
 
 #endif /* LEXER_H */

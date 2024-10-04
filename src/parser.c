@@ -32,7 +32,7 @@ static bool
 expected_next_token(parser_t *parser, token_t *token, token_kind_t kind);
 
 static bool
-expected_token(parser_t *parser, token_t *token, token_kind_t kind);
+expected_token(token_t *token, token_kind_t kind);
 
 static bool
 parser_parse_type(parser_t *parser, string_view_t *type);
@@ -68,14 +68,12 @@ static void
 skip_line_feeds(lexer_t *lexer);
 
 void
-parser_init(parser_t *parser, lexer_t *lexer, arena_t *arena, char *file_path)
+parser_init(parser_t *parser, lexer_t *lexer, arena_t *arena)
 {
     assert(parser && "parser is required");
     assert(lexer && "lexer is required");
-    assert(file_path && "file_path is required");
     parser->lexer = lexer;
     parser->arena = arena;
-    parser->file_path = file_path;
 }
 
 ast_node_t *
@@ -311,7 +309,7 @@ parser_parse_fn_args(parser_t *parser)
     bool is_not_first_arg = false;
 
     while (token.kind != TOKEN_CPAREN && token.kind != TOKEN_EOF) {
-        if (is_not_first_arg && expected_token(parser, &token, TOKEN_COMMA)) {
+        if (is_not_first_arg && expected_token(&token, TOKEN_COMMA)) {
             lexer_next_token(parser->lexer, &token);
         }
 
@@ -353,11 +351,11 @@ parser_parse_fn_params(parser_t *parser)
     bool is_not_first_param = false;
 
     while (token.kind != TOKEN_CPAREN && token.kind != TOKEN_EOF) {
-        if (is_not_first_param && expected_token(parser, &token, TOKEN_COMMA)) {
+        if (is_not_first_param && expected_token(&token, TOKEN_COMMA)) {
             lexer_next_token(parser->lexer, &token);
         }
 
-        if (!expected_token(parser, &token, TOKEN_ID)) {
+        if (!expected_token(&token, TOKEN_ID)) {
             return NULL;
         }
 
@@ -372,7 +370,7 @@ parser_parse_fn_params(parser_t *parser)
         is_not_first_param = true;
     }
 
-    if (!expected_token(parser, &token, TOKEN_CPAREN)) {
+    if (!expected_token(&token, TOKEN_CPAREN)) {
         return NULL;
     }
 
@@ -555,7 +553,7 @@ parser_parse_if_stmt(parser_t *parser)
             return NULL;
         }
 
-    } else if (!expected_token(parser, &next_token, TOKEN_LF)) {
+    } else if (!expected_token(&next_token, TOKEN_LF)) {
         return NULL;
     }
 
@@ -613,24 +611,23 @@ static bool
 expected_next_token(parser_t *parser, token_t *token, token_kind_t expected_kind)
 {
     lexer_next_token(parser->lexer, token);
-    return expected_token(parser, token, expected_kind);
+    return expected_token(token, expected_kind);
 }
 
 static bool
-expected_token(parser_t *parser, token_t *token, token_kind_t expected_kind)
+expected_token(token_t *token, token_kind_t expected_kind)
 {
     if (token->kind != expected_kind) {
         fprintf(stderr,
-                "%s:%lu:%lu: error: got '" SV_FMT "' token but expect <%s>\n",
-                parser->file_path,
-                token->cur.row + 1,
-                (token->cur.offset - token->cur.bol) + 1,
+                "%s:%lu:%lu: syntax error: got '" SV_FMT "' token but expect '%s'\n",
+                token->loc.src.filepath,
+                token_loc_to_lineno(token->loc),
+                token_loc_to_colno(token->loc),
                 SV_ARG(token->value),
                 token_kind_to_cstr(expected_kind));
 
-        string_view_t line = lexer_get_token_line(parser->lexer, token);
-        fprintf(stderr, "" SV_FMT "\n", SV_ARG(line));
-        fprintf(stderr, "%*s\n", (int)(token->cur.offset - token->cur.bol + 1), "^");
+        fprintf(stderr, SV_FMT "\n", SV_ARG(token_loc_to_line(token->loc)));
+        fprintf(stderr, "%*s\n", (int)token_loc_to_colno(token->loc), "^");
 
         exit(EXIT_FAILURE);
     }

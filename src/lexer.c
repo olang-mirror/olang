@@ -396,21 +396,21 @@ static void
 lexer_init_char_value_token(lexer_t *lexer, token_t *token, token_kind_t kind)
 {
     string_view_t str = { .chars = lexer->src.code.chars + lexer->cur.offset, .size = 1 };
-    *token = (token_t){ .kind = kind, .value = str, .cur = lexer->cur };
+    *token = (token_t){ .kind = kind, .value = str, .loc = (token_loc_t){ .src = lexer->src, .cur = lexer->cur } };
 }
 
 static void
 lexer_init_str_value_token(lexer_t *lexer, token_t *token, token_kind_t kind, lexer_cursor_t cur)
 {
     string_view_t str = { .chars = lexer->src.code.chars + cur.offset, .size = lexer->cur.offset - cur.offset };
-    *token = (token_t){ .kind = kind, .value = str, .cur = cur };
+    *token = (token_t){ .kind = kind, .value = str, .loc = (token_loc_t){ .src = lexer->src, .cur = cur } };
 }
 
 static void
 lexer_init_eof_token(lexer_t *lexer, token_t *token)
 {
     string_view_t str = { 0 };
-    *token = (token_t){ .kind = TOKEN_EOF, .value = str, .cur = lexer->cur };
+    *token = (token_t){ .kind = TOKEN_EOF, .value = str, .loc = (token_loc_t){ .src = lexer->src, .cur = lexer->cur } };
 }
 
 static token_kind_t
@@ -458,14 +458,26 @@ lexer_lookahead(lexer_t *lexer, token_t *token, size_t n)
 }
 
 string_view_t
-lexer_get_token_line(lexer_t *lexer, token_t *token)
+token_loc_to_line(token_loc_t loc)
 {
-    size_t offset = token->cur.bol;
-    string_view_t line = { .chars = lexer->src.code.chars + offset, .size = 0 };
+    size_t offset = loc.cur.bol;
+    string_view_t line = { .chars = loc.src.code.chars + offset, .size = 0 };
 
-    while ((line.size + offset) < lexer->src.code.size && line.chars[line.size] != '\n' && line.chars[line.size] != 0) {
+    while ((line.size + offset) < loc.src.code.size && line.chars[line.size] != '\n' && line.chars[line.size] != 0) {
         ++line.size;
     }
 
     return line;
+}
+
+size_t
+token_loc_to_lineno(token_loc_t loc)
+{
+    return loc.cur.row + 1;
+}
+
+size_t
+token_loc_to_colno(token_loc_t loc)
+{
+    return loc.cur.offset - loc.cur.bol + 1;
 }

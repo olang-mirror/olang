@@ -67,6 +67,9 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
             ast_fn_definition_t *fn_def = &ast->as_fn_def;
             fn_def->scope = scope_push(scope);
 
+            symbol_t *symbol = symbol_new(checker->arena, fn_def->id, type_from_id(fn_def->return_type));
+            scope_insert(scope, symbol);
+
             list_item_t *item = list_head(fn_def->params);
 
             while (item != NULL) {

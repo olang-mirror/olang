@@ -1,10 +1,28 @@
 @node Installation
 @chapter Installation
 
-This installation assumes you are running an unix like operation system and
-requires @code{make}, @code{makeinfo} and a @strong{c compiler} installed.
+This installation assumes you are running an unix-like operation system.
 
-The following commands will compile the the code and install @code{olc} binary
+@section Dependencies
+
+@itemize @bullet
+@item git
+@item make
+@item makeinfo
+@item c compiler (gcc, clang, etc)
+@end itemize
+
+@section Installing olc from source
+
+The olang is still in its early stages, so it's not packaged for major package
+managers. To install it, clone the source code and follow the installation
+instructions.
+
+@verbatim
+git clone https://git.sr.ht/~johnnyrichard/olang
+@end verbatim
+
+The following commands will compile the code and install @code{olc} binary
 (olang compiler), @code{man} pages and @code{info} docs into your system.
 
 @verbatim

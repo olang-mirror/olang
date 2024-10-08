@@ -1,3 +1,9 @@
 @node Introduction
 @chapter Introduction
 
+Welcome to the O programming manual. This manual will guide you to learn the
+language principles and how  to contribute if you are a low level geek.
+
+Olang is a project maintained by enthusiast individuals across the globe. Join
+us in the system programming language universe. Let's fight complexity
+together.

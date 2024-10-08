@@ -1,2 +1,231 @@
 @node Getting Started
 @chapter Getting Started
+
+Welcome to the O programming language! This chapter will introduce you to the
+basics of the language's syntax. We'll cover variables, data types, operators,
+control flow, and functions.
+
+By the end of this chapter, you'll have a solid foundation in the O language
+syntax and be ready to start writing your own programs. Let's dive in!
+
+@section An olang program
+
+An O programmin language program starts with a @code{main} function. This
+function must return the program exit code.
+
+@verbatim
+fn main(): u8 {
+  return 0;
+}
+@end verbatim
+
+To compile the program you can use @code{olc}.
+
+@verbatim
+$ olc my_prog.ol -o my_prog
+$ ./my_prog
+@end verbatim
+
+@section Functions
+
+Unlike C, O language does not require function prototypes. This means you can
+call a function before it's defined, making your code more flexible and easier
+to read in many cases.
+
+@verbatim
+fn main(): u8 {
+  return fib(8)
+}
+
+fn add(a: u32, b: u32): u32 {
+  return a + b
+}
+
+fn fib(n: u32): u32 {
+  if n <= 2 {
+    return n
+  }
+
+  return add(fib(n - 1), fib(n - 2))
+}
+@end verbatim
+
+@section Comments
+
+Comments starts with a @code{#}.
+
+@verbatim
+# Hi I'm a comment and I'll be ignored by the compiler.
+@end verbatim
+
+@section Variables
+
+@verbatim
+var answer: u32 = 42
+@end verbatim
+
+@section Flow control
+
+Any non zero expr is true.
+
+@verbatim
+if expr {
+  # statement
+} else {
+  # statement
+}
+@end verbatim
+
+@section Primitive data types
+
+@table @samp
+
+@item u8
+
+Unsigned 8 bits.
+
+@item u16
+
+Unsigned 16 bits.
+
+@item u32
+
+Unsigned 32 bits.
+
+@item u64
+
+Unsigned 64 bits.
+
+@end table
+
+@section Binary Operations
+
+Binary operations are pretty much like C.
+
+@subsection Logical
+
+@table @samp
+
+@item Equals
+
+@verbatim
+expr1 == expr2
+@end verbatim
+
+Results zero (false) or one (true).
+
+@item Less
+
+@verbatim
+expr1 < expr2
+@end verbatim
+
+Results zero (false) or one (true).
+
+@item Less Equal
+
+@verbatim
+expr1 <= expr2
+@end verbatim
+
+Results zero (false) or one (true).
+
+@item Greater
+
+@verbatim
+expr1 > expr2
+@end verbatim
+
+Results zero (false) or one (true).
+
+@item Greater Equal
+
+@verbatim
+expr1 >= expr2
+@end verbatim
+
+Results zero (false) or one (true).
+
+@item Or
+
+@verbatim
+expr1 || expr2
+@end verbatim
+
+Results zero (false) if both are true or one (true) if any is true.
+
+@item And
+
+@verbatim
+expr1 && expr2
+@end verbatim
+
+Results zero (false) if any is false or one (true) if both are true.
+
+@end table
+
+@subsection Bitwise
+
+@table @samp
+
+@item Shift left
+
+@verbatim
+n << bits
+@end verbatim
+
+@item Shift left
+
+@verbatim
+n >> bits
+@end verbatim
+
+@item And
+
+@verbatim
+n & bits
+@end verbatim
+
+@item Or
+
+@verbatim
+n | bits
+@end verbatim
+
+@end table
+
+@subsection Arithmetic
+
+@table @samp
+
+@item Addition
+
+@verbatim
+expr1 + expr2
+@end verbatim
+
+@item Subtraction
+
+@verbatim
+expr1 - expr2
+@end verbatim
+
+@item Multiplication
+
+@verbatim
+expr1 * expr2
+@end verbatim
+
+@item Division
+
+@verbatim
+expr1 / expr2
+@end verbatim
+
+@item Remaining
+
+@verbatim
+expr1 % expr2
+@end verbatim
+
+@end table

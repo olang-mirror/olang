@@ -50,6 +50,9 @@ static ast_node_t *
 parser_parse_var_def(parser_t *parser);
 
 static ast_node_t *
+parser_parse_var_assign_stmt(parser_t *parser);
+
+static ast_node_t *
 parser_parse_fn_definition(parser_t *parser);
 
 static list_t *
@@ -469,6 +472,14 @@ StartLoop:
             node = parser_parse_var_def(parser);
             break;
         }
+        case TOKEN_ID: {
+            lexer_lookahead(parser->lexer, &next_token, 2);
+            if (!expected_token(&next_token, TOKEN_EQ)) {
+                return NULL;
+            }
+            node = parser_parse_var_assign_stmt(parser);
+            break;
+        }
         case TOKEN_CCURLY: {
             goto EndLoop;
         }
@@ -487,7 +498,6 @@ StartLoop:
     goto StartLoop;
 EndLoop:
 
-    skip_line_feeds(parser->lexer);
     if (!skip_expected_token(parser, TOKEN_CCURLY)) {
         return NULL;
     }
@@ -601,6 +611,31 @@ parser_parse_var_def(parser_t *parser)
     skip_line_feeds(parser->lexer);
 
     return var_node;
+}
+
+static ast_node_t *
+parser_parse_var_assign_stmt(parser_t *parser)
+{
+    token_t token_id;
+
+    if (!expected_next_token(parser, &token_id, TOKEN_ID)) {
+        return NULL;
+    }
+
+    token_t token_eq;
+
+    if (!expected_next_token(parser, &token_eq, TOKEN_EQ)) {
+        return NULL;
+    }
+
+    ast_node_t *ref = ast_new_node_ref(parser->arena, token_id.loc, token_id.value);
+    ast_node_t *expr = parser_parse_expr(parser);
+
+    // FIXME: The expected line feed should be parsed from parent call
+    //        according to the grammar rules
+    skip_line_feeds(parser->lexer);
+
+    return ast_new_node_var_assign_stmt(parser->arena, token_eq.loc, ref, expr);
 }
 
 static bool

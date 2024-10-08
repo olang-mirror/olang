@@ -36,6 +36,7 @@ typedef enum
     AST_NODE_FN_CALL,
     AST_NODE_VAR_DEF,
     AST_NODE_BINARY_OP,
+    AST_NODE_VAR_ASSIGN_STMT,
     AST_NODE_RETURN_STMT,
     AST_NODE_IF_STMT,
     AST_NODE_LITERAL,
@@ -146,6 +147,13 @@ typedef struct ast_binary_op
     ast_node_t *rhs;
 } ast_binary_op_t;
 
+typedef struct ast_var_assign_stmt
+{
+    ast_node_meta_t meta;
+    ast_node_t *ref;
+    ast_node_t *expr;
+} ast_var_assign_stmt_t;
+
 typedef struct ast_return_stmt
 {
     ast_node_meta_t meta;
@@ -176,6 +184,7 @@ typedef union ast_node
     ast_literal_t as_literal;
     ast_ref_t as_ref;
     ast_block_t as_block;
+    ast_var_assign_stmt_t as_var_assign_stmt;
     ast_return_stmt_t as_return_stmt;
     ast_if_stmt_t as_if_stmt;
 } ast_node_t;
@@ -205,6 +214,9 @@ ast_new_node_literal_u32(arena_t *arena, token_loc_t loc, uint32_t value);
 
 ast_node_t *
 ast_new_node_ref(arena_t *arena, token_loc_t loc, string_view_t id);
+
+ast_node_t *
+ast_new_node_var_assign_stmt(arena_t *arena, token_loc_t loc, ast_node_t *ref, ast_node_t *expr);
 
 ast_node_t *
 ast_new_node_return_stmt(arena_t *arena, token_loc_t loc, ast_node_t *expr);

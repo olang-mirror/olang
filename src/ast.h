@@ -39,6 +39,7 @@ typedef enum
     AST_NODE_VAR_ASSIGN_STMT,
     AST_NODE_RETURN_STMT,
     AST_NODE_IF_STMT,
+    AST_NODE_WHILE_STMT,
     AST_NODE_LITERAL,
     AST_NODE_REF,
     AST_NODE_UNKNOWN
@@ -168,6 +169,13 @@ typedef struct ast_if_stmt
     ast_node_t *_else;
 } ast_if_stmt_t;
 
+typedef struct ast_while_stmt
+{
+    ast_node_meta_t meta;
+    ast_node_t *cond;
+    ast_node_t *then;
+} ast_while_stmt_t;
+
 typedef union ast_node
 {
     // inlined ast_node_meta_t struct.
@@ -187,6 +195,7 @@ typedef union ast_node
     ast_var_assign_stmt_t as_var_assign_stmt;
     ast_return_stmt_t as_return_stmt;
     ast_if_stmt_t as_if_stmt;
+    ast_while_stmt_t as_while_stmt;
 } ast_node_t;
 
 ast_node_t *
@@ -223,6 +232,9 @@ ast_new_node_return_stmt(arena_t *arena, token_loc_t loc, ast_node_t *expr);
 
 ast_node_t *
 ast_new_node_if_stmt(arena_t *arena, token_loc_t loc, ast_node_t *cond, ast_node_t *then, ast_node_t *_else);
+
+ast_node_t *
+ast_new_node_while_stmt(arena_t *arena, token_loc_t loc, ast_node_t *cond, ast_node_t *then);
 
 ast_node_t *
 ast_new_node_block(arena_t *arena);

@@ -237,6 +237,20 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 
             return node;
         }
+        case AST_NODE_WHILE_STMT: {
+            pretty_print_node_t *node = pretty_print_node_new(arena);
+            ast_while_stmt_t while_stmt = ast->as_while_stmt;
+
+            node->name = "While_Statement";
+
+            pretty_print_node_t *child = ast_node_to_pretty_print_node(while_stmt.cond, arena);
+            list_append(node->children, child);
+
+            child = ast_node_to_pretty_print_node(while_stmt.then, arena);
+            list_append(node->children, child);
+
+            return node;
+        }
         case AST_NODE_LITERAL: {
             pretty_print_node_t *node = pretty_print_node_new(arena);
             ast_literal_t literal = ast->as_literal;

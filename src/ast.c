@@ -187,6 +187,20 @@ ast_new_node_if_stmt(arena_t *arena, token_loc_t loc, ast_node_t *cond, ast_node
 }
 
 ast_node_t *
+ast_new_node_while_stmt(arena_t *arena, token_loc_t loc, ast_node_t *cond, ast_node_t *then)
+{
+    ast_node_t *node_while_stmt = arena_alloc(arena, sizeof(ast_node_t));
+    assert(node_while_stmt);
+
+    node_while_stmt->kind = AST_NODE_WHILE_STMT;
+    node_while_stmt->loc = loc;
+    node_while_stmt->as_while_stmt.cond = cond;
+    node_while_stmt->as_while_stmt.then = then;
+
+    return node_while_stmt;
+}
+
+ast_node_t *
 ast_new_node_block(arena_t *arena)
 {
     ast_node_t *node_block = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));

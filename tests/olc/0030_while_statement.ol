@@ -23,16 +23,28 @@ fn main(): u32 {
   return i
 }
 
-# XTEST test_compile(exit_code=0)
+# TEST test_compile(exit_code=0)
 #
-# XTEST test_run_binary(exit_code=9)
+# TEST test_run_binary(exit_code=10)
 #
-# XTEST test_ast WITH
+# TEST test_ast WITH
 # Translation_Unit
 # `-Function_Definition <name:main> <return:u32>
 #   `-Block
+#     |-Var_Definition <name:i> <kind:u32>
+#     | `-Literal <kind:u32> <value:0>
+#     |-While_Statement
+#     | |-Binary_Operation (<)
+#     | | |-Reference <name:i>
+#     | | `-Literal <kind:u32> <value:10>
+#     | `-Block
+#     |   `-Var_Assigment
+#     |     |-Reference <name:i>
+#     |     `-Binary_Operation (+)
+#     |       |-Reference <name:i>
+#     |       `-Literal <kind:u32> <value:1>
 #     `-Return_Statement
-#       `-Literal <kind:u32> <value:0>
+#       `-Reference <name:i>
 # END
 #
 # TEST test_contains_tokens WITH

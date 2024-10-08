@@ -627,6 +627,31 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
 
                 break;
             }
+
+            case AST_NODE_WHILE_STMT: {
+                ast_while_stmt_t while_stmt = node->as_while_stmt;
+
+                ast_node_t *cond = while_stmt.cond;
+                ast_node_t *then = while_stmt.then;
+
+                size_t begin_label = codegen_linux_x86_64_get_next_label(codegen);
+                size_t end_label = codegen_linux_x86_64_get_next_label(codegen);
+
+                fprintf(codegen->out, ".L%ld:\n", begin_label);
+                codegen_linux_x86_64_emit_expression(codegen, cond);
+                fprintf(codegen->out, "    cmp $1, %%rax\n");
+                fprintf(codegen->out, "    jnz .L%ld\n", end_label);
+
+                assert(then->kind == AST_NODE_BLOCK && "invalid while-then block");
+                ast_block_t then_block = then->as_block;
+
+                codegen_linux_x86_64_emit_block(codegen, &then_block);
+
+                fprintf(codegen->out, "    jmp .L%ld\n", begin_label);
+                fprintf(codegen->out, ".L%ld:\n", end_label);
+
+                break;
+            }
             default: {
                 // FIXME: improve error: replace the node->kind to a string representation
                 fprintf(stderr, "node kind %d not supported\n", node->kind);

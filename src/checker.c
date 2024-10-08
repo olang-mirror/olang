@@ -109,6 +109,13 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
             return;
         }
 
+        case AST_NODE_WHILE_STMT: {
+            populate_scope(checker, scope, ast->as_while_stmt.cond);
+            populate_scope(checker, scope, ast->as_while_stmt.then);
+
+            return;
+        }
+
         case AST_NODE_BINARY_OP: {
             ast_binary_op_t bin_op = ast->as_bin_op;
 

@@ -47,6 +47,9 @@ static ast_node_t *
 parser_parse_if_stmt(parser_t *parser);
 
 static ast_node_t *
+parser_parse_while_stmt(parser_t *parser);
+
+static ast_node_t *
 parser_parse_var_def(parser_t *parser);
 
 static ast_node_t *
@@ -471,6 +474,10 @@ StartLoop:
             node = parser_parse_if_stmt(parser);
             break;
         }
+        case TOKEN_WHILE: {
+            node = parser_parse_while_stmt(parser);
+            break;
+        }
         case TOKEN_VAR: {
             node = parser_parse_var_def(parser);
             break;
@@ -578,6 +585,38 @@ parser_parse_if_stmt(parser_t *parser)
     assert(node_if_stmt);
 
     return node_if_stmt;
+}
+
+static ast_node_t *
+parser_parse_while_stmt(parser_t *parser)
+{
+    token_t token_while;
+    if (!expected_next_token(parser, &token_while, TOKEN_WHILE)) {
+        return NULL;
+    }
+
+    ast_node_t *cond = parser_parse_expr(parser);
+
+    if (cond == NULL) {
+        return NULL;
+    }
+
+    skip_line_feeds(parser->lexer);
+
+    ast_node_t *then = parser_parse_block(parser);
+
+    if (then == NULL) {
+        return NULL;
+    }
+
+    token_t next_token;
+    peek_next_non_lf_token(parser->lexer, &next_token);
+
+    ast_node_t *node_while_stmt = ast_new_node_while_stmt(parser->arena, token_while.loc, cond, then);
+
+    assert(node_while_stmt);
+
+    return node_while_stmt;
 }
 
 static ast_node_t *

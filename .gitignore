@@ -2,5 +2,6 @@
 build
 *.o
 *.info
+*.orig
 docs/site.tar.gz
 tests/*/*_test

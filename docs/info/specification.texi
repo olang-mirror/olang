@@ -41,8 +41,9 @@ language.
 <block>               ::= '{' <ows> <statement> <ows> (<end-of-statement> <ows> <statement> <ows>)* <end-of-statement>? <ows> '}'
 <function-args>       ::= <expression> (<ows> ',' <function-args>)*
 <function-call>       ::= <function-name> <ows> '(' ( <ows> | <ows> <function-args> <ows> ) ')'
-<statement>           ::= <common-statement> | <if-statement> | <return-statement> | <function-call>
+<statement>           ::= <common-statement> | <if-statement> | <while-statement> | <return-statement> | <function-call>
 <if-statement>        ::= 'if' <ws> <expression> <ows> <block>
+<while-statement>     ::= 'while' <ws> <expression> <ows> <block>
 <return-statement>    ::= 'return' <ws> <expression>
 
 (* Statements *)

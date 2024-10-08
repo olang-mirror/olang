@@ -51,6 +51,7 @@ typedef enum token_kind
     TOKEN_RETURN,
     TOKEN_IF,
     TOKEN_ELSE,
+    TOKEN_WHILE,
     TOKEN_VAR,
 
     // Equality operators

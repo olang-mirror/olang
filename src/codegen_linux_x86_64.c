@@ -24,7 +24,7 @@
 #include "scope.h"
 
 #define SYS_exit (60)
-#define PTR_HEX_CSTR_SIZE (18 + 1)
+#define PTR_HEX_CSTR_SIZE (16 + 1)
 
 // The call instruction pushes EIP into stack so the first 8 bytes from stack
 // must be preserved else the ret instruction will jump to nowere.
@@ -65,6 +65,12 @@ codegen_linux_x86_64_emit_start_entrypoint(codegen_x86_64_t *codegen);
 
 static void
 codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_t *fn);
+
+static void
+codegen_linux_x86_64_put_stack_offset(codegen_x86_64_t *codegen, symbol_t *symbol, size_t offset);
+
+static size_t
+codegen_linux_x86_64_get_stack_offset(codegen_x86_64_t *codegen, symbol_t *symbol);
 
 static size_t
 type_to_bytes(type_t *type);
@@ -154,15 +160,11 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
             symbol_t *symbol = scope_lookup(ref.scope, ref.id);
             assert(symbol);
 
-            char symbol_ptr[PTR_HEX_CSTR_SIZE];
-            sprintf(symbol_ptr, "%p", (void *)symbol);
-
-            size_t *offset = (size_t *)map_get(codegen->symbols_stack_offset, symbol_ptr);
-            assert(offset);
+            size_t offset = codegen_linux_x86_64_get_stack_offset(codegen, symbol);
 
             size_t bytes = type_to_bytes(&symbol->type);
 
-            fprintf(codegen->out, "    mov -%ld(%%rbp), %s\n", *offset, get_reg_for(REG_ACCUMULATOR, bytes));
+            fprintf(codegen->out, "    mov -%ld(%%rbp), %s\n", offset, get_reg_for(REG_ACCUMULATOR, bytes));
             return bytes;
         }
         case AST_NODE_FN_CALL: {
@@ -559,17 +561,11 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                 symbol_t *symbol = scope_lookup(scope, var_def.id);
                 assert(symbol);
 
-                char symbol_ptr[PTR_HEX_CSTR_SIZE];
-                sprintf(symbol_ptr, "%p", (void *)symbol);
+                codegen_linux_x86_64_put_stack_offset(codegen, symbol, codegen->base_offset);
 
                 if (var_def.value) {
                     codegen_linux_x86_64_emit_expression(codegen, var_def.value);
                 }
-
-                size_t *offset = arena_alloc(codegen->arena, sizeof(size_t));
-                *offset = codegen->base_offset;
-
-                map_put(codegen->symbols_stack_offset, symbol_ptr, offset);
 
                 size_t type_size = type_to_bytes(&symbol->type);
 
@@ -578,6 +574,24 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                         get_reg_for(REG_ACCUMULATOR, type_size),
                         codegen->base_offset);
                 codegen->base_offset += type_size;
+
+                break;
+            }
+
+            case AST_NODE_VAR_ASSIGN_STMT: {
+                ast_var_assign_stmt_t var_assign = node->as_var_assign_stmt;
+                ast_ref_t ref = var_assign.ref->as_ref;
+                scope_t *scope = ref.scope;
+
+                symbol_t *symbol = scope_lookup(scope, ref.id);
+                assert(symbol);
+
+                size_t offset = codegen_linux_x86_64_get_stack_offset(codegen, symbol);
+
+                codegen_linux_x86_64_emit_expression(codegen, var_assign.expr);
+
+                size_t type_size = type_to_bytes(&symbol->type);
+                fprintf(codegen->out, "    mov %s, -%ld(%%rbp)\n", get_reg_for(REG_ACCUMULATOR, type_size), offset);
 
                 break;
             }
@@ -689,21 +703,17 @@ codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_
 
         ast_fn_param_t *param = item->value;
 
-        size_t *offset = arena_alloc(codegen->arena, sizeof(size_t));
-        *offset = codegen->base_offset;
-
         symbol_t *symbol = scope_lookup(fn_def->scope, param->id);
         assert(symbol);
 
-        char symbol_ptr[PTR_HEX_CSTR_SIZE];
-        sprintf(symbol_ptr, "%p", (void *)symbol);
+        size_t offset = codegen->base_offset;
 
-        map_put(codegen->symbols_stack_offset, symbol_ptr, offset);
+        codegen_linux_x86_64_put_stack_offset(codegen, symbol, codegen->base_offset);
 
         fprintf(codegen->out,
                 "    mov %s, -%ld(%%rbp)\n",
                 get_reg_for(x86_call_args[i], symbol->type.as_primitive.size),
-                *offset);
+                offset);
 
         // FIXME: add offset according to the param size
         codegen->base_offset += 8;
@@ -720,6 +730,28 @@ codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_
     ast_block_t block = block_node->as_block;
 
     codegen_linux_x86_64_emit_block(codegen, &block);
+}
+
+static void
+codegen_linux_x86_64_put_stack_offset(codegen_x86_64_t *codegen, symbol_t *symbol, size_t offset)
+{
+
+    size_t *stack_offset = arena_alloc(codegen->arena, sizeof(size_t));
+    *stack_offset = offset;
+
+    char symbol_ptr[PTR_HEX_CSTR_SIZE];
+    sprintf(symbol_ptr, "%lx", (uintptr_t)symbol);
+
+    map_put(codegen->symbols_stack_offset, symbol_ptr, stack_offset);
+}
+
+static size_t
+codegen_linux_x86_64_get_stack_offset(codegen_x86_64_t *codegen, symbol_t *symbol)
+{
+    char symbol_ptr[PTR_HEX_CSTR_SIZE];
+    sprintf(symbol_ptr, "%lx", (uintptr_t)symbol);
+
+    return *(size_t *)map_get(codegen->symbols_stack_offset, symbol_ptr);
 }
 
 static char *

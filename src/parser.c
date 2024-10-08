@@ -70,6 +70,9 @@ parser_parse_factor(parser_t *parser);
 static void
 skip_line_feeds(lexer_t *lexer);
 
+static void
+peek_next_non_lf_token(lexer_t *lexer, token_t *token);
+
 void
 parser_init(parser_t *parser, lexer_t *lexer, arena_t *arena)
 {
@@ -493,6 +496,12 @@ StartLoop:
         return NULL;
     }
 
+    if (!skip_expected_token(parser, TOKEN_LF)) {
+        return NULL;
+    }
+
+    skip_line_feeds(parser->lexer);
+
     list_append(node_block->as_block.nodes, node);
 
     goto StartLoop;
@@ -522,11 +531,6 @@ parser_parse_return_stmt(parser_t *parser)
     ast_node_t *node_return_stmt = ast_new_node_return_stmt(parser->arena, token_ret.loc, expr);
     assert(node_return_stmt);
 
-    if (!skip_expected_token(parser, TOKEN_LF)) {
-        return NULL;
-    }
-    skip_line_feeds(parser->lexer);
-
     return node_return_stmt;
 }
 
@@ -544,6 +548,8 @@ parser_parse_if_stmt(parser_t *parser)
         return NULL;
     }
 
+    skip_line_feeds(parser->lexer);
+
     ast_node_t *then = parser_parse_block(parser);
 
     if (then == NULL) {
@@ -553,28 +559,23 @@ parser_parse_if_stmt(parser_t *parser)
     ast_node_t *_else = NULL;
 
     token_t next_token;
-    lexer_next_token(parser->lexer, &next_token);
-
-    // FIXME: We are not allowing line feed right after if block statement when
-    //        the else branch is present.  We also noticed that if has the same
-    //        problem which will be addressed later.
+    peek_next_non_lf_token(parser->lexer, &next_token);
 
     if (next_token.kind == TOKEN_ELSE) {
+        skip_line_feeds(parser->lexer);
+        lexer_next_token(parser->lexer, &next_token);
+        skip_line_feeds(parser->lexer);
+
         _else = parser_parse_block(parser);
 
         if (_else == NULL) {
             return NULL;
         }
-
-    } else if (!expected_token(&next_token, TOKEN_LF)) {
-        return NULL;
     }
 
     ast_node_t *node_if_stmt = ast_new_node_if_stmt(parser->arena, token_if.loc, cond, then, _else);
 
     assert(node_if_stmt);
-
-    skip_line_feeds(parser->lexer);
 
     return node_if_stmt;
 }
@@ -608,8 +609,6 @@ parser_parse_var_def(parser_t *parser)
 
     ast_node_t *var_node = ast_new_node_var_def(parser->arena, token_id.loc, token_id.value, var_type, expr);
 
-    skip_line_feeds(parser->lexer);
-
     return var_node;
 }
 
@@ -630,10 +629,6 @@ parser_parse_var_assign_stmt(parser_t *parser)
 
     ast_node_t *ref = ast_new_node_ref(parser->arena, token_id.loc, token_id.value);
     ast_node_t *expr = parser_parse_expr(parser);
-
-    // FIXME: The expected line feed should be parsed from parent call
-    //        according to the grammar rules
-    skip_line_feeds(parser->lexer);
 
     return ast_new_node_var_assign_stmt(parser->arena, token_eq.loc, ref, expr);
 }
@@ -682,4 +677,15 @@ skip_line_feeds(lexer_t *lexer)
         lexer_next_token(lexer, &token);
         lexer_peek_next(lexer, &token);
     }
+}
+
+static void
+peek_next_non_lf_token(lexer_t *lexer, token_t *token)
+{
+    lexer_cursor_t cur = lexer->cur;
+
+    skip_line_feeds(lexer);
+    lexer_peek_next(lexer, token);
+
+    lexer->cur = cur;
 }

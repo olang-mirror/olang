@@ -15,7 +15,7 @@ function must return the program exit code.
 
 @verbatim
 fn main(): u8 {
-  return 0;
+  return 0
 }
 @end verbatim
 

@@ -78,7 +78,16 @@ language.
 <primary-expression> ::= <integer-literal>
                        | <variable-name>
                        | <function-call>
+                       | <unary-expression>
                        | '(' <ows>  <expression> <ows> ')'
+
+<unary-expression> ::= <unary-operator> <ows> <primary-expression>
+<unary-operator> ::= &
+                   | *
+                   | +
+                   | -
+                   | ~
+                   | !
 
 (* Identifiers *)
 <type>                ::= 'u32'

@@ -258,7 +258,7 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             char name[256];
             switch (literal.kind) {
                 case AST_LITERAL_U32: {
-                    sprintf(name, "Literal <kind:u32> <value:%d>", literal.as_u32);
+                    sprintf(name, "Literal <kind:u32> <value:%u>", literal.as_u32);
                     node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
                     strcpy(node->name, name);
                     break;
@@ -383,6 +383,26 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 
             return node;
         }
+
+        case AST_NODE_UNARY_OP: {
+            pretty_print_node_t *node = pretty_print_node_new(arena);
+            ast_unary_op_t unary_op = ast->as_unary_op;
+
+            switch (unary_op.kind) {
+                case AST_UNARY_BITWISE_NOT: {
+                    node->name = "Unary_Operation (~)";
+                    break;
+                }
+                default:
+                    assert(false && "unary operation kind not implemented");
+            }
+
+            pretty_print_node_t *expr = ast_node_to_pretty_print_node(unary_op.expr, arena);
+            list_append(node->children, expr);
+
+            return node;
+        }
+
         default: {
             printf("node kind = '%d' not implmented\n", ast->kind);
             assert(false);

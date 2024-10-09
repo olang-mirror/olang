@@ -36,6 +36,7 @@ typedef enum
     AST_NODE_FN_CALL,
     AST_NODE_VAR_DEF,
     AST_NODE_BINARY_OP,
+    AST_NODE_UNARY_OP,
     AST_NODE_VAR_ASSIGN_STMT,
     AST_NODE_RETURN_STMT,
     AST_NODE_IF_STMT,
@@ -148,6 +149,23 @@ typedef struct ast_binary_op
     ast_node_t *rhs;
 } ast_binary_op_t;
 
+typedef enum ast_unary_op_kind
+{
+    AST_UNARY_BITWISE_NOT,
+    AST_UNARY_LOGICAL_NOT,
+    AST_UNARY_NEGATIVE,
+    AST_UNARY_POSITIVE,
+    AST_UNARY_DEREFERENCE,
+    AST_UNARY_ADDRESSOF,
+} ast_unary_op_kind_t;
+
+typedef struct ast_unary_op
+{
+    ast_node_meta_t meta;
+    ast_unary_op_kind_t kind;
+    ast_node_t *expr;
+} ast_unary_op_t;
+
 typedef struct ast_var_assign_stmt
 {
     ast_node_meta_t meta;
@@ -189,6 +207,7 @@ typedef union ast_node
     ast_fn_call_t as_fn_call;
     ast_var_definition_t as_var_def;
     ast_binary_op_t as_bin_op;
+    ast_unary_op_t as_unary_op;
     ast_literal_t as_literal;
     ast_ref_t as_ref;
     ast_block_t as_block;
@@ -217,6 +236,9 @@ ast_new_node_var_def(arena_t *arena, token_loc_t loc, string_view_t id, type_t *
 
 ast_node_t *
 ast_new_node_bin_op(arena_t *arena, token_loc_t loc, ast_binary_op_kind_t kind, ast_node_t *lhs, ast_node_t *rhs);
+
+ast_node_t *
+ast_new_node_unary_op(arena_t *arena, token_loc_t loc, ast_unary_op_kind_t kind, ast_node_t *expr);
 
 ast_node_t *
 ast_new_node_literal_u32(arena_t *arena, token_loc_t loc, uint32_t value);

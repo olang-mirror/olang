@@ -118,6 +118,20 @@ ast_new_node_bin_op(arena_t *arena, token_loc_t loc, ast_binary_op_kind_t kind, 
 }
 
 ast_node_t *
+ast_new_node_unary_op(arena_t *arena, token_loc_t loc, ast_unary_op_kind_t kind, ast_node_t *expr)
+{
+    ast_node_t *node_unary_op = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
+    assert(node_unary_op);
+
+    node_unary_op->kind = AST_NODE_UNARY_OP;
+    node_unary_op->loc = loc;
+    node_unary_op->as_unary_op.kind = kind;
+    node_unary_op->as_unary_op.expr = expr;
+
+    return node_unary_op;
+}
+
+ast_node_t *
 ast_new_node_literal_u32(arena_t *arena, token_loc_t loc, uint32_t value)
 {
     ast_node_t *node_literal = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));

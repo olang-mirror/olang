@@ -209,6 +209,27 @@ get_binary_op_precedence(token_kind_t kind)
     }
 }
 
+static ast_unary_op_kind_t
+token_kind_to_unary_op_kind(token_kind_t token_kind)
+{
+    switch (token_kind) {
+        case TOKEN_AND:
+            return AST_UNARY_ADDRESSOF;
+        case TOKEN_STAR:
+            return AST_UNARY_DEREFERENCE;
+        case TOKEN_PLUS:
+            return AST_UNARY_POSITIVE;
+        case TOKEN_DASH:
+            return AST_UNARY_NEGATIVE;
+        case TOKEN_TILDE:
+            return AST_UNARY_BITWISE_NOT;
+        case TOKEN_BANG:
+            return AST_UNARY_LOGICAL_NOT;
+        default:
+            assert(false && "unable to covert the token_kind_t to unary_op_kind_t");
+    }
+}
+
 static ast_node_t *
 parser_parse_expr_1(parser_t *parser, ast_node_t *lhs, size_t prev_precedence)
 {
@@ -274,6 +295,20 @@ parser_parse_factor(parser_t *parser)
             }
 
             return ast_new_node_ref(parser->arena, token_id.loc, token_id.value);
+        }
+        case TOKEN_AND:
+        case TOKEN_STAR:
+        case TOKEN_PLUS:
+        case TOKEN_DASH:
+        case TOKEN_TILDE:
+        case TOKEN_BANG: {
+            ast_node_t *expr = parser_parse_expr(parser);
+            if (expr == NULL) {
+                return NULL;
+            }
+
+            ast_unary_op_kind_t kind = token_kind_to_unary_op_kind(token.kind);
+            return ast_new_node_unary_op(parser->arena, token.loc, kind, expr);
         }
 
         case TOKEN_OPAREN: {

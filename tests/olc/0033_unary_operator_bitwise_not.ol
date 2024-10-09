@@ -18,10 +18,21 @@ fn main(): u32 {
   return ~e
 }
 
-# XTEST test_compile(exit_code=0)
+# TEST test_compile(exit_code=0)
 #
-# XTEST test_run_binary(exit_code=0)
+# TEST test_run_binary(exit_code=0)
 #
 # TEST test_contains_tokens WITH
 # ./0033_unary_operator_bitwise_not.ol:18:10: <~>
+# END
+#
+# TEST test_ast WITH
+# Translation_Unit
+# `-Function_Definition <name:main> <return:u32>
+#   `-Block
+#     |-Var_Definition <name:e> <kind:u32>
+#     | `-Literal <kind:u32> <value:4294967295>
+#     `-Return_Statement
+#       `-Unary_Operation (~)
+#         `-Reference <name:e>
 # END

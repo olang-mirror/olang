@@ -530,6 +530,24 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                 }
             }
         }
+
+        case AST_NODE_UNARY_OP: {
+            ast_unary_op_t unary_op = expr_node->as_unary_op;
+            switch (unary_op.kind) {
+                case AST_UNARY_BITWISE_NOT: {
+                    size_in_bytes_t expr_bytes = codegen_linux_x86_64_emit_expression(codegen, unary_op.expr);
+
+                    fprintf(codegen->out, "    not %s\n", get_reg_for(REG_ACCUMULATOR, expr_bytes));
+
+                    return expr_bytes;
+                }
+                default: {
+                    assert(0 && "unsupported unary operation");
+                    return 0;
+                }
+            }
+        }
+
         default:
             assert(0 && "unsupported expression");
     }

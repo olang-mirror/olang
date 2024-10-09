@@ -81,6 +81,7 @@ typedef enum token_kind
     TOKEN_DASH,
     TOKEN_SLASH,
     TOKEN_STAR,
+    TOKEN_TILDE,
     TOKEN_LF,
     TOKEN_OPAREN,
     TOKEN_CPAREN,

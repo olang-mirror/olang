@@ -258,6 +258,11 @@ lexer_next_token(lexer_t *lexer, token_t *token)
                 lexer_skip_char(lexer);
                 return;
             }
+            case '~': {
+                lexer_init_char_value_token(lexer, token, TOKEN_TILDE);
+                lexer_skip_char(lexer);
+                return;
+            }
             case '/': {
                 lexer_init_char_value_token(lexer, token, TOKEN_SLASH);
                 lexer_skip_char(lexer);
@@ -303,6 +308,7 @@ static char *token_kind_str_table[] = {
     [TOKEN_DASH] = "-",
     [TOKEN_STAR] = "*",
     [TOKEN_SLASH] = "/",
+    [TOKEN_TILDE] = "~",
     [TOKEN_EQ] = "=",
     [TOKEN_CMP_EQ] = "==",
     [TOKEN_BANG] = "!",

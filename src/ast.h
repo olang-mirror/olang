@@ -66,7 +66,7 @@ typedef struct ast_translation_unit
 typedef struct ast_fn_param
 {
     string_view_t id;
-    string_view_t type_id;
+    type_t *type;
 } ast_fn_param_t;
 
 typedef struct ast_fn_definition
@@ -74,7 +74,7 @@ typedef struct ast_fn_definition
     ast_node_meta_t meta;
     string_view_t id;
     list_t *params;
-    string_view_t return_type;
+    type_t *return_type;
     ast_node_t *block;
     scope_t *scope;
 } ast_fn_definition_t;
@@ -91,7 +91,7 @@ typedef struct ast_var_definition
 {
     ast_node_meta_t meta;
     string_view_t id;
-    string_view_t type;
+    type_t *type;
     ast_node_t *value;
     scope_t *scope;
 } ast_var_definition_t;
@@ -206,14 +206,14 @@ ast_new_node_fn_def(arena_t *arena,
                     token_loc_t loc,
                     string_view_t id,
                     list_t *params,
-                    string_view_t return_type,
+                    type_t *return_type,
                     ast_node_t *block);
 
 ast_node_t *
 ast_new_node_fn_call(arena_t *arena, token_loc_t loc, string_view_t id, list_t *args);
 
 ast_node_t *
-ast_new_node_var_def(arena_t *arena, token_loc_t loc, string_view_t id, string_view_t type, ast_node_t *value);
+ast_new_node_var_def(arena_t *arena, token_loc_t loc, string_view_t id, type_t *type, ast_node_t *value);
 
 ast_node_t *
 ast_new_node_bin_op(arena_t *arena, token_loc_t loc, ast_binary_op_kind_t kind, ast_node_t *lhs, ast_node_t *rhs);
@@ -240,6 +240,6 @@ ast_node_t *
 ast_new_node_block(arena_t *arena);
 
 ast_fn_param_t *
-ast_new_fn_param(arena_t *arena, string_view_t id, string_view_t type_id);
+ast_new_fn_param(arena_t *arena, string_view_t id, type_t *type);
 
 #endif /* AST_H */

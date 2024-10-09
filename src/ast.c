@@ -44,7 +44,7 @@ ast_new_node_fn_def(arena_t *arena,
                     token_loc_t loc,
                     string_view_t id,
                     list_t *params,
-                    string_view_t return_type,
+                    type_t *return_type,
                     ast_node_t *block)
 {
     assert(arena);
@@ -86,7 +86,7 @@ ast_new_node_fn_call(arena_t *arena, token_loc_t loc, string_view_t id, list_t *
 }
 
 ast_node_t *
-ast_new_node_var_def(arena_t *arena, token_loc_t loc, string_view_t id, string_view_t type, ast_node_t *value)
+ast_new_node_var_def(arena_t *arena, token_loc_t loc, string_view_t id, type_t *type, ast_node_t *value)
 {
     ast_node_t *node_var_def = (ast_node_t *)arena_alloc(arena, sizeof(ast_node_t));
     assert(node_var_def);
@@ -217,13 +217,13 @@ ast_new_node_block(arena_t *arena)
 }
 
 ast_fn_param_t *
-ast_new_fn_param(arena_t *arena, string_view_t id, string_view_t type_id)
+ast_new_fn_param(arena_t *arena, string_view_t id, type_t *type)
 {
     ast_fn_param_t *fn_param = (ast_fn_param_t *)arena_alloc(arena, sizeof(ast_fn_param_t));
     assert(fn_param);
 
     fn_param->id = id;
-    fn_param->type_id = type_id;
+    fn_param->type = type;
 
     return fn_param;
 }

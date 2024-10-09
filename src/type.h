@@ -16,9 +16,11 @@
  */
 #ifndef TYPE_H
 #define TYPE_H
+#include "arena.h"
 #include "string_view.h"
 typedef enum
 {
+    TYPE_UNKNOWN,
     TYPE_PRIMITIVE
 } type_kind_t;
 
@@ -32,20 +34,29 @@ typedef enum
 
 typedef struct type_primitive
 {
-    short size;
+    type_kind_t _type_kind;
+    string_view_t id;
     type_primitive_kind_t kind;
+    short size;
 } type_primitive_t;
 
-typedef struct type
+typedef struct type_unknown
 {
+    type_kind_t _type_kind;
     string_view_t id;
-    type_kind_t kind;
-    union
+} type_unknown_t;
+
+typedef union
+{
+    struct
     {
-        type_primitive_t as_primitive;
+        type_kind_t kind;
+        string_view_t id;
     };
+    type_unknown_t as_unknown;
+    type_primitive_t as_primitive;
 } type_t;
 
-type_t
-type_from_id(string_view_t id);
+type_t *
+type_new_unknown(arena_t *arena, string_view_t id);
 #endif

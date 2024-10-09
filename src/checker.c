@@ -37,6 +37,55 @@ checker_new(arena_t *arena)
     return checker;
 }
 
+static type_t
+type_from_id(string_view_t id)
+{
+    type_t type = { 0 };
+    type.id = id;
+    if (string_view_eq_to_cstr(id, "u8")) {
+        type.kind = TYPE_PRIMITIVE;
+        type.as_primitive.size = 1;
+        type.as_primitive.kind = TYPE_U8;
+        return type;
+    }
+    if (string_view_eq_to_cstr(id, "u16")) {
+        type.kind = TYPE_PRIMITIVE;
+        type.as_primitive.size = 2;
+        type.as_primitive.kind = TYPE_U16;
+        return type;
+    }
+    if (string_view_eq_to_cstr(id, "u32")) {
+        type.kind = TYPE_PRIMITIVE;
+        type.as_primitive.size = 4;
+        type.as_primitive.kind = TYPE_U32;
+        return type;
+    }
+    if (string_view_eq_to_cstr(id, "u64")) {
+        type.kind = TYPE_PRIMITIVE;
+        type.as_primitive.size = 8;
+        type.as_primitive.kind = TYPE_U64;
+        return type;
+    }
+
+    // FIXME: handle user defined types
+    assert(0 && "unknown type");
+}
+
+/**
+ * transform unknown types into actual types
+ */
+static void
+type_resolve(type_t *type)
+{
+    switch (type->kind) {
+        case TYPE_UNKNOWN:
+            *type = type_from_id(type->as_unknown.id);
+            break;
+        case TYPE_PRIMITIVE:
+            break;
+    }
+}
+
 void
 checker_check(checker_t *checker, ast_node_t *ast)
 {
@@ -67,7 +116,8 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
             ast_fn_definition_t *fn_def = &ast->as_fn_def;
             fn_def->scope = scope_push(scope);
 
-            symbol_t *symbol = symbol_new(checker->arena, fn_def->id, type_from_id(fn_def->return_type));
+            type_resolve(fn_def->return_type);
+            symbol_t *symbol = symbol_new(checker->arena, fn_def->id, fn_def->return_type);
             scope_insert(scope, symbol);
 
             list_item_t *item = list_head(fn_def->params);
@@ -75,7 +125,8 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
             while (item != NULL) {
                 ast_fn_param_t *param = (ast_fn_param_t *)item->value;
 
-                symbol_t *symbol = symbol_new(checker->arena, param->id, type_from_id(param->type_id));
+                type_resolve(param->type);
+                symbol_t *symbol = symbol_new(checker->arena, param->id, param->type);
                 scope_insert(fn_def->scope, symbol);
 
                 item = list_next(item);
@@ -156,7 +207,9 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
         case AST_NODE_VAR_DEF: {
             string_view_t id = ast->as_var_def.id;
 
-            symbol_t *symbol = symbol_new(checker->arena, id, type_from_id(ast->as_var_def.type));
+            type_resolve(ast->as_var_def.type);
+
+            symbol_t *symbol = symbol_new(checker->arena, id, ast->as_var_def.type);
 
             scope_insert(scope, symbol);
             ast->as_var_def.scope = scope;

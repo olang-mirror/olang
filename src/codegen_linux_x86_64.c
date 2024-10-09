@@ -165,7 +165,7 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
 
             size_t offset = codegen_linux_x86_64_get_stack_offset(codegen, symbol);
 
-            size_t bytes = type_to_bytes(&symbol->type);
+            size_t bytes = type_to_bytes(symbol->type);
 
             fprintf(codegen->out, "    mov -%ld(%%rbp), %s\n", offset, get_reg_for(REG_ACCUMULATOR, bytes));
             return bytes;
@@ -195,7 +195,7 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
 
             fprintf(codegen->out, "    call " SV_FMT "\n", SV_ARG(fn_call.id));
 
-            return type_to_bytes(&symbol->type);
+            return type_to_bytes(symbol->type);
         }
         case AST_NODE_BINARY_OP: {
             ast_binary_op_t bin_op = expr_node->as_bin_op;
@@ -570,7 +570,7 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                     codegen_linux_x86_64_emit_expression(codegen, var_def.value);
                 }
 
-                size_t type_size = type_to_bytes(&symbol->type);
+                size_t type_size = type_to_bytes(symbol->type);
 
                 fprintf(codegen->out,
                         "    mov %s, -%ld(%%rbp)\n",
@@ -593,7 +593,7 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
 
                 codegen_linux_x86_64_emit_expression(codegen, var_assign.expr);
 
-                size_t type_size = type_to_bytes(&symbol->type);
+                size_t type_size = type_to_bytes(symbol->type);
                 fprintf(codegen->out, "    mov %s, -%ld(%%rbp)\n", get_reg_for(REG_ACCUMULATOR, type_size), offset);
 
                 break;
@@ -682,6 +682,9 @@ type_to_bytes(type_t *type)
         case TYPE_PRIMITIVE: {
             return type->as_primitive.size;
         }
+        case TYPE_UNKNOWN: {
+            assert(0 && "cannot calculate size of an unknown type: probably a parser issue.");
+        }
     }
 
     assert(0 && "unreachable");
@@ -702,7 +705,7 @@ calculate_fn_local_size(scope_t *scope)
 
     for (size_t i = 0; i < scope->symbols->size; ++i) {
         symbol_t *symbol = (symbol_t *)kvs[i]->value;
-        local_size += type_to_bytes(&symbol->type);
+        local_size += type_to_bytes(symbol->type);
     }
 
     size_t max_child_local_size = 0;
@@ -748,7 +751,8 @@ codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_
 
         fprintf(codegen->out,
                 "    mov %s, -%ld(%%rbp)\n",
-                get_reg_for(x86_call_args[i], symbol->type.as_primitive.size),
+                // FIXME: Type may not be an as_primitive
+                get_reg_for(x86_call_args[i], symbol->type->as_primitive.size),
                 offset);
 
         // FIXME: add offset according to the param size

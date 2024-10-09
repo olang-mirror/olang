@@ -113,7 +113,7 @@ pretty_print_new_fn_param(ast_fn_param_t *param, arena_t *arena)
 {
     pretty_print_node_t *node = pretty_print_node_new(arena);
     char name[256];
-    sprintf(name, "Param_Definition <name:" SV_FMT "> <type:" SV_FMT ">", SV_ARG(param->id), SV_ARG(param->type_id));
+    sprintf(name, "Param_Definition <name:" SV_FMT "> <type:" SV_FMT ">", SV_ARG(param->id), SV_ARG(param->type->id));
     node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
     strcpy(node->name, name);
     return node;
@@ -148,7 +148,7 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             sprintf(name,
                     "Function_Definition <name:" SV_FMT "> <return:" SV_FMT ">",
                     SV_ARG(fn_def.id),
-                    SV_ARG(fn_def.return_type));
+                    SV_ARG(fn_def.return_type->id));
             node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
             strcpy(node->name, name);
 

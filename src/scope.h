@@ -26,7 +26,7 @@
 typedef struct symbol
 {
     string_view_t id;
-    type_t type;
+    type_t *type;
 } symbol_t;
 
 typedef struct scope
@@ -41,7 +41,7 @@ scope_t *
 scope_new(arena_t *arena);
 
 symbol_t *
-symbol_new(arena_t *arena, string_view_t id, type_t type);
+symbol_new(arena_t *arena, string_view_t id, type_t *type);
 
 symbol_t *
 scope_lookup(scope_t *scope, string_view_t id);

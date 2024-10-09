@@ -371,7 +371,7 @@ parser_parse_fn_params(parser_t *parser)
         string_view_t type_id;
         parser_parse_type(parser, &type_id);
 
-        ast_fn_param_t *param = ast_new_fn_param(parser->arena, token.value, type_id);
+        ast_fn_param_t *param = ast_new_fn_param(parser->arena, token.value, type_new_unknown(parser->arena, type_id));
         list_append(params, param);
 
         skip_line_feeds(parser->lexer);
@@ -420,7 +420,12 @@ parser_parse_fn_definition(parser_t *parser)
         return NULL;
     }
 
-    return ast_new_node_fn_def(parser->arena, fn_name_token.loc, fn_name_token.value, params, fn_return_type, block);
+    return ast_new_node_fn_def(parser->arena,
+                               fn_name_token.loc,
+                               fn_name_token.value,
+                               params,
+                               type_new_unknown(parser->arena, fn_return_type),
+                               block);
 }
 
 static bool
@@ -652,7 +657,8 @@ parser_parse_var_def(parser_t *parser)
         return NULL;
     }
 
-    ast_node_t *var_node = ast_new_node_var_def(parser->arena, token_id.loc, token_id.value, var_type, expr);
+    ast_node_t *var_node = ast_new_node_var_def(
+        parser->arena, token_id.loc, token_id.value, type_new_unknown(parser->arena, var_type), expr);
 
     return var_node;
 }

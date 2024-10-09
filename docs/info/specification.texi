@@ -42,7 +42,7 @@ language.
 <function-args>       ::= <expression> (<ows> ',' <function-args>)*
 <function-call>       ::= <function-name> <ows> '(' ( <ows> | <ows> <function-args> <ows> ) ')'
 <statement>           ::= <common-statement> | <if-statement> | <while-statement> | <return-statement> | <function-call>
-<if-statement>        ::= 'if' <ws> <expression> <ows> <block>
+<if-statement>        ::= 'if' <ws> <expression> <ows> <block> ( <ows> 'else' ( <ows> <block> | <ows> <if-statement> ) )?
 <while-statement>     ::= 'while' <ws> <expression> <ows> <block>
 <return-statement>    ::= 'return' <ws> <expression>
 

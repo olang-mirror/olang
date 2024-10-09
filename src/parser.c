@@ -573,7 +573,13 @@ parser_parse_if_stmt(parser_t *parser)
         lexer_next_token(parser->lexer, &next_token);
         skip_line_feeds(parser->lexer);
 
-        _else = parser_parse_block(parser);
+        lexer_peek_next(parser->lexer, &next_token);
+
+        if (next_token.kind == TOKEN_IF) {
+            _else = parser_parse_if_stmt(parser);
+        } else {
+            _else = parser_parse_block(parser);
+        }
 
         if (_else == NULL) {
             return NULL;

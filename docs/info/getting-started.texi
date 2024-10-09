@@ -71,6 +71,8 @@ Any non zero expr is true.
 @verbatim
 if expr {
   # statement
+} else if expr {
+  # statement
 } else {
   # statement
 }

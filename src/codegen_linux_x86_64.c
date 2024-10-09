@@ -67,6 +67,9 @@ static void
 codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_t *fn);
 
 static void
+codegen_linux_x86_64_emit_if(codegen_x86_64_t *codegen, ast_if_stmt_t is_stmt);
+
+static void
 codegen_linux_x86_64_put_stack_offset(codegen_x86_64_t *codegen, symbol_t *symbol, size_t offset);
 
 static size_t
@@ -597,34 +600,7 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
             }
 
             case AST_NODE_IF_STMT: {
-                ast_if_stmt_t if_stmt = node->as_if_stmt;
-
-                ast_node_t *cond = if_stmt.cond;
-                ast_node_t *then = if_stmt.then;
-                ast_node_t *_else = if_stmt._else;
-
-                size_t end_if_label = codegen_linux_x86_64_get_next_label(codegen);
-                size_t end_else_label = codegen_linux_x86_64_get_next_label(codegen);
-
-                codegen_linux_x86_64_emit_expression(codegen, cond);
-                fprintf(codegen->out, "    cmp $1, %%rax\n");
-                fprintf(codegen->out, "    jnz .L%ld\n", end_if_label);
-
-                assert(then->kind == AST_NODE_BLOCK && "invalid if-then block");
-                ast_block_t then_block = then->as_block;
-
-                codegen_linux_x86_64_emit_block(codegen, &then_block);
-                fprintf(codegen->out, "    jmp .L%ld\n", end_else_label);
-
-                fprintf(codegen->out, ".L%ld:\n", end_if_label);
-
-                if (_else != NULL) {
-                    ast_block_t else_block = _else->as_block;
-                    codegen_linux_x86_64_emit_block(codegen, &else_block);
-                }
-
-                fprintf(codegen->out, ".L%ld:\n", end_else_label);
-
+                codegen_linux_x86_64_emit_if(codegen, node->as_if_stmt);
                 break;
             }
 
@@ -662,6 +638,41 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
     }
 
     codegen->base_offset = block_offset;
+}
+
+static void
+codegen_linux_x86_64_emit_if(codegen_x86_64_t *codegen, ast_if_stmt_t if_stmt)
+{
+    ast_node_t *cond = if_stmt.cond;
+    ast_node_t *then = if_stmt.then;
+    ast_node_t *_else = if_stmt._else;
+
+    size_t end_if_label = codegen_linux_x86_64_get_next_label(codegen);
+    size_t end_else_label = codegen_linux_x86_64_get_next_label(codegen);
+
+    codegen_linux_x86_64_emit_expression(codegen, cond);
+    fprintf(codegen->out, "    cmp $1, %%rax\n");
+    fprintf(codegen->out, "    jnz .L%ld\n", end_if_label);
+
+    assert(then->kind == AST_NODE_BLOCK && "invalid if-then block");
+    ast_block_t then_block = then->as_block;
+
+    codegen_linux_x86_64_emit_block(codegen, &then_block);
+    fprintf(codegen->out, "    jmp .L%ld\n", end_else_label);
+
+    fprintf(codegen->out, ".L%ld:\n", end_if_label);
+
+    if (_else != NULL) {
+        if (_else->kind == AST_NODE_IF_STMT) {
+            ast_if_stmt_t else_if = _else->as_if_stmt;
+            codegen_linux_x86_64_emit_if(codegen, else_if);
+        } else {
+            ast_block_t else_block = _else->as_block;
+            codegen_linux_x86_64_emit_block(codegen, &else_block);
+        }
+    }
+
+    fprintf(codegen->out, ".L%ld:\n", end_else_label);
 }
 
 static size_t

@@ -682,6 +682,9 @@ type_to_bytes(type_t *type)
         case TYPE_PRIMITIVE: {
             return type->as_primitive.size;
         }
+        case TYPE_PTR: {
+            return 8;
+        }
         case TYPE_UNKNOWN: {
             assert(0 && "cannot calculate size of an unknown type: probably a parser issue.");
         }

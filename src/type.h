@@ -18,10 +18,14 @@
 #define TYPE_H
 #include "arena.h"
 #include "string_view.h"
+
+typedef union type type_t;
+
 typedef enum
 {
     TYPE_UNKNOWN,
-    TYPE_PRIMITIVE
+    TYPE_PRIMITIVE,
+    TYPE_PTR
 } type_kind_t;
 
 typedef enum
@@ -46,7 +50,14 @@ typedef struct type_unknown
     string_view_t id;
 } type_unknown_t;
 
-typedef union
+typedef struct type_ptr
+{
+    type_kind_t _type_kind;
+    string_view_t id;
+    type_t *type;
+} type_ptr_t;
+
+typedef union type
 {
     struct
     {
@@ -55,8 +66,12 @@ typedef union
     };
     type_unknown_t as_unknown;
     type_primitive_t as_primitive;
+    type_ptr_t as_ptr;
 } type_t;
 
 type_t *
 type_new_unknown(arena_t *arena, string_view_t id);
+
+type_t *
+type_new_ptr(arena_t *arena, string_view_t id, type_t *type);
 #endif

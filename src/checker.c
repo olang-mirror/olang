@@ -81,6 +81,8 @@ type_resolve(type_t *type)
         case TYPE_UNKNOWN:
             *type = type_from_id(type->as_unknown.id);
             break;
+        case TYPE_PTR:
+            type_resolve(type->as_ptr.type);
         case TYPE_PRIMITIVE:
             break;
     }

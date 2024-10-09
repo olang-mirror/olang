@@ -24,6 +24,18 @@ type_new_unknown(arena_t *arena, string_view_t id)
     assert(type);
 
     type->kind = TYPE_UNKNOWN;
-    type->as_unknown.id = id;
+    type->id = id;
+    return type;
+}
+
+type_t *
+type_new_ptr(arena_t *arena, string_view_t id, type_t *ref_type)
+{
+    type_t *type = arena_alloc(arena, sizeof(type_t));
+    assert(type);
+
+    type->kind = TYPE_PTR;
+    type->id = id;
+    type->as_ptr.type = ref_type;
     return type;
 }

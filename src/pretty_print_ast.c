@@ -274,7 +274,7 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             ast_var_definition_t var = ast->as_var_def;
 
             char name[256];
-            sprintf(name, "Var_Definition <name:" SV_FMT "> <kind:u32>", SV_ARG(var.id));
+            sprintf(name, "Var_Definition <name:" SV_FMT "> <kind:" SV_FMT ">", SV_ARG(var.id), SV_ARG(var.type->id));
             node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
             strcpy(node->name, name);
 

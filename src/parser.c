@@ -34,8 +34,8 @@ expected_next_token(parser_t *parser, token_t *token, token_kind_t kind);
 static bool
 expected_token(token_t *token, token_kind_t kind);
 
-static bool
-parser_parse_type(parser_t *parser, string_view_t *type);
+static type_t *
+parser_parse_type(parser_t *parser);
 
 static ast_node_t *
 parser_parse_block(parser_t *parser);
@@ -368,10 +368,13 @@ parser_parse_fn_params(parser_t *parser)
             return NULL;
         }
 
-        string_view_t type_id;
-        parser_parse_type(parser, &type_id);
+        type_t *type = parser_parse_type(parser);
 
-        ast_fn_param_t *param = ast_new_fn_param(parser->arena, token.value, type_new_unknown(parser->arena, type_id));
+        if (type == NULL) {
+            return NULL;
+        }
+
+        ast_fn_param_t *param = ast_new_fn_param(parser->arena, token.value, type);
         list_append(params, param);
 
         skip_line_feeds(parser->lexer);
@@ -408,8 +411,9 @@ parser_parse_fn_definition(parser_t *parser)
         return NULL;
     }
 
-    string_view_t fn_return_type;
-    if (!parser_parse_type(parser, &fn_return_type)) {
+    type_t *ret_type = parser_parse_type(parser);
+
+    if (ret_type == NULL) {
         return NULL;
     }
 
@@ -420,21 +424,16 @@ parser_parse_fn_definition(parser_t *parser)
         return NULL;
     }
 
-    return ast_new_node_fn_def(parser->arena,
-                               fn_name_token.loc,
-                               fn_name_token.value,
-                               params,
-                               type_new_unknown(parser->arena, fn_return_type),
-                               block);
+    return ast_new_node_fn_def(parser->arena, fn_name_token.loc, fn_name_token.value, params, ret_type, block);
 }
 
-static bool
-parser_parse_type(parser_t *parser, string_view_t *type)
+static type_t *
+parser_parse_type(parser_t *parser)
 {
     skip_line_feeds(parser->lexer);
 
     if (!skip_expected_token(parser, TOKEN_COLON)) {
-        return false;
+        return NULL;
     }
 
     skip_line_feeds(parser->lexer);
@@ -442,12 +441,27 @@ parser_parse_type(parser_t *parser, string_view_t *type)
     token_t token;
 
     if (!expected_next_token(parser, &token, TOKEN_ID)) {
-        return false;
+        return NULL;
     }
 
-    *type = token.value;
+    token_t ptr_token;
 
-    return true;
+    lexer_peek_next(parser->lexer, &ptr_token);
+
+    type_t *type = type_new_unknown(parser->arena, token.value);
+
+    if (ptr_token.kind == TOKEN_STAR) {
+        if (!skip_expected_token(parser, TOKEN_STAR)) {
+            return NULL;
+        }
+        string_view_t ptr_id = token.value;
+
+        ptr_id.size = ptr_token.value.chars - token.value.chars + ptr_token.value.size;
+
+        return type_new_ptr(parser->arena, ptr_id, type);
+    }
+
+    return type;
 }
 
 static ast_node_t *
@@ -642,8 +656,8 @@ parser_parse_var_def(parser_t *parser)
         return NULL;
     }
 
-    string_view_t var_type;
-    if (!parser_parse_type(parser, &var_type)) {
+    type_t *type = parser_parse_type(parser);
+    if (type == NULL) {
         return NULL;
     }
 
@@ -657,8 +671,7 @@ parser_parse_var_def(parser_t *parser)
         return NULL;
     }
 
-    ast_node_t *var_node = ast_new_node_var_def(
-        parser->arena, token_id.loc, token_id.value, type_new_unknown(parser->arena, var_type), expr);
+    ast_node_t *var_node = ast_new_node_var_def(parser->arena, token_id.loc, token_id.value, type, expr);
 
     return var_node;
 }

@@ -78,6 +78,14 @@ if expr {
 }
 @end verbatim
 
+While loop
+
+@verbatim
+while expr {
+  # statement
+}
+@end verbatim
+
 @section Primitive data types
 
 @table @samp

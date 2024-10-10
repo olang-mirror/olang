@@ -29,7 +29,7 @@ fn main(): u32 {
 #   `-Block
 #     |-Var_Definition <name:code> <kind:u32>
 #     | `-Literal <kind:u32> <value:1>
-#     |-Var_Assigment
+#     |-Binary_Operation (=)
 #     | |-Reference <name:code>
 #     | `-Literal <kind:u32> <value:0>
 #     `-Return_Statement

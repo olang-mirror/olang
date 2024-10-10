@@ -38,7 +38,7 @@ fn main(): u32 {
 #     | | |-Reference <name:i>
 #     | | `-Literal <kind:u32> <value:10>
 #     | `-Block
-#     |   `-Var_Assigment
+#     |   `-Binary_Operation (=)
 #     |     |-Reference <name:i>
 #     |     `-Binary_Operation (+)
 #     |       |-Reference <name:i>

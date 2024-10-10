@@ -48,8 +48,7 @@ language.
 
 (* Statements *)
 <end-of-statement>    ::= ';' | <line-break>
-<common-statement>    ::= <variable-definition> | <constant-definition> | <assignment>
-<assignment>          ::= <variable-name> <ows> <assignment-operator> <ows> <expression>
+<common-statement>    ::= <variable-definition> | <constant-definition> | <expression>
 <assignment-operator> ::= '='
                         | '*='
                         | '/='
@@ -64,7 +63,8 @@ language.
 
 (* Expressions *)
 <expression> ::= <binary-expression>
-<binary-expression> ::= <logical-or-expression>
+<binary-expression> ::= <assignment-expression>
+<assignment-expression> ::= <logical-or-expression> (<ows> <assignment-operator> <ows> <logical-or-expression>)*
 <logical-or-expression> ::= <logical-and-expression> (<ows> '||' <ows> <logical-and-expression>)*
 <logical-and-expression> ::= <bitwise-or-expression> (<ows> '&&' <ows> <bitwise-or-expression>)*
 <bitwise-or-expression> ::= <bitwise-xor-expression> (<ows> '|' <ows> <bitwise-xor-expression>)*
@@ -82,12 +82,12 @@ language.
                        | '(' <ows>  <expression> <ows> ')'
 
 <unary-expression> ::= <unary-operator> <ows> <primary-expression>
-<unary-operator> ::= &
-                   | *
-                   | +
-                   | -
-                   | ~
-                   | !
+<unary-operator> ::= '&'
+                   | '*'
+                   | '+'
+                   | '-'
+                   | '~'
+                   | '!'
 
 (* Identifiers *)
 <type>                ::= 'u32'

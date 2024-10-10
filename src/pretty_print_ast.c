@@ -193,20 +193,6 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             }
             return node;
         }
-        case AST_NODE_VAR_ASSIGN_STMT: {
-            pretty_print_node_t *node = pretty_print_node_new(arena);
-            ast_var_assign_stmt_t var_assign_stmt = ast->as_var_assign_stmt;
-
-            node->name = "Var_Assigment";
-
-            pretty_print_node_t *ref = ast_node_to_pretty_print_node(var_assign_stmt.ref, arena);
-            pretty_print_node_t *expr = ast_node_to_pretty_print_node(var_assign_stmt.expr, arena);
-
-            list_append(node->children, ref);
-            list_append(node->children, expr);
-
-            return node;
-        }
         case AST_NODE_RETURN_STMT: {
             pretty_print_node_t *node = pretty_print_node_new(arena);
             ast_return_stmt_t return_stmt = ast->as_return_stmt;
@@ -371,6 +357,10 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
                     node->name = "Binary_Operation (|)";
                     break;
                 }
+                case AST_BINOP_ASSIGN: {
+                    node->name = "Binary_Operation (=)";
+                    break;
+                }
                 default:
                     assert(false && "binop not implemented");
             }
@@ -393,8 +383,26 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
                     node->name = "Unary_Operation (~)";
                     break;
                 }
-                default:
-                    assert(false && "unary operation kind not implemented");
+                case AST_UNARY_DEREFERENCE: {
+                    node->name = "Unary_Operation (*)";
+                    break;
+                }
+                case AST_UNARY_NEGATIVE: {
+                    node->name = "Unary_Operation (-)";
+                    break;
+                }
+                case AST_UNARY_LOGICAL_NOT: {
+                    node->name = "Unary_Operation (!)";
+                    break;
+                }
+                case AST_UNARY_POSITIVE: {
+                    node->name = "Unary_Operation (+)";
+                    break;
+                }
+                case AST_UNARY_ADDRESSOF: {
+                    node->name = "Unary_Operation (&)";
+                    break;
+                }
             }
 
             pretty_print_node_t *expr = ast_node_to_pretty_print_node(unary_op.expr, arena);

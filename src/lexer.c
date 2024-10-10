@@ -339,6 +339,7 @@ bool
 token_kind_is_binary_op(token_kind_t kind)
 {
     switch (kind) {
+        case TOKEN_EQ:
         case TOKEN_PLUS:
         case TOKEN_DASH:
         case TOKEN_SLASH:

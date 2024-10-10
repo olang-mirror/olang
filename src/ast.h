@@ -37,7 +37,6 @@ typedef enum
     AST_NODE_VAR_DEF,
     AST_NODE_BINARY_OP,
     AST_NODE_UNARY_OP,
-    AST_NODE_VAR_ASSIGN_STMT,
     AST_NODE_RETURN_STMT,
     AST_NODE_IF_STMT,
     AST_NODE_WHILE_STMT,
@@ -139,6 +138,7 @@ typedef enum ast_binary_op_kind
     AST_BINOP_CMP_NEQ,
     AST_BINOP_LOGICAL_AND,
     AST_BINOP_LOGICAL_OR,
+    AST_BINOP_ASSIGN,
 } ast_binary_op_kind_t;
 
 typedef struct ast_binary_op

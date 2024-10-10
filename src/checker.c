@@ -184,14 +184,6 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
             return;
         }
 
-        case AST_NODE_VAR_ASSIGN_STMT: {
-            ast_var_assign_stmt_t var_assign_stmt = ast->as_var_assign_stmt;
-
-            populate_scope(checker, scope, var_assign_stmt.ref);
-            populate_scope(checker, scope, var_assign_stmt.expr);
-            return;
-        }
-
         case AST_NODE_RETURN_STMT: {
             ast_return_stmt_t return_stmt = ast->as_return_stmt;
 

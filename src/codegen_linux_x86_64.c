@@ -524,6 +524,24 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
 
                     return 1;
                 }
+                case AST_BINOP_ASSIGN: {
+                    // FIXME: It may not be a ref
+                    ast_ref_t ref = bin_op.lhs->as_ref;
+                    scope_t *scope = ref.scope;
+
+                    symbol_t *symbol = scope_lookup(scope, ref.id);
+                    assert(symbol);
+
+                    size_t offset = codegen_linux_x86_64_get_stack_offset(codegen, symbol);
+
+                    codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+
+                    size_t type_size = type_to_bytes(symbol->type);
+                    fprintf(codegen->out, "    mov %s, -%ld(%%rbp)\n", get_reg_for(REG_ACCUMULATOR, type_size), offset);
+
+                    // FIXME: we don't support a = b = c
+                    return 0;
+                }
                 default: {
                     assert(0 && "unsupported binary operation");
                     return 0;
@@ -599,21 +617,8 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                 break;
             }
 
-            case AST_NODE_VAR_ASSIGN_STMT: {
-                ast_var_assign_stmt_t var_assign = node->as_var_assign_stmt;
-                ast_ref_t ref = var_assign.ref->as_ref;
-                scope_t *scope = ref.scope;
-
-                symbol_t *symbol = scope_lookup(scope, ref.id);
-                assert(symbol);
-
-                size_t offset = codegen_linux_x86_64_get_stack_offset(codegen, symbol);
-
-                codegen_linux_x86_64_emit_expression(codegen, var_assign.expr);
-
-                size_t type_size = type_to_bytes(symbol->type);
-                fprintf(codegen->out, "    mov %s, -%ld(%%rbp)\n", get_reg_for(REG_ACCUMULATOR, type_size), offset);
-
+            case AST_NODE_BINARY_OP: {
+                codegen_linux_x86_64_emit_expression(codegen, node);
                 break;
             }
 

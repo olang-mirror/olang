@@ -53,9 +53,6 @@ static ast_node_t *
 parser_parse_var_def(parser_t *parser);
 
 static ast_node_t *
-parser_parse_var_assign_stmt(parser_t *parser);
-
-static ast_node_t *
 parser_parse_fn_definition(parser_t *parser);
 
 static list_t *
@@ -150,6 +147,8 @@ token_kind_to_binary_op_kind(token_kind_t kind)
             return AST_BINOP_LOGICAL_AND;
         case TOKEN_LOGICAL_OR:
             return AST_BINOP_LOGICAL_OR;
+        case TOKEN_EQ:
+            return AST_BINOP_ASSIGN;
         default: {
             fprintf(stderr, "error: token kind (%s) not compatible with binary op kind\n", token_kind_to_cstr(kind));
             assert(false);
@@ -160,6 +159,7 @@ token_kind_to_binary_op_kind(token_kind_t kind)
 typedef enum
 {
     BINOP_MIN_PREC,
+    BINOP_ASSIGN_PREC,
     BINOP_LOGICAL_OR_PREC,
     BINOP_LOGICAL_AND_PREC,
     BINOP_BITWISE_OR_PREC,
@@ -204,6 +204,8 @@ get_binary_op_precedence(token_kind_t kind)
             return BINOP_LOGICAL_AND_PREC;
         case TOKEN_LOGICAL_OR:
             return BINOP_LOGICAL_OR_PREC;
+        case TOKEN_EQ:
+            return BINOP_ASSIGN_PREC;
         default:
             assert(false);
     }
@@ -293,7 +295,6 @@ parser_parse_factor(parser_t *parser)
                 list_t *args = parser_parse_fn_args(parser);
                 return ast_new_node_fn_call(parser->arena, token_id.loc, token_id.value, args);
             }
-
             return ast_new_node_ref(parser->arena, token_id.loc, token_id.value);
         }
         case TOKEN_AND:
@@ -536,20 +537,11 @@ StartLoop:
             node = parser_parse_var_def(parser);
             break;
         }
-        case TOKEN_ID: {
-            lexer_lookahead(parser->lexer, &next_token, 2);
-            if (!expected_token(&next_token, TOKEN_EQ)) {
-                return NULL;
-            }
-            node = parser_parse_var_assign_stmt(parser);
-            break;
-        }
         case TOKEN_CCURLY: {
             goto EndLoop;
         }
         default: {
-            // FIXME: write a better error message
-            goto EndLoop;
+            node = parser_parse_expr(parser);
         }
     }
 
@@ -709,27 +701,6 @@ parser_parse_var_def(parser_t *parser)
     ast_node_t *var_node = ast_new_node_var_def(parser->arena, token_id.loc, token_id.value, type, expr);
 
     return var_node;
-}
-
-static ast_node_t *
-parser_parse_var_assign_stmt(parser_t *parser)
-{
-    token_t token_id;
-
-    if (!expected_next_token(parser, &token_id, TOKEN_ID)) {
-        return NULL;
-    }
-
-    token_t token_eq;
-
-    if (!expected_next_token(parser, &token_eq, TOKEN_EQ)) {
-        return NULL;
-    }
-
-    ast_node_t *ref = ast_new_node_ref(parser->arena, token_id.loc, token_id.value);
-    ast_node_t *expr = parser_parse_expr(parser);
-
-    return ast_new_node_var_assign_stmt(parser->arena, token_eq.loc, ref, expr);
 }
 
 static bool

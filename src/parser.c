@@ -303,7 +303,7 @@ parser_parse_factor(parser_t *parser)
         case TOKEN_DASH:
         case TOKEN_TILDE:
         case TOKEN_BANG: {
-            ast_node_t *expr = parser_parse_expr(parser);
+            ast_node_t *expr = parser_parse_factor(parser);
             if (expr == NULL) {
                 return NULL;
             }

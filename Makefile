@@ -74,20 +74,21 @@ olang.info: docs/info/*.texi
 	$(MAKEINFO) docs/info/olang.texi
 
 $(TARGET): $(BUILDDIR) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
+	@$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
+	@printf 'CCLD\t%s\n' '$@'
 
 $(BUILDDIR):
 	@mkdir -p $@
 
 .PHONY: format
 format: $(SRCS) $(HEADERS)
-	clang-format --dry-run --Werror $?
-	$(MAKE) -C tests/unit/ format
+	@clang-format --dry-run --Werror $?
+	@$(MAKE) --no-print-directory -C tests/unit/ format
 
 .PHONY: format-fix
 format-fix: $(SRCS) $(HEADERS)
-	clang-format -i $?
-	$(MAKE) -C tests/unit/ format-fix
+	@clang-format -i $?
+	@$(MAKE) --no-print-directory -C tests/unit/ format-fix
 
 .PHONY: check-olc
 check-olc: $(TARGET)
@@ -100,7 +101,7 @@ check-unit: $(TARGET)
 .PHONY: clean
 clean:
 	@rm -f olang.info
-	$(MAKE) -C tests/unit/ clean
+	@$(MAKE) --no-print-directory -C tests/unit/ clean
 	@rm -rf build/ $(TARGET)
 
 .PHONY: check
@@ -115,4 +116,5 @@ docs-dist:
 	$(MAKE) -C docs dist
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@printf 'CC\t%s\n' '$@'

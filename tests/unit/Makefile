@@ -11,6 +11,7 @@ all: $(RUN_TESTS)
 
 %.bin: %.c $(MUNIT)
 	@$(CC) $(CFLAGS) $(MUNIT) $(DEP_OBJS) $< -o $@
+	@printf 'CCLD\t%s\n' '$@'
 
 %.run: %.bin
 	@./$<
@@ -20,10 +21,11 @@ clean:
 	@$(RM) -rfv lib
 
 format: $(SRCS)
-	clang-format --dry-run --Werror $?
+	@clang-format --dry-run --Werror $?
 
 format-fix: $(SRCS)
-	clang-format -i $?
+	@clang-format -i $?
 
 $(MUNIT):
 	@$(CC) -c $(MUNIT_SRC) $(CFLAGS) -o $(MUNIT)
+	@printf 'CCLD\t%s\n' '$@'

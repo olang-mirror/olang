@@ -95,12 +95,33 @@ list_next_test(const MunitParameter params[], void *user_data_or_fixture)
     return MUNIT_OK;
 }
 
-static MunitTest tests[] = { { "/list_append_test", list_append_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-                             { "/list_get_test", list_get_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-                             { "/list_next_test", list_next_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-                             { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL } };
+static MunitTest tests[] = {
+    { "/list_append_test",
+      list_append_test,
+      NULL,
+      NULL,
+      MUNIT_TEST_OPTION_NONE,
+      NULL },
+    { "/list_get_test",
+      list_get_test,
+      NULL,
+      NULL,
+      MUNIT_TEST_OPTION_NONE,
+      NULL },
+    { "/list_next_test",
+      list_next_test,
+      NULL,
+      NULL,
+      MUNIT_TEST_OPTION_NONE,
+      NULL },
+    { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+};
 
-static const MunitSuite suite = { "/list", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE };
+static const MunitSuite suite = { "/list",
+                                  tests,
+                                  NULL,
+                                  1,
+                                  MUNIT_SUITE_OPTION_NONE };
 
 int
 main(int argc, char *argv[])

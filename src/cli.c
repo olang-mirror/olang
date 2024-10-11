@@ -65,7 +65,8 @@ cli_parse_args(int argc, char **argv)
         arg = cli_args_shift(&args);
     }
 
-    if (opts.options & CLI_OPT_OUTPUT || opts.options & CLI_OPT_DUMP_TOKENS || opts.options & CLI_OPT_DUMP_AST) {
+    if (opts.options & CLI_OPT_OUTPUT || opts.options & CLI_OPT_DUMP_TOKENS ||
+        opts.options & CLI_OPT_DUMP_AST) {
         return opts;
     }
 
@@ -110,7 +111,9 @@ cli_opts_parse_arch(cli_opts_t *opts, cli_args_t *args)
     char *arch = cli_args_shift(args);
 
     if (arch == NULL) {
-        fprintf(stderr, "error: missing architecture for arg '--arch': available options (x86_64 | aarch64)\n");
+        fprintf(stderr,
+                "error: missing architecture for arg '--arch': available "
+                "options (x86_64 | aarch64)\n");
         cli_print_usage(stderr, opts->compiler_path);
         exit(EXIT_FAILURE);
     }
@@ -140,14 +143,16 @@ cli_opts_parse_sysroot(cli_opts_t *opts, cli_args_t *args)
 void
 cli_print_usage(FILE *stream, char *compiler_path)
 {
-    fprintf(stream,
-            "Usage: %s [options] file...\n"
-            "Options:\n"
-            "  --dump-tokens    Display lexer token stream\n"
-            "  --dump-ast       Display ast tree to stdout\n"
-            "  --arch <arch>    Binary arch: default to x86_64 (x86_64 | aarch64)\n"
-            "  --sysroot <dir>  System root dir where the GNU Assembler and GNU Linker are located: default to '/'\n"
-            "  -o <file>        Compile program into a binary file\n"
-            "  --save-temps     Keep temp files used to compile program\n",
-            compiler_path);
+    fprintf(
+        stream,
+        "Usage: %s [options] file...\n"
+        "Options:\n"
+        "  --dump-tokens    Display lexer token stream\n"
+        "  --dump-ast       Display ast tree to stdout\n"
+        "  --arch <arch>    Binary arch: default to x86_64 (x86_64 | aarch64)\n"
+        "  --sysroot <dir>  System root dir where the GNU Assembler and GNU "
+        "Linker are located: default to '/'\n"
+        "  -o <file>        Compile program into a binary file\n"
+        "  --save-temps     Keep temp files used to compile program\n",
+        compiler_path);
 }

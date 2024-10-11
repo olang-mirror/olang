@@ -84,11 +84,27 @@ arena_padding_test(const MunitParameter params[], void *user_data_or_fixture)
     return MUNIT_OK;
 }
 
-static MunitTest tests[] = { { "/arena_alloc_test", arena_alloc_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-                             { "/arena_padding_test", arena_padding_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-                             { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL } };
+static MunitTest tests[] = {
+    { "/arena_alloc_test",
+      arena_alloc_test,
+      NULL,
+      NULL,
+      MUNIT_TEST_OPTION_NONE,
+      NULL },
+    { "/arena_padding_test",
+      arena_padding_test,
+      NULL,
+      NULL,
+      MUNIT_TEST_OPTION_NONE,
+      NULL },
+    { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+};
 
-static const MunitSuite suite = { "/arena", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE };
+static const MunitSuite suite = { "/arena",
+                                  tests,
+                                  NULL,
+                                  1,
+                                  MUNIT_SUITE_OPTION_NONE };
 
 int
 main(int argc, char *argv[])

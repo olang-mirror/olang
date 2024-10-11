@@ -58,22 +58,28 @@ typedef enum x86_64_register_type
  * ──────────────────────────────────────────────────────────────
  * x86-64        rdi   rsi   rdx   r10   r8    r9    -
  */
-static int x86_call_args[X86_CALL_ARG_SIZE] = { REG_DEST_IDX, REG_SRC_IDX, REG_DATA, REG_R10, REG_R8, REG_R9 };
+static int x86_call_args[X86_CALL_ARG_SIZE] = { REG_DEST_IDX, REG_SRC_IDX,
+                                                REG_DATA,     REG_R10,
+                                                REG_R8,       REG_R9 };
 
 static void
 codegen_linux_x86_64_emit_start_entrypoint(codegen_x86_64_t *codegen);
 
 static void
-codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_t *fn);
+codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen,
+                                   ast_fn_definition_t *fn);
 
 static void
 codegen_linux_x86_64_emit_if(codegen_x86_64_t *codegen, ast_if_stmt_t is_stmt);
 
 static void
-codegen_linux_x86_64_put_stack_offset(codegen_x86_64_t *codegen, symbol_t *symbol, size_t offset);
+codegen_linux_x86_64_put_stack_offset(codegen_x86_64_t *codegen,
+                                      symbol_t *symbol,
+                                      size_t offset);
 
 static size_t
-codegen_linux_x86_64_get_stack_offset(codegen_x86_64_t *codegen, symbol_t *symbol);
+codegen_linux_x86_64_get_stack_offset(codegen_x86_64_t *codegen,
+                                      symbol_t *symbol);
 
 static size_t
 type_to_bytes(type_t *type);
@@ -94,7 +100,8 @@ codegen_linux_x86_64_init(codegen_x86_64_t *codegen, arena_t *arena, FILE *out)
 }
 
 void
-codegen_linux_x86_64_emit_translation_unit(codegen_x86_64_t *codegen, ast_node_t *node)
+codegen_linux_x86_64_emit_translation_unit(codegen_x86_64_t *codegen,
+                                           ast_node_t *node)
 {
     codegen->label_index = 0;
     codegen_linux_x86_64_emit_start_entrypoint(codegen);
@@ -146,7 +153,8 @@ codegen_linux_x86_64_get_next_label(codegen_x86_64_t *codegen)
 typedef size_t size_in_bytes_t;
 
 static size_in_bytes_t
-codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr_node)
+codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen,
+                                     ast_node_t *expr_node)
 {
     switch (expr_node->kind) {
         case AST_NODE_LITERAL: {
@@ -163,11 +171,15 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
             symbol_t *symbol = scope_lookup(ref.scope, ref.id);
             assert(symbol);
 
-            size_t offset = codegen_linux_x86_64_get_stack_offset(codegen, symbol);
+            size_t offset =
+                codegen_linux_x86_64_get_stack_offset(codegen, symbol);
 
             size_t bytes = type_to_bytes(symbol->type);
 
-            fprintf(codegen->out, "    mov -%ld(%%rbp), %s\n", offset, get_reg_for(REG_ACCUMULATOR, bytes));
+            fprintf(codegen->out,
+                    "    mov -%ld(%%rbp), %s\n",
+                    offset,
+                    get_reg_for(REG_ACCUMULATOR, bytes));
             return bytes;
         }
         case AST_NODE_FN_CALL: {
@@ -177,7 +189,8 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
             assert(symbol);
 
             size_t i = 0;
-            for (list_item_t *item = list_head(fn_call.args); item != NULL; item = list_next(item)) {
+            for (list_item_t *item = list_head(fn_call.args); item != NULL;
+                 item = list_next(item)) {
                 // FIXME: add support for more args than X86_CALL_ARG_SIZE
                 assert(i < X86_CALL_ARG_SIZE);
 
@@ -185,12 +198,16 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
 
                 codegen_linux_x86_64_emit_expression(codegen, arg_node);
 
-                fprintf(codegen->out, "    push %s\n", get_reg_for(REG_ACCUMULATOR, 8));
+                fprintf(codegen->out,
+                        "    push %s\n",
+                        get_reg_for(REG_ACCUMULATOR, 8));
                 ++i;
             }
 
             for (; i > 0; --i) {
-                fprintf(codegen->out, "    pop %s\n", get_reg_for(x86_call_args[i - 1], 8));
+                fprintf(codegen->out,
+                        "    pop %s\n",
+                        get_reg_for(x86_call_args[i - 1], 8));
             }
 
             fprintf(codegen->out, "    call " SV_FMT "\n", SV_ARG(fn_call.id));
@@ -202,13 +219,18 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
             switch (bin_op.kind) {
                 case AST_BINOP_ADDITION: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out,
@@ -220,48 +242,69 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                 }
                 case AST_BINOP_MULTIPLICATION: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
-                    fprintf(codegen->out, "    mul %s\n", get_reg_for(REG_COUNTER, expr_bytes));
+                    fprintf(codegen->out,
+                            "    mul %s\n",
+                            get_reg_for(REG_COUNTER, expr_bytes));
 
                     return expr_bytes;
                 }
                 case AST_BINOP_DIVISION: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out, "    xor %%rdx, %%rdx\n");
-                    fprintf(codegen->out, "    div %s\n", get_reg_for(REG_COUNTER, expr_bytes));
+                    fprintf(codegen->out,
+                            "    div %s\n",
+                            get_reg_for(REG_COUNTER, expr_bytes));
 
                     return expr_bytes;
                 }
                 case AST_BINOP_REMINDER: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out, "    xor %%rdx, %%rdx\n");
-                    fprintf(codegen->out, "    div %s\n", get_reg_for(REG_COUNTER, expr_bytes));
+                    fprintf(codegen->out,
+                            "    div %s\n",
+                            get_reg_for(REG_COUNTER, expr_bytes));
                     fprintf(codegen->out,
                             "    mov %s, %s\n",
                             get_reg_for(REG_DATA, expr_bytes),
@@ -271,13 +314,18 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                 }
                 case AST_BINOP_SUBTRACTION: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out,
@@ -289,13 +337,18 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                 }
                 case AST_BINOP_CMP_EQ: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out,
@@ -303,19 +356,26 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                             get_reg_for(REG_COUNTER, expr_bytes),
                             get_reg_for(REG_ACCUMULATOR, expr_bytes));
                     fprintf(codegen->out, "    sete %%al\n");
-                    fprintf(codegen->out, "    movzb %%al, %s\n", get_reg_for(REG_ACCUMULATOR, expr_bytes));
+                    fprintf(codegen->out,
+                            "    movzb %%al, %s\n",
+                            get_reg_for(REG_ACCUMULATOR, expr_bytes));
 
                     return expr_bytes;
                 }
                 case AST_BINOP_CMP_LT: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out,
@@ -323,19 +383,26 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                             get_reg_for(REG_COUNTER, expr_bytes),
                             get_reg_for(REG_ACCUMULATOR, expr_bytes));
                     fprintf(codegen->out, "    setl %%al\n");
-                    fprintf(codegen->out, "    movzb %%al, %s\n", get_reg_for(REG_ACCUMULATOR, expr_bytes));
+                    fprintf(codegen->out,
+                            "    movzb %%al, %s\n",
+                            get_reg_for(REG_ACCUMULATOR, expr_bytes));
 
                     return expr_bytes;
                 }
                 case AST_BINOP_CMP_GT: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out,
@@ -343,19 +410,26 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                             get_reg_for(REG_COUNTER, expr_bytes),
                             get_reg_for(REG_ACCUMULATOR, expr_bytes));
                     fprintf(codegen->out, "    setg %%al\n");
-                    fprintf(codegen->out, "    movzb %%al, %s\n", get_reg_for(REG_ACCUMULATOR, expr_bytes));
+                    fprintf(codegen->out,
+                            "    movzb %%al, %s\n",
+                            get_reg_for(REG_ACCUMULATOR, expr_bytes));
 
                     return expr_bytes;
                 }
                 case AST_BINOP_CMP_NEQ: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out,
@@ -363,19 +437,26 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                             get_reg_for(REG_COUNTER, expr_bytes),
                             get_reg_for(REG_ACCUMULATOR, expr_bytes));
                     fprintf(codegen->out, "    setne %%al\n");
-                    fprintf(codegen->out, "    movzb %%al, %s\n", get_reg_for(REG_ACCUMULATOR, expr_bytes));
+                    fprintf(codegen->out,
+                            "    movzb %%al, %s\n",
+                            get_reg_for(REG_ACCUMULATOR, expr_bytes));
 
                     return expr_bytes;
                 }
                 case AST_BINOP_CMP_LEQ: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out,
@@ -383,19 +464,26 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                             get_reg_for(REG_COUNTER, expr_bytes),
                             get_reg_for(REG_ACCUMULATOR, expr_bytes));
                     fprintf(codegen->out, "    setle %%al\n");
-                    fprintf(codegen->out, "    movzb %%al, %s\n", get_reg_for(REG_ACCUMULATOR, expr_bytes));
+                    fprintf(codegen->out,
+                            "    movzb %%al, %s\n",
+                            get_reg_for(REG_ACCUMULATOR, expr_bytes));
 
                     return expr_bytes;
                 }
                 case AST_BINOP_CMP_GEQ: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out,
@@ -403,7 +491,9 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                             get_reg_for(REG_COUNTER, expr_bytes),
                             get_reg_for(REG_ACCUMULATOR, expr_bytes));
                     fprintf(codegen->out, "    setge %%al\n");
-                    fprintf(codegen->out, "    movzb %%al, %s\n", get_reg_for(REG_ACCUMULATOR, expr_bytes));
+                    fprintf(codegen->out,
+                            "    movzb %%al, %s\n",
+                            get_reg_for(REG_ACCUMULATOR, expr_bytes));
 
                     return expr_bytes;
                 }
@@ -413,10 +503,14 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
-                    fprintf(codegen->out, "    shl %%cl, %s\n", get_reg_for(REG_ACCUMULATOR, lhs_bytes));
+                    fprintf(codegen->out,
+                            "    shl %%cl, %s\n",
+                            get_reg_for(REG_ACCUMULATOR, lhs_bytes));
 
                     return lhs_bytes;
                 }
@@ -426,22 +520,31 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
-                    fprintf(codegen->out, "    shr %%cl, %s\n", get_reg_for(REG_ACCUMULATOR, lhs_bytes));
+                    fprintf(codegen->out,
+                            "    shr %%cl, %s\n",
+                            get_reg_for(REG_ACCUMULATOR, lhs_bytes));
 
                     return lhs_bytes;
                 }
                 case AST_BINOP_BITWISE_XOR: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out,
@@ -453,13 +556,18 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                 }
                 case AST_BINOP_BITWISE_AND: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out,
@@ -471,13 +579,18 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                 }
                 case AST_BINOP_BITWISE_OR: {
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
                     fprintf(codegen->out, "    push %%rax\n");
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
 
-                    size_in_bytes_t expr_bytes = bytes_max(rhs_bytes, lhs_bytes);
+                    size_in_bytes_t expr_bytes =
+                        bytes_max(rhs_bytes, lhs_bytes);
 
                     fprintf(codegen->out, "    pop %%rcx\n");
                     fprintf(codegen->out,
@@ -488,16 +601,25 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                     return expr_bytes;
                 }
                 case AST_BINOP_LOGICAL_AND: {
-                    size_t label_exit = codegen_linux_x86_64_get_next_label(codegen);
+                    size_t label_exit =
+                        codegen_linux_x86_64_get_next_label(codegen);
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
-                    fprintf(codegen->out, "    cmp $0, %s\n", get_reg_for(REG_ACCUMULATOR, lhs_bytes));
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
+                    fprintf(codegen->out,
+                            "    cmp $0, %s\n",
+                            get_reg_for(REG_ACCUMULATOR, lhs_bytes));
                     fprintf(codegen->out, "    je .L%ld\n", label_exit);
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
-                    fprintf(codegen->out, "    cmp $0, %s\n", get_reg_for(REG_ACCUMULATOR, rhs_bytes));
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
+                    fprintf(codegen->out,
+                            "    cmp $0, %s\n",
+                            get_reg_for(REG_ACCUMULATOR, rhs_bytes));
                     fprintf(codegen->out, "    je .L%ld\n", label_exit);
                     fprintf(codegen->out, "    mov $1, %%rax\n");
                     fprintf(codegen->out, ".L%ld:\n", label_exit);
@@ -505,17 +627,27 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                     return 1;
                 }
                 case AST_BINOP_LOGICAL_OR: {
-                    size_t label_t = codegen_linux_x86_64_get_next_label(codegen);
-                    size_t label_f = codegen_linux_x86_64_get_next_label(codegen);
+                    size_t label_t =
+                        codegen_linux_x86_64_get_next_label(codegen);
+                    size_t label_f =
+                        codegen_linux_x86_64_get_next_label(codegen);
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t lhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.lhs);
-                    fprintf(codegen->out, "    cmp $0, %s\n", get_reg_for(REG_ACCUMULATOR, lhs_bytes));
+                    size_in_bytes_t lhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.lhs);
+                    fprintf(codegen->out,
+                            "    cmp $0, %s\n",
+                            get_reg_for(REG_ACCUMULATOR, lhs_bytes));
                     fprintf(codegen->out, "    jne .L%ld\n", label_t);
 
                     fprintf(codegen->out, "    xor %%rax, %%rax\n");
-                    size_in_bytes_t rhs_bytes = codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
-                    fprintf(codegen->out, "    cmp $0, %s\n", get_reg_for(REG_ACCUMULATOR, rhs_bytes));
+                    size_in_bytes_t rhs_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             bin_op.rhs);
+                    fprintf(codegen->out,
+                            "    cmp $0, %s\n",
+                            get_reg_for(REG_ACCUMULATOR, rhs_bytes));
                     fprintf(codegen->out, "    je .L%ld\n", label_f);
 
                     fprintf(codegen->out, ".L%ld:\n", label_t);
@@ -532,12 +664,16 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
                     symbol_t *symbol = scope_lookup(scope, ref.id);
                     assert(symbol);
 
-                    size_t offset = codegen_linux_x86_64_get_stack_offset(codegen, symbol);
+                    size_t offset =
+                        codegen_linux_x86_64_get_stack_offset(codegen, symbol);
 
                     codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
 
                     size_t type_size = type_to_bytes(symbol->type);
-                    fprintf(codegen->out, "    mov %s, -%ld(%%rbp)\n", get_reg_for(REG_ACCUMULATOR, type_size), offset);
+                    fprintf(codegen->out,
+                            "    mov %s, -%ld(%%rbp)\n",
+                            get_reg_for(REG_ACCUMULATOR, type_size),
+                            offset);
 
                     // FIXME: we don't support a = b = c
                     return 0;
@@ -553,9 +689,13 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen, ast_node_t *expr
             ast_unary_op_t unary_op = expr_node->as_unary_op;
             switch (unary_op.kind) {
                 case AST_UNARY_BITWISE_NOT: {
-                    size_in_bytes_t expr_bytes = codegen_linux_x86_64_emit_expression(codegen, unary_op.expr);
+                    size_in_bytes_t expr_bytes =
+                        codegen_linux_x86_64_emit_expression(codegen,
+                                                             unary_op.expr);
 
-                    fprintf(codegen->out, "    not %s\n", get_reg_for(REG_ACCUMULATOR, expr_bytes));
+                    fprintf(codegen->out,
+                            "    not %s\n",
+                            get_reg_for(REG_ACCUMULATOR, expr_bytes));
 
                     return expr_bytes;
                 }
@@ -600,10 +740,12 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                 symbol_t *symbol = scope_lookup(scope, var_def.id);
                 assert(symbol);
 
-                codegen_linux_x86_64_put_stack_offset(codegen, symbol, codegen->base_offset);
+                codegen_linux_x86_64_put_stack_offset(
+                    codegen, symbol, codegen->base_offset);
 
                 if (var_def.value) {
-                    codegen_linux_x86_64_emit_expression(codegen, var_def.value);
+                    codegen_linux_x86_64_emit_expression(codegen,
+                                                         var_def.value);
                 }
 
                 size_t type_size = type_to_bytes(symbol->type);
@@ -633,7 +775,8 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                 ast_node_t *cond = while_stmt.cond;
                 ast_node_t *then = while_stmt.then;
 
-                size_t begin_label = codegen_linux_x86_64_get_next_label(codegen);
+                size_t begin_label =
+                    codegen_linux_x86_64_get_next_label(codegen);
                 size_t end_label = codegen_linux_x86_64_get_next_label(codegen);
 
                 fprintf(codegen->out, ".L%ld:\n", begin_label);
@@ -641,7 +784,8 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                 fprintf(codegen->out, "    cmp $1, %%rax\n");
                 fprintf(codegen->out, "    jnz .L%ld\n", end_label);
 
-                assert(then->kind == AST_NODE_BLOCK && "invalid while-then block");
+                assert(then->kind == AST_NODE_BLOCK &&
+                       "invalid while-then block");
                 ast_block_t then_block = then->as_block;
 
                 codegen_linux_x86_64_emit_block(codegen, &then_block);
@@ -652,7 +796,8 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                 break;
             }
             default: {
-                // FIXME: improve error: replace the node->kind to a string representation
+                // FIXME: improve error: replace the node->kind to a string
+                // representation
                 fprintf(stderr, "node kind %d not supported\n", node->kind);
                 assert(0 && "unsupported block statement");
                 break;
@@ -709,7 +854,8 @@ type_to_bytes(type_t *type)
             return 8;
         }
         case TYPE_UNKNOWN: {
-            assert(0 && "cannot calculate size of an unknown type: probably a parser issue.");
+            assert(0 && "cannot calculate size of an unknown type: probably a "
+                        "parser issue.");
         }
     }
 
@@ -739,7 +885,8 @@ calculate_fn_local_size(scope_t *scope)
     list_item_t *item = list_head(scope->children);
 
     while (item != NULL) {
-        size_t child_local_size = calculate_fn_local_size((scope_t *)item->value);
+        size_t child_local_size =
+            calculate_fn_local_size((scope_t *)item->value);
 
         if (child_local_size > max_child_local_size) {
             max_child_local_size = child_local_size;
@@ -752,7 +899,8 @@ calculate_fn_local_size(scope_t *scope)
 }
 
 static void
-codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_t *fn_def)
+codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen,
+                                   ast_fn_definition_t *fn_def)
 {
     codegen->base_offset = X86_CALL_EIP_STACK_OFFSET;
 
@@ -763,7 +911,8 @@ codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_
     fprintf(codegen->out, "    mov %%rsp, %%rbp\n");
 
     size_t i = 0;
-    for (list_item_t *item = list_head(fn_def->params); item != NULL; item = list_next(item)) {
+    for (list_item_t *item = list_head(fn_def->params); item != NULL;
+         item = list_next(item)) {
         assert(i < X86_CALL_ARG_SIZE);
 
         ast_fn_param_t *param = item->value;
@@ -773,7 +922,8 @@ codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_
 
         size_t offset = codegen->base_offset;
 
-        codegen_linux_x86_64_put_stack_offset(codegen, symbol, codegen->base_offset);
+        codegen_linux_x86_64_put_stack_offset(
+            codegen, symbol, codegen->base_offset);
 
         fprintf(codegen->out,
                 "    mov %s, -%ld(%%rbp)\n",
@@ -799,7 +949,9 @@ codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen, ast_fn_definition_
 }
 
 static void
-codegen_linux_x86_64_put_stack_offset(codegen_x86_64_t *codegen, symbol_t *symbol, size_t offset)
+codegen_linux_x86_64_put_stack_offset(codegen_x86_64_t *codegen,
+                                      symbol_t *symbol,
+                                      size_t offset)
 {
 
     size_t *stack_offset = arena_alloc(codegen->arena, sizeof(size_t));
@@ -812,7 +964,8 @@ codegen_linux_x86_64_put_stack_offset(codegen_x86_64_t *codegen, symbol_t *symbo
 }
 
 static size_t
-codegen_linux_x86_64_get_stack_offset(codegen_x86_64_t *codegen, symbol_t *symbol)
+codegen_linux_x86_64_get_stack_offset(codegen_x86_64_t *codegen,
+                                      symbol_t *symbol)
 {
     char symbol_ptr[PTR_HEX_CSTR_SIZE];
     sprintf(symbol_ptr, "%lx", (uintptr_t)symbol);

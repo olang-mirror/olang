@@ -229,16 +229,30 @@ ast_new_node_fn_def(arena_t *arena,
                     ast_node_t *block);
 
 ast_node_t *
-ast_new_node_fn_call(arena_t *arena, token_loc_t loc, string_view_t id, list_t *args);
+ast_new_node_fn_call(arena_t *arena,
+                     token_loc_t loc,
+                     string_view_t id,
+                     list_t *args);
 
 ast_node_t *
-ast_new_node_var_def(arena_t *arena, token_loc_t loc, string_view_t id, type_t *type, ast_node_t *value);
+ast_new_node_var_def(arena_t *arena,
+                     token_loc_t loc,
+                     string_view_t id,
+                     type_t *type,
+                     ast_node_t *value);
 
 ast_node_t *
-ast_new_node_bin_op(arena_t *arena, token_loc_t loc, ast_binary_op_kind_t kind, ast_node_t *lhs, ast_node_t *rhs);
+ast_new_node_bin_op(arena_t *arena,
+                    token_loc_t loc,
+                    ast_binary_op_kind_t kind,
+                    ast_node_t *lhs,
+                    ast_node_t *rhs);
 
 ast_node_t *
-ast_new_node_unary_op(arena_t *arena, token_loc_t loc, ast_unary_op_kind_t kind, ast_node_t *expr);
+ast_new_node_unary_op(arena_t *arena,
+                      token_loc_t loc,
+                      ast_unary_op_kind_t kind,
+                      ast_node_t *expr);
 
 ast_node_t *
 ast_new_node_literal_u32(arena_t *arena, token_loc_t loc, uint32_t value);
@@ -247,16 +261,26 @@ ast_node_t *
 ast_new_node_ref(arena_t *arena, token_loc_t loc, string_view_t id);
 
 ast_node_t *
-ast_new_node_var_assign_stmt(arena_t *arena, token_loc_t loc, ast_node_t *ref, ast_node_t *expr);
+ast_new_node_var_assign_stmt(arena_t *arena,
+                             token_loc_t loc,
+                             ast_node_t *ref,
+                             ast_node_t *expr);
 
 ast_node_t *
 ast_new_node_return_stmt(arena_t *arena, token_loc_t loc, ast_node_t *expr);
 
 ast_node_t *
-ast_new_node_if_stmt(arena_t *arena, token_loc_t loc, ast_node_t *cond, ast_node_t *then, ast_node_t *_else);
+ast_new_node_if_stmt(arena_t *arena,
+                     token_loc_t loc,
+                     ast_node_t *cond,
+                     ast_node_t *then,
+                     ast_node_t *_else);
 
 ast_node_t *
-ast_new_node_while_stmt(arena_t *arena, token_loc_t loc, ast_node_t *cond, ast_node_t *then);
+ast_new_node_while_stmt(arena_t *arena,
+                        token_loc_t loc,
+                        ast_node_t *cond,
+                        ast_node_t *then);
 
 ast_node_t *
 ast_new_node_block(arena_t *arena);

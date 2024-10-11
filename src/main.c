@@ -158,7 +158,8 @@ handle_codegen_linux(cli_opts_t *opts)
         } else if (strcmp(opts->arch, "aarch64") == 0) {
             codegen_linux_aarch64_emit_translation_unit(out, ast);
         } else {
-            fprintf(stderr, "error: architecture '%s' not supported\n", opts->arch);
+            fprintf(
+                stderr, "error: architecture '%s' not supported\n", opts->arch);
             cli_print_usage(stderr, opts->compiler_path);
             exit(EXIT_FAILURE);
         }
@@ -171,7 +172,11 @@ handle_codegen_linux(cli_opts_t *opts)
     }
 
     char command[512];
-    sprintf(command, "%s/bin/as %s -o " SV_FMT ".o", opts->sysroot, asm_file, SV_ARG(opts->output_bin));
+    sprintf(command,
+            "%s/bin/as %s -o " SV_FMT ".o",
+            opts->sysroot,
+            asm_file,
+            SV_ARG(opts->output_bin));
 
     int exit_code = system(command);
 
@@ -210,7 +215,10 @@ read_entire_file(char *filepath, arena_t *arena)
     FILE *stream = fopen(filepath, "rb");
 
     if (stream == NULL) {
-        fprintf(stderr, "error: could not open file %s: %s\n", filepath, strerror(errno));
+        fprintf(stderr,
+                "error: could not open file %s: %s\n",
+                filepath,
+                strerror(errno));
         exit(EXIT_FAILURE);
     }
 
@@ -225,7 +233,10 @@ read_entire_file(char *filepath, arena_t *arena)
     code.chars = (char *)arena_alloc(arena, (size_t)code.size);
 
     if (code.chars == NULL) {
-        fprintf(stderr, "error: could not read file %s: %s\n", filepath, strerror(errno));
+        fprintf(stderr,
+                "error: could not read file %s: %s\n",
+                filepath,
+                strerror(errno));
         exit(EXIT_FAILURE);
     }
 

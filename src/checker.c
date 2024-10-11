@@ -30,7 +30,9 @@ checker_new(arena_t *arena)
 
     checker_t *checker = (checker_t *)arena_alloc(arena, sizeof(checker_t));
     if (checker == NULL) {
-        fprintf(stderr, "[FATAL] Out of memory: checker_new: %s\n", strerror(errno));
+        fprintf(stderr,
+                "[FATAL] Out of memory: checker_new: %s\n",
+                strerror(errno));
         exit(EXIT_FAILURE);
     }
     checker->arena = arena;
@@ -119,7 +121,8 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
             fn_def->scope = scope_push(scope);
 
             type_resolve(fn_def->return_type);
-            symbol_t *symbol = symbol_new(checker->arena, fn_def->id, fn_def->return_type);
+            symbol_t *symbol =
+                symbol_new(checker->arena, fn_def->id, fn_def->return_type);
             scope_insert(scope, symbol);
 
             list_item_t *item = list_head(fn_def->params);
@@ -128,7 +131,8 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
                 ast_fn_param_t *param = (ast_fn_param_t *)item->value;
 
                 type_resolve(param->type);
-                symbol_t *symbol = symbol_new(checker->arena, param->id, param->type);
+                symbol_t *symbol =
+                    symbol_new(checker->arena, param->id, param->type);
                 scope_insert(fn_def->scope, symbol);
 
                 item = list_next(item);
@@ -210,7 +214,8 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
 
             type_resolve(ast->as_var_def.type);
 
-            symbol_t *symbol = symbol_new(checker->arena, id, ast->as_var_def.type);
+            symbol_t *symbol =
+                symbol_new(checker->arena, id, ast->as_var_def.type);
 
             scope_insert(scope, symbol);
             ast->as_var_def.scope = scope;

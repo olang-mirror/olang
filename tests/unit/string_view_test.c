@@ -22,7 +22,8 @@
 #include <string.h>
 
 static MunitResult
-string_view_eq_to_cstr_test(const MunitParameter params[], void *user_data_or_fixture)
+string_view_eq_to_cstr_test(const MunitParameter params[],
+                            void *user_data_or_fixture)
 {
     char *name = "John Doe";
 
@@ -46,7 +47,8 @@ string_view_eq_to_cstr_test(const MunitParameter params[], void *user_data_or_fi
 }
 
 static MunitResult
-string_view_to_u32_test(const MunitParameter params[], void *user_data_or_fixture)
+string_view_to_u32_test(const MunitParameter params[],
+                        void *user_data_or_fixture)
 {
     char *number = "69";
 
@@ -68,12 +70,26 @@ string_view_to_u32_test(const MunitParameter params[], void *user_data_or_fixtur
 }
 
 static MunitTest tests[] = {
-    { "/eq_to_cstr_test", string_view_eq_to_cstr_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { "/to_u32_test", string_view_to_u32_test, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { "/eq_to_cstr_test",
+      string_view_eq_to_cstr_test,
+      NULL,
+      NULL,
+      MUNIT_TEST_OPTION_NONE,
+      NULL },
+    { "/to_u32_test",
+      string_view_to_u32_test,
+      NULL,
+      NULL,
+      MUNIT_TEST_OPTION_NONE,
+      NULL },
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
 
-static const MunitSuite suite = { "/string_view", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE };
+static const MunitSuite suite = { "/string_view",
+                                  tests,
+                                  NULL,
+                                  1,
+                                  MUNIT_SUITE_OPTION_NONE };
 
 int
 main(int argc, char *argv[])

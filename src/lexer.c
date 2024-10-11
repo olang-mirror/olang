@@ -50,7 +50,10 @@ static void
 lexer_init_char_value_token(lexer_t *lexer, token_t *token, token_kind_t kind);
 
 static void
-lexer_init_str_value_token(lexer_t *lexer, token_t *token, token_kind_t kind, lexer_cursor_t cur);
+lexer_init_str_value_token(lexer_t *lexer,
+                           token_t *token,
+                           token_kind_t kind,
+                           lexer_cursor_t cur);
 
 static void
 lexer_init_eof_token(lexer_t *lexer, token_t *token);
@@ -95,7 +98,8 @@ lexer_next_token(lexer_t *lexer, token_t *token)
                 .size = lexer->cur.offset - start_cur.offset,
             };
 
-            lexer_init_str_value_token(lexer, token, lexer_str_to_token_kind(text), start_cur);
+            lexer_init_str_value_token(
+                lexer, token, lexer_str_to_token_kind(text), start_cur);
             return;
         }
 
@@ -117,7 +121,8 @@ lexer_next_token(lexer_t *lexer, token_t *token)
 
                 if (lexer_current_char(lexer) == '=') {
                     lexer_skip_char(lexer);
-                    lexer_init_str_value_token(lexer, token, TOKEN_CMP_EQ, start_cur);
+                    lexer_init_str_value_token(
+                        lexer, token, TOKEN_CMP_EQ, start_cur);
                     return;
                 }
 
@@ -130,7 +135,8 @@ lexer_next_token(lexer_t *lexer, token_t *token)
 
                 if (lexer_current_char(lexer) == '=') {
                     lexer_skip_char(lexer);
-                    lexer_init_str_value_token(lexer, token, TOKEN_CMP_NEQ, start_cur);
+                    lexer_init_str_value_token(
+                        lexer, token, TOKEN_CMP_NEQ, start_cur);
                     return;
                 }
 
@@ -143,7 +149,8 @@ lexer_next_token(lexer_t *lexer, token_t *token)
 
                 if (lexer_current_char(lexer) == '&') {
                     lexer_skip_char(lexer);
-                    lexer_init_str_value_token(lexer, token, TOKEN_LOGICAL_AND, start_cur);
+                    lexer_init_str_value_token(
+                        lexer, token, TOKEN_LOGICAL_AND, start_cur);
                     return;
                 }
 
@@ -156,7 +163,8 @@ lexer_next_token(lexer_t *lexer, token_t *token)
 
                 if (lexer_current_char(lexer) == '|') {
                     lexer_skip_char(lexer);
-                    lexer_init_str_value_token(lexer, token, TOKEN_LOGICAL_OR, start_cur);
+                    lexer_init_str_value_token(
+                        lexer, token, TOKEN_LOGICAL_OR, start_cur);
                     return;
                 }
 
@@ -170,16 +178,19 @@ lexer_next_token(lexer_t *lexer, token_t *token)
                 switch (lexer_current_char(lexer)) {
                     case '<': {
                         lexer_skip_char(lexer);
-                        lexer_init_str_value_token(lexer, token, TOKEN_BITWISE_LSHIFT, start_cur);
+                        lexer_init_str_value_token(
+                            lexer, token, TOKEN_BITWISE_LSHIFT, start_cur);
                         return;
                     }
                     case '=': {
                         lexer_skip_char(lexer);
-                        lexer_init_str_value_token(lexer, token, TOKEN_CMP_LEQ, start_cur);
+                        lexer_init_str_value_token(
+                            lexer, token, TOKEN_CMP_LEQ, start_cur);
                         return;
                     }
                     default: {
-                        lexer_init_str_value_token(lexer, token, TOKEN_LT, start_cur);
+                        lexer_init_str_value_token(
+                            lexer, token, TOKEN_LT, start_cur);
                         return;
                     }
                 }
@@ -191,16 +202,19 @@ lexer_next_token(lexer_t *lexer, token_t *token)
                 switch (lexer_current_char(lexer)) {
                     case '>': {
                         lexer_skip_char(lexer);
-                        lexer_init_str_value_token(lexer, token, TOKEN_BITWISE_RSHIFT, start_cur);
+                        lexer_init_str_value_token(
+                            lexer, token, TOKEN_BITWISE_RSHIFT, start_cur);
                         return;
                     }
                     case '=': {
                         lexer_skip_char(lexer);
-                        lexer_init_str_value_token(lexer, token, TOKEN_CMP_GEQ, start_cur);
+                        lexer_init_str_value_token(
+                            lexer, token, TOKEN_CMP_GEQ, start_cur);
                         return;
                     }
                     default: {
-                        lexer_init_str_value_token(lexer, token, TOKEN_GT, start_cur);
+                        lexer_init_str_value_token(
+                            lexer, token, TOKEN_GT, start_cur);
                         return;
                     }
                 }
@@ -421,7 +435,10 @@ lexer_init_char_value_token(lexer_t *lexer, token_t *token, token_kind_t kind)
 }
 
 static void
-lexer_init_str_value_token(lexer_t *lexer, token_t *token, token_kind_t kind, lexer_cursor_t cur)
+lexer_init_str_value_token(lexer_t *lexer,
+                           token_t *token,
+                           token_kind_t kind,
+                           lexer_cursor_t cur)
 {
     string_view_t str = {
         .chars = lexer->src.code.chars + cur.offset,
@@ -510,7 +527,8 @@ token_loc_to_line(token_loc_t loc)
         .size = 0,
     };
 
-    while ((line.size + offset) < loc.src.code.size && line.chars[line.size] != '\n' && line.chars[line.size] != 0) {
+    while ((line.size + offset) < loc.src.code.size &&
+           line.chars[line.size] != '\n' && line.chars[line.size] != 0) {
         ++line.size;
     }
 

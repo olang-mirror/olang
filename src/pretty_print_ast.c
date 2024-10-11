@@ -80,7 +80,10 @@ pretty_print_print_ident(uint64_t *prefix, size_t level, bool lst_children)
 }
 
 static void
-pretty_print_tree(pretty_print_node_t *node, uint64_t *prefix, size_t level, bool lst_children)
+pretty_print_tree(pretty_print_node_t *node,
+                  uint64_t *prefix,
+                  size_t level,
+                  bool lst_children)
 {
     pretty_print_print_ident(prefix, level, lst_children);
 
@@ -94,7 +97,8 @@ pretty_print_tree(pretty_print_node_t *node, uint64_t *prefix, size_t level, boo
 
     size_t size = list_size(list);
     for (size_t i = 0; i < size; ++i) {
-        pretty_print_node_t *it = (pretty_print_node_t *)list_get(list, i)->value;
+        pretty_print_node_t *it =
+            (pretty_print_node_t *)list_get(list, i)->value;
         pretty_print_tree(it, prefix, level + 1, i + 1 == size);
     }
 }
@@ -102,7 +106,8 @@ pretty_print_tree(pretty_print_node_t *node, uint64_t *prefix, size_t level, boo
 static pretty_print_node_t *
 pretty_print_node_new(arena_t *arena)
 {
-    pretty_print_node_t *node = (pretty_print_node_t *)arena_alloc(arena, sizeof(pretty_print_node_t));
+    pretty_print_node_t *node =
+        (pretty_print_node_t *)arena_alloc(arena, sizeof(pretty_print_node_t));
     node->children = (list_t *)arena_alloc(arena, sizeof(list_t));
     list_init(node->children, arena);
     return node;
@@ -113,7 +118,10 @@ pretty_print_new_fn_param(ast_fn_param_t *param, arena_t *arena)
 {
     pretty_print_node_t *node = pretty_print_node_new(arena);
     char name[256];
-    sprintf(name, "Param_Definition <name:" SV_FMT "> <type:" SV_FMT ">", SV_ARG(param->id), SV_ARG(param->type->id));
+    sprintf(name,
+            "Param_Definition <name:" SV_FMT "> <type:" SV_FMT ">",
+            SV_ARG(param->id),
+            SV_ARG(param->type->id));
     node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
     strcpy(node->name, name);
     return node;
@@ -132,7 +140,8 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             while (item != NULL) {
                 ast_node_t *decl = (ast_node_t *)item->value;
 
-                pretty_print_node_t *fn_node = ast_node_to_pretty_print_node(decl, arena);
+                pretty_print_node_t *fn_node =
+                    ast_node_to_pretty_print_node(decl, arena);
                 list_append(node->children, fn_node);
 
                 item = list_next(item);
@@ -149,16 +158,19 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
                     "Function_Definition <name:" SV_FMT "> <return:" SV_FMT ">",
                     SV_ARG(fn_def.id),
                     SV_ARG(fn_def.return_type->id));
-            node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
+            node->name =
+                (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
             strcpy(node->name, name);
 
             list_item_t *param = list_head(fn_def.params);
             while (param != NULL) {
-                list_append(node->children, pretty_print_new_fn_param(param->value, arena));
+                list_append(node->children,
+                            pretty_print_new_fn_param(param->value, arena));
                 param = list_next(param);
             }
 
-            pretty_print_node_t *block = ast_node_to_pretty_print_node(fn_def.block, arena);
+            pretty_print_node_t *block =
+                ast_node_to_pretty_print_node(fn_def.block, arena);
             list_append(node->children, block);
             return node;
         }
@@ -167,13 +179,16 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             ast_fn_call_t fn_call = ast->as_fn_call;
 
             char name[256];
-            sprintf(name, "Function_Call <name:" SV_FMT ">", SV_ARG(fn_call.id));
-            node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
+            sprintf(
+                name, "Function_Call <name:" SV_FMT ">", SV_ARG(fn_call.id));
+            node->name =
+                (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
             strcpy(node->name, name);
 
             list_item_t *item = list_head(fn_call.args);
             while (item != NULL) {
-                list_append(node->children, ast_node_to_pretty_print_node(item->value, arena));
+                list_append(node->children,
+                            ast_node_to_pretty_print_node(item->value, arena));
                 item = list_next(item);
             }
 
@@ -187,8 +202,10 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 
             size_t block_nodes_size = list_size(block.nodes);
             for (size_t i = 0; i < block_nodes_size; ++i) {
-                ast_node_t *ast_node = (ast_node_t *)list_get(block.nodes, i)->value;
-                pretty_print_node_t *child = ast_node_to_pretty_print_node(ast_node, arena);
+                ast_node_t *ast_node =
+                    (ast_node_t *)list_get(block.nodes, i)->value;
+                pretty_print_node_t *child =
+                    ast_node_to_pretty_print_node(ast_node, arena);
                 list_append(node->children, child);
             }
             return node;
@@ -199,7 +216,8 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 
             node->name = "Return_Statement";
 
-            pretty_print_node_t *child = ast_node_to_pretty_print_node(return_stmt.expr, arena);
+            pretty_print_node_t *child =
+                ast_node_to_pretty_print_node(return_stmt.expr, arena);
             list_append(node->children, child);
 
             return node;
@@ -210,7 +228,8 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 
             node->name = "If_Statement";
 
-            pretty_print_node_t *child = ast_node_to_pretty_print_node(if_stmt.cond, arena);
+            pretty_print_node_t *child =
+                ast_node_to_pretty_print_node(if_stmt.cond, arena);
             list_append(node->children, child);
 
             child = ast_node_to_pretty_print_node(if_stmt.then, arena);
@@ -229,7 +248,8 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 
             node->name = "While_Statement";
 
-            pretty_print_node_t *child = ast_node_to_pretty_print_node(while_stmt.cond, arena);
+            pretty_print_node_t *child =
+                ast_node_to_pretty_print_node(while_stmt.cond, arena);
             list_append(node->children, child);
 
             child = ast_node_to_pretty_print_node(while_stmt.then, arena);
@@ -244,8 +264,10 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             char name[256];
             switch (literal.kind) {
                 case AST_LITERAL_U32: {
-                    sprintf(name, "Literal <kind:u32> <value:%u>", literal.as_u32);
-                    node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
+                    sprintf(
+                        name, "Literal <kind:u32> <value:%u>", literal.as_u32);
+                    node->name = (char *)arena_alloc(
+                        arena, sizeof(char) * (strlen(name) + 1));
                     strcpy(node->name, name);
                     break;
                 }
@@ -260,11 +282,16 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
             ast_var_definition_t var = ast->as_var_def;
 
             char name[256];
-            sprintf(name, "Var_Definition <name:" SV_FMT "> <kind:" SV_FMT ">", SV_ARG(var.id), SV_ARG(var.type->id));
-            node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
+            sprintf(name,
+                    "Var_Definition <name:" SV_FMT "> <kind:" SV_FMT ">",
+                    SV_ARG(var.id),
+                    SV_ARG(var.type->id));
+            node->name =
+                (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
             strcpy(node->name, name);
 
-            pretty_print_node_t *child = ast_node_to_pretty_print_node(var.value, arena);
+            pretty_print_node_t *child =
+                ast_node_to_pretty_print_node(var.value, arena);
             list_append(node->children, child);
 
             return node;
@@ -275,7 +302,8 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 
             char name[256];
             sprintf(name, "Reference <name:" SV_FMT ">", SV_ARG(ref.id));
-            node->name = (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
+            node->name =
+                (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
             strcpy(node->name, name);
 
             return node;
@@ -365,8 +393,10 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
                     assert(false && "binop not implemented");
             }
 
-            pretty_print_node_t *lhs = ast_node_to_pretty_print_node(binop.lhs, arena);
-            pretty_print_node_t *rhs = ast_node_to_pretty_print_node(binop.rhs, arena);
+            pretty_print_node_t *lhs =
+                ast_node_to_pretty_print_node(binop.lhs, arena);
+            pretty_print_node_t *rhs =
+                ast_node_to_pretty_print_node(binop.rhs, arena);
 
             list_append(node->children, lhs);
             list_append(node->children, rhs);
@@ -405,7 +435,8 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
                 }
             }
 
-            pretty_print_node_t *expr = ast_node_to_pretty_print_node(unary_op.expr, arena);
+            pretty_print_node_t *expr =
+                ast_node_to_pretty_print_node(unary_op.expr, arena);
             list_append(node->children, expr);
 
             return node;

@@ -42,7 +42,8 @@ map_new(arena_t *arena)
 {
     map_t *map = (map_t *)arena_alloc(arena, sizeof(map_t));
     if (map == NULL) {
-        fprintf(stderr, "[FATAL] Out of memory: map_new: %s\n", strerror(errno));
+        fprintf(
+            stderr, "[FATAL] Out of memory: map_new: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
     map->arena = arena;
@@ -54,11 +55,13 @@ static void
 map_init(map_t *map)
 {
     assert(map);
-    map->entries = (map_entry_t *)arena_alloc(map->arena, MAP_INITIAL_CAPACITY * sizeof(map_entry_t));
+    map->entries = (map_entry_t *)arena_alloc(
+        map->arena, MAP_INITIAL_CAPACITY * sizeof(map_entry_t));
     assert(map->entries != NULL);
     memset(map->entries, 0, MAP_INITIAL_CAPACITY * sizeof(map_entry_t));
     if (map->entries == NULL) {
-        fprintf(stderr, "[FATAL] Out of memory: map_init: %s\n", strerror(errno));
+        fprintf(
+            stderr, "[FATAL] Out of memory: map_init: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
     map->capacity = MAP_INITIAL_CAPACITY;
@@ -101,7 +104,8 @@ map_put(map_t *map, char *key, void *value)
             break;
         }
         if (entry->next == NULL) {
-            entry->next = (map_entry_t *)arena_alloc(map->arena, sizeof(map_entry_t));
+            entry->next =
+                (map_entry_t *)arena_alloc(map->arena, sizeof(map_entry_t));
             *entry->next = (map_entry_t){
                 .key = _strdup(key, map->arena),
                 .hash = hash,

@@ -150,7 +150,10 @@ token_kind_to_binary_op_kind(token_kind_t kind)
         case TOKEN_EQ:
             return AST_BINOP_ASSIGN;
         default: {
-            fprintf(stderr, "error: token kind (%s) not compatible with binary op kind\n", token_kind_to_cstr(kind));
+            fprintf(
+                stderr,
+                "error: token kind (%s) not compatible with binary op kind\n",
+                token_kind_to_cstr(kind));
             assert(false);
         }
     }
@@ -228,7 +231,8 @@ token_kind_to_unary_op_kind(token_kind_t token_kind)
         case TOKEN_BANG:
             return AST_UNARY_LOGICAL_NOT;
         default:
-            assert(false && "unable to covert the token_kind_t to unary_op_kind_t");
+            assert(false &&
+                   "unable to covert the token_kind_t to unary_op_kind_t");
     }
 }
 
@@ -251,12 +255,18 @@ parser_parse_expr_1(parser_t *parser, ast_node_t *lhs, size_t prev_precedence)
         lexer_peek_next(parser->lexer, &lookahead_token);
 
         while (token_kind_is_binary_op(lookahead_token.kind) &&
-               get_binary_op_precedence(lookahead_token.kind) > get_binary_op_precedence(token_op.kind)) {
-            rhs = parser_parse_expr_1(parser, rhs, get_binary_op_precedence(token_op.kind));
+               get_binary_op_precedence(lookahead_token.kind) >
+                   get_binary_op_precedence(token_op.kind)) {
+            rhs = parser_parse_expr_1(
+                parser, rhs, get_binary_op_precedence(token_op.kind));
             lexer_peek_next(parser->lexer, &lookahead_token);
         }
 
-        lhs = ast_new_node_bin_op(parser->arena, token_op.loc, token_kind_to_binary_op_kind(token_op.kind), lhs, rhs);
+        lhs = ast_new_node_bin_op(parser->arena,
+                                  token_op.loc,
+                                  token_kind_to_binary_op_kind(token_op.kind),
+                                  lhs,
+                                  rhs);
         if (lhs == NULL) {
             return NULL;
         }
@@ -284,7 +294,8 @@ parser_parse_factor(parser_t *parser)
 
     switch (token.kind) {
         case TOKEN_NUMBER:
-            return ast_new_node_literal_u32(parser->arena, token.loc, string_view_to_u32(token.value));
+            return ast_new_node_literal_u32(
+                parser->arena, token.loc, string_view_to_u32(token.value));
 
         case TOKEN_ID: {
             token_t token_id = token;
@@ -293,9 +304,11 @@ parser_parse_factor(parser_t *parser)
 
             if (token.kind == TOKEN_OPAREN) {
                 list_t *args = parser_parse_fn_args(parser);
-                return ast_new_node_fn_call(parser->arena, token_id.loc, token_id.value, args);
+                return ast_new_node_fn_call(
+                    parser->arena, token_id.loc, token_id.value, args);
             }
-            return ast_new_node_ref(parser->arena, token_id.loc, token_id.value);
+            return ast_new_node_ref(
+                parser->arena, token_id.loc, token_id.value);
         }
         case TOKEN_AND:
         case TOKEN_STAR:
@@ -325,7 +338,9 @@ parser_parse_factor(parser_t *parser)
             return expr;
         }
         default: {
-            fprintf(stderr, "error: parse_factor: unsupported or invalid token (%s)\n", token_kind_to_cstr(token.kind));
+            fprintf(stderr,
+                    "error: parse_factor: unsupported or invalid token (%s)\n",
+                    token_kind_to_cstr(token.kind));
             assert(false);
         }
     }
@@ -340,7 +355,9 @@ parser_parse_fn_args(parser_t *parser)
 
     list_t *args = arena_alloc(parser->arena, sizeof(list_t));
     if (args == NULL) {
-        fprintf(stderr, "[FATAL] Out of memory: parser_parse_fn_args: %s\n", strerror(errno));
+        fprintf(stderr,
+                "[FATAL] Out of memory: parser_parse_fn_args: %s\n",
+                strerror(errno));
         exit(EXIT_FAILURE);
     }
 
@@ -382,7 +399,9 @@ parser_parse_fn_params(parser_t *parser)
 
     list_t *params = arena_alloc(parser->arena, sizeof(list_t));
     if (params == NULL) {
-        fprintf(stderr, "[FATAL] Out of memory: parser_parse_fn_params: %s\n", strerror(errno));
+        fprintf(stderr,
+                "[FATAL] Out of memory: parser_parse_fn_params: %s\n",
+                strerror(errno));
         exit(EXIT_FAILURE);
     }
 
@@ -410,7 +429,8 @@ parser_parse_fn_params(parser_t *parser)
             return NULL;
         }
 
-        ast_fn_param_t *param = ast_new_fn_param(parser->arena, token.value, type);
+        ast_fn_param_t *param =
+            ast_new_fn_param(parser->arena, token.value, type);
         list_append(params, param);
 
         skip_line_feeds(parser->lexer);
@@ -460,7 +480,12 @@ parser_parse_fn_definition(parser_t *parser)
         return NULL;
     }
 
-    return ast_new_node_fn_def(parser->arena, fn_name_token.loc, fn_name_token.value, params, ret_type, block);
+    return ast_new_node_fn_def(parser->arena,
+                               fn_name_token.loc,
+                               fn_name_token.value,
+                               params,
+                               ret_type,
+                               block);
 }
 
 static type_t *
@@ -492,7 +517,8 @@ parser_parse_type(parser_t *parser)
         }
         string_view_t ptr_id = token.value;
 
-        ptr_id.size = ptr_token.value.chars - token.value.chars + ptr_token.value.size;
+        ptr_id.size =
+            ptr_token.value.chars - token.value.chars + ptr_token.value.size;
 
         return type_new_ptr(parser->arena, ptr_id, type);
     }
@@ -581,7 +607,8 @@ parser_parse_return_stmt(parser_t *parser)
         return NULL;
     }
 
-    ast_node_t *node_return_stmt = ast_new_node_return_stmt(parser->arena, token_ret.loc, expr);
+    ast_node_t *node_return_stmt =
+        ast_new_node_return_stmt(parser->arena, token_ret.loc, expr);
     assert(node_return_stmt);
 
     return node_return_stmt;
@@ -632,7 +659,8 @@ parser_parse_if_stmt(parser_t *parser)
         }
     }
 
-    ast_node_t *node_if_stmt = ast_new_node_if_stmt(parser->arena, token_if.loc, cond, then, _else);
+    ast_node_t *node_if_stmt =
+        ast_new_node_if_stmt(parser->arena, token_if.loc, cond, then, _else);
 
     assert(node_if_stmt);
 
@@ -664,7 +692,8 @@ parser_parse_while_stmt(parser_t *parser)
     token_t next_token;
     peek_next_non_lf_token(parser->lexer, &next_token);
 
-    ast_node_t *node_while_stmt = ast_new_node_while_stmt(parser->arena, token_while.loc, cond, then);
+    ast_node_t *node_while_stmt =
+        ast_new_node_while_stmt(parser->arena, token_while.loc, cond, then);
 
     assert(node_while_stmt);
 
@@ -698,7 +727,8 @@ parser_parse_var_def(parser_t *parser)
         return NULL;
     }
 
-    ast_node_t *var_node = ast_new_node_var_def(parser->arena, token_id.loc, token_id.value, type, expr);
+    ast_node_t *var_node = ast_new_node_var_def(
+        parser->arena, token_id.loc, token_id.value, type, expr);
 
     return var_node;
 }
@@ -711,7 +741,9 @@ skip_expected_token(parser_t *parser, token_kind_t expected_kind)
 }
 
 static bool
-expected_next_token(parser_t *parser, token_t *token, token_kind_t expected_kind)
+expected_next_token(parser_t *parser,
+                    token_t *token,
+                    token_kind_t expected_kind)
 {
     lexer_next_token(parser->lexer, token);
     return expected_token(token, expected_kind);
@@ -722,7 +754,8 @@ expected_token(token_t *token, token_kind_t expected_kind)
 {
     if (token->kind != expected_kind) {
         fprintf(stderr,
-                "%s:%lu:%lu: syntax error: got '" SV_FMT "' token but expect '%s'\n",
+                "%s:%lu:%lu: syntax error: got '" SV_FMT
+                "' token but expect '%s'\n",
                 token->loc.src.filepath,
                 token_loc_to_lineno(token->loc),
                 token_loc_to_colno(token->loc),

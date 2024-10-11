@@ -28,7 +28,8 @@ scope_new(arena_t *arena)
     assert(arena);
     scope_t *scope = (scope_t *)arena_alloc(arena, sizeof(scope_t));
     if (scope == NULL) {
-        fprintf(stderr, "[FATAL] Out of memory: scope_new: %s\n", strerror(errno));
+        fprintf(
+            stderr, "[FATAL] Out of memory: scope_new: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
     scope->arena = arena;
@@ -38,7 +39,8 @@ scope_new(arena_t *arena)
     list_t *children = (list_t *)arena_alloc(arena, sizeof(list_t));
 
     if (children == NULL) {
-        fprintf(stderr, "[FATAL] Out of memory: scope_new: %s\n", strerror(errno));
+        fprintf(
+            stderr, "[FATAL] Out of memory: scope_new: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
@@ -54,7 +56,8 @@ symbol_new(arena_t *arena, string_view_t id, type_t *type)
     assert(arena);
     symbol_t *symbol = (symbol_t *)arena_alloc(arena, sizeof(symbol_t));
     if (symbol == NULL) {
-        fprintf(stderr, "[FATAL] Out of memory: symbol_new: %s\n", strerror(errno));
+        fprintf(
+            stderr, "[FATAL] Out of memory: symbol_new: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
     symbol->id = id;

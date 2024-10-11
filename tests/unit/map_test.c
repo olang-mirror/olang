@@ -92,12 +92,26 @@ test_map_get_kvs(const MunitParameter params[], void *user_data_or_fixture)
 }
 
 static MunitTest tests[] = {
-    { "/test_create_new", test_create_new, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { "/test_map_put_and_get", test_map_put_and_get, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { "/test_create_new",
+      test_create_new,
+      NULL,
+      NULL,
+      MUNIT_TEST_OPTION_NONE,
+      NULL },
+    { "/test_map_put_and_get",
+      test_map_put_and_get,
+      NULL,
+      NULL,
+      MUNIT_TEST_OPTION_NONE,
+      NULL },
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
 
-static const MunitSuite suite = { "/map", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE };
+static const MunitSuite suite = { "/map",
+                                  tests,
+                                  NULL,
+                                  1,
+                                  MUNIT_SUITE_OPTION_NONE };
 
 int
 main(int argc, char *argv[])

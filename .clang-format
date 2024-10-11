@@ -33,7 +33,7 @@ AlignOperands:   Align
 AlignTrailingComments: true
 AllowAllArgumentsOnNextLine: true
 AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortEnumsOnASingleLine: true
+AllowShortEnumsOnASingleLine: false
 AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: Inline

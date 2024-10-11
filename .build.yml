@@ -21,6 +21,9 @@ tasks:
   - check: |
       cd olang
       make check
+  - check-spec: |
+      cd olang
+      ./contrib/bin/run-ebnf <(find tests/olc/ -name '*.ol' | xargs -L1 grep -Ev '(^#|^$)' | cat) 1> /dev/null
   - docs-publish: |
       cd olang
       if [ "$BUILD_REASON" = "" ]

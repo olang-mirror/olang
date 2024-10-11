@@ -28,7 +28,6 @@ TEST_INVOCATION=""
 TEST_LINE_NUMBER=""
 TEST_CONTENTS_PATH=""
 TEST_ARGS=""
-TEST_SOME_PASSED=""
 
 # UI
 COLOR_RED=1
@@ -37,17 +36,21 @@ COLOR_YELLOW=3
 COLOR_CYAN=6
 COLOR_GRAY=7
 
+if [ -t 1 ]; then
+  if tput setaf 1 > /dev/null 2>&1; then
+    HAS_COLORS=1
+  fi
+fi
+
 colored() {
   text="$1"
 
-  if [ -t 1 ]; then
-    if tput setaf 1 > /dev/null 2>&1; then
-      color=$(tput setaf "$2")
-      reset=$(tput sgr0)
+  if [ -n "$HAS_COLORS" ]; then
+    color=$(tput setaf "$2")
+    reset=$(tput sgr0)
 
-      printf "%s%s%s" "$color" "$text" "$reset"
-      return
-    fi
+    printf "%s%s%s" "$color" "$text" "$reset"
+    return
   fi
 
   printf "%s" "$text"
@@ -58,22 +61,12 @@ colored() {
 print_failed() {
   reason="$1"
 
-  if [ -n "$TEST_SOME_PASSED" ]; then
-    echo
-  fi
-
-  colored "$TEST_FILE:$TEST_LINE_NUMBER:1: " $COLOR_GRAY
-  colored "[$TEST_INVOCATION] " $COLOR_CYAN
-  colored "failed" $COLOR_RED
-  if [ -n "$reason" ]; then
-    printf ": %s" "$reason"
-  fi
-  echo
-}
-
-print_passed() {
-  colored "." $COLOR_GREEN
-  TEST_SOME_PASSED="true"
+  printf "%s:%s:1: %s %s: %s\n" \
+    "$TEST_FILE" \
+    "$TEST_LINE_NUMBER" \
+    "$(colored "failed" "$COLOR_RED")" \
+    "$(colored "$TEST_INVOCATION" "$COLOR_CYAN")" \
+    "$reason"
 }
 # end test output
 
@@ -88,9 +81,9 @@ expect_output_contains() {
 
     if [ "$(grep "$(printf "%s" "$expected_line" | sed 's/\\/\\\\/g')" "$actual_file" | wc -c)" = "0" ]; then
       print_failed
-      colored "(not found) $expected_line" $COLOR_YELLOW
+      colored "(not found) $expected_line" "$COLOR_YELLOW"
       echo
-      colored "$(awk '{print "(actual) " $0}' "$actual_file")" $COLOR_GRAY
+      colored "$(awk '{print "(actual) " $0}' "$actual_file")" "$COLOR_GRAY"
       echo
       exit 1
     fi
@@ -118,6 +111,8 @@ cleanup() {
 
 main() {
   all_test_end="$(grep -n "# END" "$TEST_FILE" | awk -F: '{print $1}')"
+
+  ts=$(date +%s%N)
 
   grep -n "# TEST " "$TEST_FILE" | while read -r line ; do
     TEST_LINE_NUMBER="$(echo "$line" | awk -F: '{ print $1 }')"
@@ -147,14 +142,22 @@ main() {
 
     if type "$TEST_NAME" | grep -q 'function'; then
         "$TEST_NAME"
-        print_passed
     else
         print_failed "test not implemented"
     fi
   done || exit 1;
 
+  elapsed=$((($(date +%s%N) - ts)/1000000))
+
+  padsize=$((59 - ${#TEST_FILE}))
+
+  printf "%s %*s [ %s ] [ % 4dms ]\n" \
+    "$TEST_FILE" \
+    $(( padsize > 0 ? padsize : 0 )) "" \
+    "$(colored "OK" "$COLOR_GREEN")"\
+    $elapsed
+
   cleanup
-  echo
 }
 
 get_test_args() {

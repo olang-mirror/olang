@@ -238,7 +238,10 @@ read_entire_file(char *filepath, arena_t *arena)
 
     fclose(stream);
 
-    return (source_code_t){ .filepath = filepath, .code = code };
+    return (source_code_t){
+        .filepath = filepath,
+        .code = code,
+    };
 }
 
 static void

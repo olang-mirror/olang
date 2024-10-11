@@ -26,14 +26,20 @@ string_view_eq_to_cstr_test(const MunitParameter params[], void *user_data_or_fi
 {
     char *name = "John Doe";
 
-    string_view_t str = { .chars = name, .size = strlen(name) };
+    string_view_t str = {
+        .chars = name,
+        .size = strlen(name),
+    };
 
     assert_true(string_view_eq_to_cstr(str, "John Doe"));
     assert_false(string_view_eq_to_cstr(str, "Doe"));
 
     char *return_stmt = "return EXIT_SUCCESS;";
 
-    str = (string_view_t){ .chars = return_stmt + 7, .size = 12 };
+    str = (string_view_t){
+        .chars = return_stmt + 7,
+        .size = 12,
+    };
     assert_true(string_view_eq_to_cstr(str, "EXIT_SUCCESS"));
 
     return MUNIT_OK;
@@ -44,11 +50,17 @@ string_view_to_u32_test(const MunitParameter params[], void *user_data_or_fixtur
 {
     char *number = "69";
 
-    string_view_t str = { .chars = number, .size = strlen(number) };
+    string_view_t str = {
+        .chars = number,
+        .size = strlen(number),
+    };
 
     assert_uint32(string_view_to_u32(str), ==, 69);
 
-    str = (string_view_t){ .chars = "39;", .size = 2 };
+    str = (string_view_t){
+        .chars = "39;",
+        .size = 2,
+    };
 
     assert_uint32(string_view_to_u32(str), ==, 39);
 

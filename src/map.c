@@ -86,7 +86,12 @@ map_put(map_t *map, char *key, void *value)
     map_entry_t *entry = map->entries + map_get_index(map, hash);
 
     if (entry->key == NULL) {
-        *entry = (map_entry_t){ .key = _strdup(key, map->arena), .hash = hash, .value = value, .next = NULL };
+        *entry = (map_entry_t){
+            .key = _strdup(key, map->arena),
+            .hash = hash,
+            .value = value,
+            .next = NULL,
+        };
         return true;
     }
 
@@ -97,7 +102,12 @@ map_put(map_t *map, char *key, void *value)
         }
         if (entry->next == NULL) {
             entry->next = (map_entry_t *)arena_alloc(map->arena, sizeof(map_entry_t));
-            *entry->next = (map_entry_t){ .key = _strdup(key, map->arena), .hash = hash, .value = value, .next = NULL };
+            *entry->next = (map_entry_t){
+                .key = _strdup(key, map->arena),
+                .hash = hash,
+                .value = value,
+                .next = NULL,
+            };
 
             break;
         }

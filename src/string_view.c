@@ -24,7 +24,10 @@
 string_view_t
 string_view_from_cstr(char *cstr)
 {
-    return (string_view_t){ .chars = cstr, .size = strlen(cstr) };
+    return (string_view_t){
+        .chars = cstr,
+        .size = strlen(cstr),
+    };
 }
 
 bool

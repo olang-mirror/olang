@@ -35,7 +35,10 @@ cli_opts_parse_sysroot(cli_opts_t *opts, cli_args_t *args);
 cli_opts_t
 cli_parse_args(int argc, char **argv)
 {
-    cli_args_t args = { .argc = argc, .argv = argv };
+    cli_args_t args = {
+        .argc = argc,
+        .argv = argv,
+    };
     cli_opts_t opts = { 0 };
 
     opts.compiler_path = cli_args_shift(&args);

@@ -90,8 +90,10 @@ lexer_next_token(lexer_t *lexer, token_t *token)
                 current_char = lexer_current_char(lexer);
             }
 
-            string_view_t text = { .chars = lexer->src.code.chars + start_cur.offset,
-                                   .size = lexer->cur.offset - start_cur.offset };
+            string_view_t text = {
+                .chars = lexer->src.code.chars + start_cur.offset,
+                .size = lexer->cur.offset - start_cur.offset,
+            };
 
             lexer_init_str_value_token(lexer, token, lexer_str_to_token_kind(text), start_cur);
             return;
@@ -403,22 +405,52 @@ _isspace(char c)
 static void
 lexer_init_char_value_token(lexer_t *lexer, token_t *token, token_kind_t kind)
 {
-    string_view_t str = { .chars = lexer->src.code.chars + lexer->cur.offset, .size = 1 };
-    *token = (token_t){ .kind = kind, .value = str, .loc = (token_loc_t){ .src = lexer->src, .cur = lexer->cur } };
+    string_view_t str = {
+        .chars = lexer->src.code.chars + lexer->cur.offset,
+        .size = 1,
+    };
+    *token = (token_t){
+        .kind = kind,
+        .value = str,
+        .loc =
+            (token_loc_t){
+                .src = lexer->src,
+                .cur = lexer->cur,
+            },
+    };
 }
 
 static void
 lexer_init_str_value_token(lexer_t *lexer, token_t *token, token_kind_t kind, lexer_cursor_t cur)
 {
-    string_view_t str = { .chars = lexer->src.code.chars + cur.offset, .size = lexer->cur.offset - cur.offset };
-    *token = (token_t){ .kind = kind, .value = str, .loc = (token_loc_t){ .src = lexer->src, .cur = cur } };
+    string_view_t str = {
+        .chars = lexer->src.code.chars + cur.offset,
+        .size = lexer->cur.offset - cur.offset,
+    };
+    *token = (token_t){
+        .kind = kind,
+        .value = str,
+        .loc =
+            (token_loc_t){
+                .src = lexer->src,
+                .cur = cur,
+            },
+    };
 }
 
 static void
 lexer_init_eof_token(lexer_t *lexer, token_t *token)
 {
     string_view_t str = { 0 };
-    *token = (token_t){ .kind = TOKEN_EOF, .value = str, .loc = (token_loc_t){ .src = lexer->src, .cur = lexer->cur } };
+    *token = (token_t){
+        .kind = TOKEN_EOF,
+        .value = str,
+        .loc =
+            (token_loc_t){
+                .src = lexer->src,
+                .cur = lexer->cur,
+            },
+    };
 }
 
 static token_kind_t
@@ -473,7 +505,10 @@ string_view_t
 token_loc_to_line(token_loc_t loc)
 {
     size_t offset = loc.cur.bol;
-    string_view_t line = { .chars = loc.src.code.chars + offset, .size = 0 };
+    string_view_t line = {
+        .chars = loc.src.code.chars + offset,
+        .size = 0,
+    };
 
     while ((line.size + offset) < loc.src.code.size && line.chars[line.size] != '\n' && line.chars[line.size] != 0) {
         ++line.size;

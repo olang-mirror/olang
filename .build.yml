@@ -6,6 +6,8 @@ packages:
   - hut
   - clang
   - texinfo
+  - clojure
+  - rlwrap
 environment:
   site: o-lang.org
 sources:

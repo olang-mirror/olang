@@ -105,6 +105,9 @@ checker_check(checker_t *checker, ast_node_t *ast)
 static void
 populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
 {
+    assert(checker);
+    assert(scope);
+
     switch (ast->kind) {
         case AST_NODE_TRANSLATION_UNIT: {
             list_item_t *item = list_head(ast->as_translation_unit.decls);
@@ -219,6 +222,8 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
 
             scope_insert(scope, symbol);
             ast->as_var_def.scope = scope;
+
+            populate_scope(checker, scope, ast->as_var_def.value);
             return;
         }
 

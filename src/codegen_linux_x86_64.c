@@ -699,6 +699,22 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen,
 
                     return expr_bytes;
                 }
+                case AST_UNARY_ADDRESSOF: {
+                    assert(unary_op.expr->kind == AST_NODE_REF &&
+                           "unsupported unary expression for addressof (&)");
+
+                    ast_ref_t ref = unary_op.expr->as_ref;
+
+                    symbol_t *symbol = scope_lookup(ref.scope, ref.id);
+                    assert(symbol);
+
+                    size_t offset =
+                        codegen_linux_x86_64_get_stack_offset(codegen, symbol);
+
+                    fprintf(
+                        codegen->out, "    lea -%ld(%%rbp), %%rax\n", offset);
+                    return 8;
+                }
                 default: {
                     assert(0 && "unsupported unary operation");
                     return 0;

@@ -65,7 +65,7 @@ static ast_node_t *
 parser_parse_expr(parser_t *parser);
 
 static ast_node_t *
-parser_parse_factor(parser_t *parser);
+parser_parse_primary_expr(parser_t *parser);
 
 static void
 skip_line_feeds(lexer_t *lexer);
@@ -247,7 +247,7 @@ parser_parse_expr_1(parser_t *parser, ast_node_t *lhs, size_t prev_precedence)
         token_t token_op;
         lexer_next_token(parser->lexer, &token_op);
 
-        ast_node_t *rhs = parser_parse_factor(parser);
+        ast_node_t *rhs = parser_parse_primary_expr(parser);
         if (rhs == NULL) {
             return NULL;
         }
@@ -278,7 +278,7 @@ parser_parse_expr_1(parser_t *parser, ast_node_t *lhs, size_t prev_precedence)
 static ast_node_t *
 parser_parse_expr(parser_t *parser)
 {
-    ast_node_t *lhs = parser_parse_factor(parser);
+    ast_node_t *lhs = parser_parse_primary_expr(parser);
     if (lhs == NULL) {
         return NULL;
     }
@@ -287,7 +287,7 @@ parser_parse_expr(parser_t *parser)
 }
 
 static ast_node_t *
-parser_parse_factor(parser_t *parser)
+parser_parse_primary_expr(parser_t *parser)
 {
     token_t token;
     lexer_next_token(parser->lexer, &token);
@@ -316,7 +316,7 @@ parser_parse_factor(parser_t *parser)
         case TOKEN_DASH:
         case TOKEN_TILDE:
         case TOKEN_BANG: {
-            ast_node_t *expr = parser_parse_factor(parser);
+            ast_node_t *expr = parser_parse_primary_expr(parser);
             if (expr == NULL) {
                 return NULL;
             }

@@ -28,6 +28,9 @@
 static bool
 skip_expected_token(parser_t *parser, token_kind_t expected_kind);
 
+static void
+skip_next_token(parser_t *parser);
+
 static bool
 expected_next_token(parser_t *parser, token_t *token, token_kind_t kind);
 
@@ -63,6 +66,9 @@ parser_parse_fn_params(parser_t *parser);
 
 static ast_node_t *
 parser_parse_expr(parser_t *parser);
+
+static ast_node_t *
+parser_parse_unary_expr(parser_t *parser);
 
 static ast_node_t *
 parser_parse_primary_expr(parser_t *parser);
@@ -247,7 +253,7 @@ parser_parse_expr_1(parser_t *parser, ast_node_t *lhs, size_t prev_precedence)
         token_t token_op;
         lexer_next_token(parser->lexer, &token_op);
 
-        ast_node_t *rhs = parser_parse_primary_expr(parser);
+        ast_node_t *rhs = parser_parse_unary_expr(parser);
         if (rhs == NULL) {
             return NULL;
         }
@@ -278,12 +284,39 @@ parser_parse_expr_1(parser_t *parser, ast_node_t *lhs, size_t prev_precedence)
 static ast_node_t *
 parser_parse_expr(parser_t *parser)
 {
-    ast_node_t *lhs = parser_parse_primary_expr(parser);
+    ast_node_t *lhs = parser_parse_unary_expr(parser);
     if (lhs == NULL) {
         return NULL;
     }
 
     return parser_parse_expr_1(parser, lhs, BINOP_MIN_PREC);
+}
+
+static ast_node_t *
+parser_parse_unary_expr(parser_t *parser)
+{
+    token_t token;
+    lexer_peek_next(parser->lexer, &token);
+    switch (token.kind) {
+        case TOKEN_AND:
+        case TOKEN_STAR:
+        case TOKEN_PLUS:
+        case TOKEN_DASH:
+        case TOKEN_TILDE:
+        case TOKEN_BANG: {
+            skip_next_token(parser);
+            ast_node_t *expr = parser_parse_unary_expr(parser);
+            if (expr == NULL) {
+                return NULL;
+            }
+
+            ast_unary_op_kind_t kind = token_kind_to_unary_op_kind(token.kind);
+            return ast_new_node_unary_op(parser->arena, token.loc, kind, expr);
+        }
+        default: {
+            return parser_parse_primary_expr(parser);
+        }
+    }
 }
 
 static ast_node_t *
@@ -309,20 +342,6 @@ parser_parse_primary_expr(parser_t *parser)
             }
             return ast_new_node_ref(
                 parser->arena, token_id.loc, token_id.value);
-        }
-        case TOKEN_AND:
-        case TOKEN_STAR:
-        case TOKEN_PLUS:
-        case TOKEN_DASH:
-        case TOKEN_TILDE:
-        case TOKEN_BANG: {
-            ast_node_t *expr = parser_parse_primary_expr(parser);
-            if (expr == NULL) {
-                return NULL;
-            }
-
-            ast_unary_op_kind_t kind = token_kind_to_unary_op_kind(token.kind);
-            return ast_new_node_unary_op(parser->arena, token.loc, kind, expr);
         }
 
         case TOKEN_OPAREN: {
@@ -738,6 +757,13 @@ skip_expected_token(parser_t *parser, token_kind_t expected_kind)
 {
     token_t token;
     return expected_next_token(parser, &token, expected_kind);
+}
+
+static void
+skip_next_token(parser_t *parser)
+{
+    token_t token;
+    lexer_next_token(parser->lexer, &token);
 }
 
 static bool

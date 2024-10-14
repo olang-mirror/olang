@@ -52,19 +52,18 @@
 <cmp-relational-expression> ::= <bitwise-shift-expression> (<ows> ('<' | '>' | '<=' | '>=') <ows> <bitwise-shift-expression>)*
 <bitwise-shift-expression>  ::= <additive-expression> (<ows> ('<<' | '>>') <ows> <additive-expression>)*
 <additive-expression>       ::= <multiplicative-expression> (<ows> ('+' | '-') <ows> <multiplicative-expression>)*
-<multiplicative-expression> ::= <primary-expression> (<ows> ('*' | '/' | '%') <ows> <primary-expression>)*
-<primary-expression>        ::= <integer-literal>
-                              | <variable-name>
-                              | <function-call>
-                              | <unary-expression>
-                              | '(' <ows> <expression> <ows> ')'
-<unary-expression>          ::= <unary-operator> <ows> <primary-expression>
+<multiplicative-expression> ::= <unary-expression> (<ows> ('*' | '/' | '%') <ows> <unary-expression>)*
+<unary-expression>          ::= (<unary-operator> <ows>)* <primary-expression>
 <unary-operator>            ::= '&'
                               | '*'
                               | '+'
                               | '-'
                               | '~'
                               | '!'
+<primary-expression>        ::= <integer-literal>
+                              | <variable-name>
+                              | <function-call>
+                              | '(' <ows> <expression> <ows> ')'
 
 (* Identifiers *)
 <type>       ::= ('u8' | 'u16' | 'u32' | 'u64') (<ows> '*')*

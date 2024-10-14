@@ -20,9 +20,9 @@ fn main(): u32 {
   return a
 }
 
-# xTEST test_compile(exit_code=0)
+# TEST test_compile(exit_code=0)
 #
-# xTEST test_run_binary(exit_code=0)
+# TEST test_run_binary(exit_code=0)
 #
 # TEST test_ast WITH
 # Translation_Unit

@@ -657,23 +657,54 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen,
                     return 1;
                 }
                 case AST_BINOP_ASSIGN: {
-                    // FIXME: It may not be a ref
-                    ast_ref_t ref = bin_op.lhs->as_ref;
-                    scope_t *scope = ref.scope;
+                    switch (bin_op.lhs->kind) {
+                        case AST_NODE_REF: {
+                            ast_ref_t ref = bin_op.lhs->as_ref;
+                            scope_t *scope = ref.scope;
 
-                    symbol_t *symbol = scope_lookup(scope, ref.id);
-                    assert(symbol);
+                            symbol_t *symbol = scope_lookup(scope, ref.id);
+                            assert(symbol);
 
-                    size_t offset =
-                        codegen_linux_x86_64_get_stack_offset(codegen, symbol);
+                            size_t offset =
+                                codegen_linux_x86_64_get_stack_offset(codegen,
+                                                                      symbol);
 
-                    codegen_linux_x86_64_emit_expression(codegen, bin_op.rhs);
+                            codegen_linux_x86_64_emit_expression(codegen,
+                                                                 bin_op.rhs);
 
-                    size_t type_size = type_to_bytes(symbol->type);
-                    fprintf(codegen->out,
-                            "    mov %s, -%ld(%%rbp)\n",
-                            get_reg_for(REG_ACCUMULATOR, type_size),
-                            offset);
+                            size_t type_size = type_to_bytes(symbol->type);
+                            fprintf(codegen->out,
+                                    "    mov %s, -%ld(%%rbp)\n",
+                                    get_reg_for(REG_ACCUMULATOR, type_size),
+                                    offset);
+                            break;
+                        }
+                        case AST_NODE_UNARY_OP: {
+                            assert(bin_op.lhs->as_unary_op.kind ==
+                                       AST_UNARY_DEREFERENCE &&
+                                   "unsupported assignment lhs");
+
+                            codegen_linux_x86_64_emit_expression(codegen,
+                                                                 bin_op.lhs);
+
+                            fprintf(codegen->out, "    push %%rax\n");
+
+                            size_t type_size =
+                                codegen_linux_x86_64_emit_expression(
+                                    codegen, bin_op.rhs);
+
+                            fprintf(codegen->out, "    pop %%rdx\n");
+
+                            fprintf(codegen->out,
+                                    "    mov %s, (%%rdx) \n",
+                                    get_reg_for(REG_ACCUMULATOR, type_size));
+
+                            break;
+                        }
+                        default: {
+                            assert(false && "unsupported assignment lhs");
+                        }
+                    }
 
                     // FIXME: we don't support a = b = c
                     return 0;
@@ -714,6 +745,14 @@ codegen_linux_x86_64_emit_expression(codegen_x86_64_t *codegen,
                     fprintf(
                         codegen->out, "    lea -%ld(%%rbp), %%rax\n", offset);
                     return 8;
+                }
+                case AST_UNARY_DEREFERENCE: {
+                    // FIXME: support dereference of dereference (**)
+                    assert(unary_op.expr->kind == AST_NODE_REF &&
+                           "unsupported unary expression for dereference (*)");
+
+                    return codegen_linux_x86_64_emit_expression(codegen,
+                                                                unary_op.expr);
                 }
                 default: {
                     assert(0 && "unsupported unary operation");

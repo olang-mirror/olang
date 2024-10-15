@@ -28,7 +28,6 @@
 
 // The call instruction pushes EIP into stack so the first 8 bytes from stack
 // must be preserved else the ret instruction will jump to nowere.
-#define X86_CALL_EIP_STACK_OFFSET (8)
 #define X86_CALL_ARG_SIZE 6
 
 #define bytes_max(a, b) ((a) > (b) ? (a) : (b))
@@ -795,6 +794,9 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                 symbol_t *symbol = scope_lookup(scope, var_def.id);
                 assert(symbol);
 
+                size_t type_size = type_to_bytes(symbol->type);
+                codegen->base_offset += type_size;
+
                 codegen_linux_x86_64_put_stack_offset(
                     codegen, symbol, codegen->base_offset);
 
@@ -803,13 +805,10 @@ codegen_linux_x86_64_emit_block(codegen_x86_64_t *codegen, ast_block_t *block)
                                                          var_def.value);
                 }
 
-                size_t type_size = type_to_bytes(symbol->type);
-
                 fprintf(codegen->out,
                         "    mov %s, -%ld(%%rbp)\n",
                         get_reg_for(REG_ACCUMULATOR, type_size),
                         codegen->base_offset);
-                codegen->base_offset += type_size;
 
                 break;
             }
@@ -957,7 +956,7 @@ static void
 codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen,
                                    ast_fn_definition_t *fn_def)
 {
-    codegen->base_offset = X86_CALL_EIP_STACK_OFFSET;
+    codegen->base_offset = 0;
 
     ast_node_t *block_node = fn_def->block;
     fprintf(codegen->out, "" SV_FMT ":\n", SV_ARG(fn_def->id));
@@ -975,6 +974,8 @@ codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen,
         symbol_t *symbol = scope_lookup(fn_def->scope, param->id);
         assert(symbol);
 
+        // FIXME: add offset according to the param size
+        codegen->base_offset += 8;
         size_t offset = codegen->base_offset;
 
         codegen_linux_x86_64_put_stack_offset(
@@ -986,8 +987,6 @@ codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen,
                 get_reg_for(x86_call_args[i], symbol->type->as_primitive.size),
                 offset);
 
-        // FIXME: add offset according to the param size
-        codegen->base_offset += 8;
         ++i;
     }
 

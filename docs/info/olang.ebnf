@@ -1,5 +1,5 @@
 (* Entry Point *)
-<translation-unit> ::= (<ows> (<external-declaration> | <comment>) <ows> (<end-of-statement> | <end-of-file>))*
+<translation-unit> ::= (<ows> (<external-declaration>) <ows> (<end-of-statement> | <end-of-file>))*
 
 (* Translation Unit *)
 <external-declaration> ::= <common-statement> | <function-definition>
@@ -76,7 +76,6 @@
 <integer-base16>  ::= #'0[Xx]' <hex-digit> (<hex-digit> | '_')*
 
 (* Utilities *)
-<comment>      ::= '#' #'[^\n]*'
 <ws>           ::= <white-space>+
 <ows>          ::= <white-space>*
 <white-space>  ::= <linear-space> | <line-break>

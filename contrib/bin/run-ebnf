@@ -19,4 +19,4 @@ BASEDIR="$(dirname "$0")"
 
 DEPS='{:deps {instaparse/instaparse {:mvn/version "1.5.0"}}}'
 
-cat $BASEDIR/../../docs/info/olang.ebnf | sed 's/<\([a-z-]*\)>/\1/g' | FILE="$1" clj -Sdeps "$DEPS" -M $BASEDIR/ebnf.clj
+cat $BASEDIR/../../docs/info/olang.ebnf | sed 's/<\([a-z-]*\)>/\1/g' | FILE=<(cat $1 | sed 's/#.*$//') clj -Sdeps "$DEPS" -M $BASEDIR/ebnf.clj

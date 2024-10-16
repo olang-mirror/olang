@@ -68,6 +68,8 @@ var answer: u32 = 42
 
 Any non zero expr is true.
 
+@subsection If-Else
+
 @verbatim
 if expr {
   # statement
@@ -79,6 +81,14 @@ if expr {
 @end verbatim
 
 While loop
+
+@verbatim
+while expr {
+  # statement
+}
+@end verbatim
+
+@subsection While loop
 
 @verbatim
 while expr {

@@ -11,7 +11,7 @@
 <variable-initializer> ::= '=' <ows> <expression>
 
 (* Functions *)
-<function-definition> ::= 'fn' <ws> <function-name> <ows> '(' ( <ows> | <ows> <function-params> <ows> ) ')' <ows> ':' <ows> <return-type> <ows> <function-body>
+<function-definition> ::= ('extern' <ws>)? 'fn' <ws> <function-name> <ows> '(' ( <ows> | <ows> <function-params> <ows> ) ')' <ows> ':' <ows> <return-type> <ows> <function-body>?
 <function-name>       ::= <identifier>
 <function-params>     ::= <identifier> <ows> ':' <ows> <type> ( <ows> ',' <ows> <function-params>)*
 <return-type>         ::= <type>

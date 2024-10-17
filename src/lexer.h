@@ -53,6 +53,7 @@ typedef enum token_kind
     TOKEN_ELSE,
     TOKEN_WHILE,
     TOKEN_VAR,
+    TOKEN_EXTERN,
 
     // Equality operators
     TOKEN_CMP_EQ,

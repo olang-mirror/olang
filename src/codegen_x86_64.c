@@ -887,6 +887,10 @@ static void
 codegen_x86_64_emit_function(codegen_x86_64_t *codegen,
                              ast_fn_definition_t *fn_def)
 {
+    if (fn_def->_extern) {
+        return;
+    }
+
     fprintf(codegen->out, ".globl " SV_FMT "\n", SV_ARG(fn_def->id));
     codegen->base_offset = 0;
 

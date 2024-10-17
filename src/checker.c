@@ -141,7 +141,9 @@ populate_scope(checker_t *checker, scope_t *scope, ast_node_t *ast)
                 item = list_next(item);
             }
 
-            populate_scope(checker, fn_def->scope, ast->as_fn_def.block);
+            if (ast->as_fn_def.block != NULL) {
+                populate_scope(checker, fn_def->scope, ast->as_fn_def.block);
+            }
             return;
         }
 

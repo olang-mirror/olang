@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "codegen_linux_aarch64.h"
+#include "codegen_aarch64.h"
 #include "list.h"
 
 #define SYS_exit (93)
@@ -36,15 +36,15 @@
  */
 
 static void
-codegen_linux_aarch64_emit_start_entrypoint(FILE *out);
+codegen_aarch64_emit_start_entrypoint(FILE *out);
 
 static void
-codegen_linux_aarch64_emit_function(FILE *out, ast_fn_definition_t *fn);
+codegen_aarch64_emit_function(FILE *out, ast_fn_definition_t *fn);
 
 void
-codegen_linux_aarch64_emit_translation_unit(FILE *out, ast_node_t *node)
+codegen_aarch64_emit_translation_unit(FILE *out, ast_node_t *node)
 {
-    codegen_linux_aarch64_emit_start_entrypoint(out);
+    codegen_aarch64_emit_start_entrypoint(out);
 
     assert(node->kind == AST_NODE_TRANSLATION_UNIT);
     ast_translation_unit_t translation_unit = node->as_translation_unit;
@@ -58,7 +58,7 @@ codegen_linux_aarch64_emit_translation_unit(FILE *out, ast_node_t *node)
 
         if (decl->kind == AST_NODE_FN_DEF) {
             ast_fn_definition_t fn = decl->as_fn_def;
-            codegen_linux_aarch64_emit_function(out, &fn);
+            codegen_aarch64_emit_function(out, &fn);
 
             main_found = main_found || string_view_eq_to_cstr(fn.id, "main");
         } else {
@@ -72,7 +72,7 @@ codegen_linux_aarch64_emit_translation_unit(FILE *out, ast_node_t *node)
 }
 
 static void
-codegen_linux_aarch64_emit_start_entrypoint(FILE *out)
+codegen_aarch64_emit_start_entrypoint(FILE *out)
 {
     fprintf(out, ".text\n");
     fprintf(out, ".globl _start\n\n");
@@ -84,7 +84,7 @@ codegen_linux_aarch64_emit_start_entrypoint(FILE *out)
 }
 
 static void
-codegen_linux_aarch64_emit_function(FILE *out, ast_fn_definition_t *fn)
+codegen_aarch64_emit_function(FILE *out, ast_fn_definition_t *fn)
 {
     ast_node_t *block_node = fn->block;
     assert(block_node->kind == AST_NODE_BLOCK);

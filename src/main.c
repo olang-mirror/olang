@@ -24,8 +24,8 @@
 #include "arena.h"
 #include "checker.h"
 #include "cli.h"
-#include "codegen_linux_aarch64.h"
-#include "codegen_linux_x86_64.h"
+#include "codegen_aarch64.h"
+#include "codegen_x86_64.h"
 #include "lexer.h"
 #include "parser.h"
 #include "pretty_print_ast.h"
@@ -148,15 +148,15 @@ handle_codegen_linux(cli_opts_t *opts)
 
     if (!(opts->options & CLI_OPT_ARCH)) {
         codegen_x86_64_t codegen = { 0 };
-        codegen_linux_x86_64_init(&codegen, &arena, out);
-        codegen_linux_x86_64_emit_translation_unit(&codegen, ast);
+        codegen_x86_64_init(&codegen, &arena, out);
+        codegen_x86_64_emit_translation_unit(&codegen, ast);
     } else {
         if (strcmp(opts->arch, "x86_64") == 0) {
             codegen_x86_64_t codegen = { 0 };
-            codegen_linux_x86_64_init(&codegen, &arena, out);
-            codegen_linux_x86_64_emit_translation_unit(&codegen, ast);
+            codegen_x86_64_init(&codegen, &arena, out);
+            codegen_x86_64_emit_translation_unit(&codegen, ast);
         } else if (strcmp(opts->arch, "aarch64") == 0) {
-            codegen_linux_aarch64_emit_translation_unit(out, ast);
+            codegen_aarch64_emit_translation_unit(out, ast);
         } else {
             fprintf(
                 stderr, "error: architecture '%s' not supported\n", opts->arch);

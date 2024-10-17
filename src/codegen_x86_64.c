@@ -967,7 +967,7 @@ get_reg_for(x86_64_register_type_t type, size_t bytes)
     switch (type) {
         case REG_ACCUMULATOR: {
             if (bytes <= 1) {
-                return "%ah";
+                return "%al";
             } else if (bytes <= 2) {
                 return "%ax";
             } else if (bytes <= 4) {
@@ -977,7 +977,7 @@ get_reg_for(x86_64_register_type_t type, size_t bytes)
         }
         case REG_BASE: {
             if (bytes <= 1) {
-                return "%bh";
+                return "%bl";
             } else if (bytes <= 2) {
                 return "%bx";
             } else if (bytes <= 4) {
@@ -987,7 +987,7 @@ get_reg_for(x86_64_register_type_t type, size_t bytes)
         }
         case REG_COUNTER: {
             if (bytes <= 1) {
-                return "%ch";
+                return "%cl";
             } else if (bytes <= 2) {
                 return "%cx";
             } else if (bytes <= 4) {
@@ -997,7 +997,7 @@ get_reg_for(x86_64_register_type_t type, size_t bytes)
         }
         case REG_DATA: {
             if (bytes <= 1) {
-                return "%dh";
+                return "%dl";
             } else if (bytes <= 2) {
                 return "%dx";
             } else if (bytes <= 4) {

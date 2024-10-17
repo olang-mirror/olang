@@ -53,6 +53,8 @@ cli_parse_args(int argc, char **argv)
             opts.options |= CLI_OPT_SAVE_TEMPS;
         } else if (strcmp(arg, "-o") == 0) {
             cli_opts_parse_output(&opts, &args);
+        } else if (strcmp(arg, "-c") == 0) {
+            opts.options |= CLI_OPT_COMPILE_ONLY;
         } else if (strcmp(arg, "--arch") == 0) {
             opts.options |= CLI_OPT_ARCH;
             cli_opts_parse_arch(&opts, &args);
@@ -153,6 +155,7 @@ cli_print_usage(FILE *stream, char *compiler_path)
         "  --sysroot <dir>  System root dir where the GNU Assembler and GNU "
         "Linker are located: default to '/'\n"
         "  -o <file>        Compile program into a binary file\n"
+        "  -c               Assemble the source files, but do not link\n"
         "  --save-temps     Keep temp files used to compile program\n",
         compiler_path);
 }

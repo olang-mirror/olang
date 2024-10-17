@@ -107,24 +107,18 @@ codegen_linux_x86_64_emit_translation_unit(codegen_x86_64_t *codegen,
 
     list_item_t *item = list_head(translation_unit.decls);
 
-    bool main_found = false;
-
     while (item != NULL) {
         ast_node_t *decl = (ast_node_t *)item->value;
 
         if (decl->kind == AST_NODE_FN_DEF) {
             ast_fn_definition_t fn = decl->as_fn_def;
             codegen_linux_x86_64_emit_function(codegen, &fn);
-
-            main_found = main_found || string_view_eq_to_cstr(fn.id, "main");
         } else {
             assert(0 && "translation unit only supports function declarations");
         }
 
         item = list_next(item);
     }
-
-    assert(main_found && "main function is required.");
 }
 
 static size_t

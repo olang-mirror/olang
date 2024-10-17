@@ -173,10 +173,11 @@ handle_codegen_linux(cli_opts_t *opts)
 
     char command[512];
     sprintf(command,
-            "%s/bin/as %s -o " SV_FMT ".o",
+            "%s/bin/as %s -o " SV_FMT "%s",
             opts->sysroot,
             asm_file,
-            SV_ARG(opts->output_bin));
+            SV_ARG(opts->output_bin),
+            opts->options & CLI_OPT_COMPILE_ONLY ? "" : ".o");
 
     int exit_code = system(command);
 
@@ -184,16 +185,18 @@ handle_codegen_linux(cli_opts_t *opts)
         exit(exit_code);
     }
 
-    sprintf(command,
-            "%s/bin/cc " SV_FMT ".o -o " SV_FMT,
-            opts->sysroot,
-            SV_ARG(opts->output_bin),
-            SV_ARG(opts->output_bin));
+    if (!(opts->options & CLI_OPT_COMPILE_ONLY)) {
+        sprintf(command,
+                "%s/bin/cc " SV_FMT ".o -o " SV_FMT,
+                opts->sysroot,
+                SV_ARG(opts->output_bin),
+                SV_ARG(opts->output_bin));
 
-    exit_code = system(command);
+        exit_code = system(command);
 
-    if (exit_code != 0) {
-        exit(exit_code);
+        if (exit_code != 0) {
+            exit(exit_code);
+        }
     }
 
     if (!(opts->options & CLI_OPT_SAVE_TEMPS)) {

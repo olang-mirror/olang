@@ -43,7 +43,8 @@ typedef enum
     CLI_OPT_SAVE_TEMPS = 1 << 2,
     CLI_OPT_ARCH = 1 << 3,
     CLI_OPT_SYSROOT = 1 << 4,
-    CLI_OPT_DUMP_AST = 1 << 5
+    CLI_OPT_DUMP_AST = 1 << 5,
+    CLI_OPT_COMPILE_ONLY = 1 << 6
 } cli_opt_t;
 
 cli_opts_t

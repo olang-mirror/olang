@@ -34,6 +34,12 @@ Display AST tree to stdout right after syntax analyzes
 Compile program into a binary file
 
 .TP
+.BI \-c
+Compile or assemble the source files, but do not link.  The linking stage
+simply  is  not  done.   The ultimate output is in the form of an object file
+for each source file.
+
+.TP
 .BR \-\-save\-temps
 Keep temp files used to compile program
 

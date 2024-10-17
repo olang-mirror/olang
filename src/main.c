@@ -185,7 +185,7 @@ handle_codegen_linux(cli_opts_t *opts)
     }
 
     sprintf(command,
-            "%s/bin/ld " SV_FMT ".o -o " SV_FMT "",
+            "%s/bin/cc " SV_FMT ".o -o " SV_FMT,
             opts->sysroot,
             SV_ARG(opts->output_bin),
             SV_ARG(opts->output_bin));

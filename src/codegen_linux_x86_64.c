@@ -62,9 +62,6 @@ static int x86_call_args[X86_CALL_ARG_SIZE] = { REG_DEST_IDX, REG_SRC_IDX,
                                                 REG_R8,       REG_R9 };
 
 static void
-codegen_linux_x86_64_emit_start_entrypoint(codegen_x86_64_t *codegen);
-
-static void
 codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen,
                                    ast_fn_definition_t *fn);
 
@@ -103,7 +100,7 @@ codegen_linux_x86_64_emit_translation_unit(codegen_x86_64_t *codegen,
                                            ast_node_t *node)
 {
     codegen->label_index = 0;
-    codegen_linux_x86_64_emit_start_entrypoint(codegen);
+    fprintf(codegen->out, ".text\n");
 
     assert(node->kind == AST_NODE_TRANSLATION_UNIT);
     ast_translation_unit_t translation_unit = node->as_translation_unit;
@@ -128,19 +125,6 @@ codegen_linux_x86_64_emit_translation_unit(codegen_x86_64_t *codegen,
     }
 
     assert(main_found && "main function is required.");
-}
-
-static void
-codegen_linux_x86_64_emit_start_entrypoint(codegen_x86_64_t *codegen)
-{
-    fprintf(codegen->out, ".text\n");
-    fprintf(codegen->out, ".globl _start\n\n");
-
-    fprintf(codegen->out, "_start:\n");
-    fprintf(codegen->out, "    call main\n");
-    fprintf(codegen->out, "    mov %%eax, %%edi\n");
-    fprintf(codegen->out, "    mov $%d, %%eax\n", SYS_exit);
-    fprintf(codegen->out, "    syscall\n");
 }
 
 static size_t
@@ -956,6 +940,7 @@ static void
 codegen_linux_x86_64_emit_function(codegen_x86_64_t *codegen,
                                    ast_fn_definition_t *fn_def)
 {
+    fprintf(codegen->out, ".globl " SV_FMT "\n", SV_ARG(fn_def->id));
     codegen->base_offset = 0;
 
     ast_node_t *block_node = fn_def->block;

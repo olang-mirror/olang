@@ -75,6 +75,7 @@ typedef struct ast_fn_definition
     string_view_t id;
     list_t *params;
     type_t *return_type;
+    bool _extern;
     ast_node_t *block;
     scope_t *scope;
 } ast_fn_definition_t;
@@ -226,6 +227,7 @@ ast_new_node_fn_def(arena_t *arena,
                     string_view_t id,
                     list_t *params,
                     type_t *return_type,
+                    bool _extern,
                     ast_node_t *block);
 
 ast_node_t *

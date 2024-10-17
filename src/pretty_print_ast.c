@@ -155,9 +155,11 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
 
             char name[256];
             sprintf(name,
-                    "Function_Definition <name:" SV_FMT "> <return:" SV_FMT ">",
+                    "Function_Definition <name:" SV_FMT "> <return:" SV_FMT
+                    ">%s",
                     SV_ARG(fn_def.id),
-                    SV_ARG(fn_def.return_type->id));
+                    SV_ARG(fn_def.return_type->id),
+                    fn_def._extern ? " <extern>" : "");
             node->name =
                 (char *)arena_alloc(arena, sizeof(char) * (strlen(name) + 1));
             strcpy(node->name, name);
@@ -169,9 +171,11 @@ ast_node_to_pretty_print_node(ast_node_t *ast, arena_t *arena)
                 param = list_next(param);
             }
 
-            pretty_print_node_t *block =
-                ast_node_to_pretty_print_node(fn_def.block, arena);
-            list_append(node->children, block);
+            if (fn_def.block != NULL) {
+                pretty_print_node_t *block =
+                    ast_node_to_pretty_print_node(fn_def.block, arena);
+                list_append(node->children, block);
+            }
             return node;
         }
         case AST_NODE_FN_CALL: {

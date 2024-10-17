@@ -23,7 +23,7 @@ fn main(): u32 {
 #
 # XTEST test_run_binary(exit_code=0)
 #
-# XTEST test_ast WITH
+# TEST test_ast WITH
 # Translation_Unit
 # |-Function_Definition <name:putchar> <return:u32> <extern>
 # | `-Param_Definition <name:c> <type:u32>

@@ -467,6 +467,16 @@ parser_parse_fn_params(parser_t *parser)
 ast_node_t *
 parser_parse_fn_definition(parser_t *parser)
 {
+    bool _extern = false;
+
+    token_t _extern_token;
+    lexer_peek_next(parser->lexer, &_extern_token);
+
+    if (_extern_token.kind == TOKEN_EXTERN) {
+        _extern = true;
+        skip_next_token(parser);
+    }
+
     if (!skip_expected_token(parser, TOKEN_FN)) {
         return NULL;
     }
@@ -494,9 +504,12 @@ parser_parse_fn_definition(parser_t *parser)
 
     skip_line_feeds(parser->lexer);
 
-    ast_node_t *block = parser_parse_block(parser);
-    if (block == NULL) {
-        return NULL;
+    ast_node_t *block = NULL;
+    if (!_extern) {
+        block = parser_parse_block(parser);
+        if (block == NULL) {
+            return NULL;
+        }
     }
 
     return ast_new_node_fn_def(parser->arena,
@@ -504,6 +517,7 @@ parser_parse_fn_definition(parser_t *parser)
                                fn_name_token.value,
                                params,
                                ret_type,
+                               _extern,
                                block);
 }
 
